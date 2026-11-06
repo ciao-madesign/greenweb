@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital Footprint Counter</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+  <main>
+    <h1 data-i18n="app.title"></h1>
+    <h2 data-i18n="dashboard.today"></h2>
+    <p id="empty" hidden data-i18n="dashboard.empty"></p>
+    <table id="table" hidden>
+      <thead><tr>
+        <th data-i18n="col.domain"></th><th data-i18n="col.category"></th>
+        <th data-i18n="col.requests"></th><th data-i18n="col.data"></th><th data-i18n="col.time"></th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="note" data-i18n="dashboard.note"></p>
+  </main>
+  <script type="module" src="dashboard.js"></script>
+</body>
+</html>

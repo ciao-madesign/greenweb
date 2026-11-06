@@ -1,0 +1,21 @@
+{
+  "app.title": "Digital Footprint Counter",
+  "dashboard.today": "Oggi",
+  "dashboard.empty": "Ancora nessun dato. Naviga un po' e ritorna.",
+  "dashboard.note": "Versione iniziale: mostra dati trasferiti e tempo attivo misurati. Le stime ambientali arrivano nella prossima fase.",
+  "col.domain": "Sito",
+  "col.category": "Categoria",
+  "col.requests": "Richieste",
+  "col.data": "Dati",
+  "col.time": "Tempo attivo",
+  "category.browsing": "Navigazione",
+  "category.search": "Ricerca",
+  "category.communication": "Comunicazione",
+  "category.streaming": "Streaming",
+  "category.social": "Social",
+  "category.ai_text": "AI testuale",
+  "category.ai_image": "AI immagini",
+  "category.ai_video": "AI video",
+  "category.download": "Download",
+  "category.other": "Altro"
+}
