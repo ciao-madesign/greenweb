@@ -2,7 +2,7 @@
   "app.title": "Digital Footprint Counter",
   "dashboard.today": "Today",
   "dashboard.empty": "No data yet. Browse a little and come back.",
-  "dashboard.note": "Early version: showing measured data transfer and active time. Environmental estimates arrive in the next phase.",
+  "dashboard.note": "Estimates, not measurements: every value is a range (hover to see min–max) based on documented coefficients. Sources and methods are in data/coefficients.json.",
   "col.domain": "Site",
   "col.category": "Category",
   "col.requests": "Requests",
@@ -17,5 +17,16 @@
   "category.ai_image": "AI (images)",
   "category.ai_video": "AI (video)",
   "category.download": "Download",
-  "category.other": "Other"
+  "category.other": "Other",
+  "dashboard.total": "Total",
+  "col.energy": "Energy",
+  "col.co2e": "CO₂e",
+  "col.water": "Water",
+  "col.cost": "Cost",
+  "col.reliability": "Reliability",
+  "reliability.high": "High",
+  "reliability.medium": "Medium",
+  "reliability.low": "Low",
+  "reliability.unavailable": "N/A",
+  "dashboard.incomplete": "Includes activities whose remote part cannot be estimated yet."
 }

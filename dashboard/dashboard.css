@@ -8,3 +8,5 @@ table { width: 100%; border-collapse: collapse; }
 th, td { padding: .4rem .5rem; border-block-end: 1px solid var(--line); text-align: start; }
 td.num { text-align: end; font-variant-numeric: tabular-nums; }
 .note { color: var(--muted); font-size: .9rem; margin-block-start: 1.5rem; }
+tr.total td { font-weight: 600; border-block-start: 2px solid var(--line); }
+td[title] { cursor: help; }
