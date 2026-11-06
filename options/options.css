@@ -1,0 +1,3 @@
+label { display: grid; gap: .2rem; margin-block: .8rem; max-width: 24rem; }
+select, input, button { font: inherit; padding: .4rem .5rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+button { cursor: pointer; border-color: #c62828; color: #c62828; }

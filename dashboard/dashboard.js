@@ -1,6 +1,7 @@
 import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
 import { dayKey, classify } from '../src/core.js';
+import { makeFormatter } from '../src/format.js';
 import { estimateEntry, convert, sumEstimates, sumTri, resolveProfile } from '../src/engine.js';
 
 const lang = await initI18n();
@@ -12,12 +13,7 @@ const [{ stats = {}, settings = {} }, catalog, coeffs] = await Promise.all([
 ]);
 const profile = resolveProfile(coeffs, settings);
 
-const sig = new Intl.NumberFormat(lang, { maximumSignificantDigits: 2 });
-const money = new Intl.NumberFormat(lang, { style: 'currency', currency: profile.currency, maximumSignificantDigits: 2 });
-const scale = (v, unit) => unit === 'Wh' ? (v >= 1000 ? `${sig.format(v / 1000)} kWh` : `${sig.format(v)} Wh`)
-  : unit === 'g' ? (v >= 1000 ? `${sig.format(v / 1000)} kg` : `${sig.format(v)} g`)
-  : unit === 'mL' ? (v >= 1000 ? `${sig.format(v / 1000)} L` : `${sig.format(v)} mL`)
-  : money.format(v);
+const scale = makeFormatter(lang, profile.currency);
 const cell = (tr, text, title) => { const td = tr.insertCell(); td.textContent = text; td.className = 'num'; if (title) td.title = title; return td; };
 const range = (x, unit) => `${scale(x.min, unit)} – ${scale(x.max, unit)}`;
 
@@ -50,4 +46,5 @@ if (!rows.length) {
   total.className = 'total';
   document.getElementById('table').hidden = false;
 }
-document.getElementById('profile').textContent = `${profile.label} · ${profile.co2_g_per_kwh} gCO₂e/kWh · ${profile.currency}`;
+document.getElementById('settings-link').onclick = (e) => { e.preventDefault(); api.runtime.openOptionsPage(); };
+document.getElementById('profile').textContent = `${t('profile.' + (settings.profile in coeffs.profiles ? settings.profile : 'it'))} · ${profile.co2_g_per_kwh} gCO₂e/kWh · ${profile.currency}`;

@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital Footprint Counter</title>
+  <link rel="stylesheet" href="../dashboard/dashboard.css">
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <main>
+    <h1 data-i18n="options.title"></h1>
+    <label><span data-i18n="options.metric"></span><select id="metric"></select></label>
+    <label><span data-i18n="options.profile"></span><select id="profile"></select></label>
+    <label><span data-i18n="options.language"></span><select id="lang"></select></label>
+
+    <h2 data-i18n="options.advanced"></h2>
+    <p class="note" data-i18n="options.advanced_hint"></p>
+    <label><span data-i18n="options.co2factor"></span><input id="co2" type="number" min="0" step="any"></label>
+    <label><span id="price-label"></span><input id="price" type="number" min="0" step="any"></label>
+    <label><span data-i18n="options.threshold_low"></span><input id="low" type="number" min="0" step="any"></label>
+    <label><span data-i18n="options.threshold_high"></span><input id="high" type="number" min="0" step="any"></label>
+    <p class="note" data-i18n="options.threshold_hint"></p>
+
+    <h2 data-i18n="options.data"></h2>
+    <button id="delete" data-i18n="options.delete"></button>
+    <p id="status" class="note" role="status"></p>
+  </main>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

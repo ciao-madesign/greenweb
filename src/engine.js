@@ -58,3 +58,31 @@ export function resolveProfile(c, settings = {}) {
   const base = c.profiles[settings.profile] ?? c.profiles[DEFAULT_PROFILE];
   return { ...base, ...(settings.overrides ?? {}) };
 }
+
+// --- Metriche, soglie e semaforo ---------------------------------------------
+export const METRICS = {
+  co2e:  { key: 'co2_g',    unit: 'g' },
+  water: { key: 'water_ml', unit: 'mL' },
+  cost:  { key: 'cost',     unit: 'cur' },
+};
+export const DEFAULT_METRIC = 'co2e';
+export const metricOf = (settings = {}) => (METRICS[settings.metric] ? settings.metric : DEFAULT_METRIC);
+
+export const zeroEstimate = () => ({ wh: { min: 0, mid: 0, max: 0 }, reliability: 'high', incomplete: false });
+
+/** Stima del totale di un giorno: stats[giorno] = { dominio: { n, b, ms } }. */
+export function estimateDay(dayStats, domains, classify, c) {
+  const list = Object.entries(dayStats ?? {}).map(([host, e]) => estimateEntry(e, classify(host, domains), c));
+  return list.length ? sumEstimates(list) : zeroEstimate();
+}
+
+/** Soglie [verde→giallo, giallo→rosso] nell'unità della metrica: override utente, altrimenti derivate dal riferimento. */
+export function thresholdsFor(metric, settings, profile, c) {
+  const custom = settings?.thresholds?.[metric];
+  if (Array.isArray(custom) && custom.length === 2 && custom[0] < custom[1]) return custom;
+  const ref = c.reference_thresholds_wh_per_day;
+  const at = (wh) => convert({ min: wh, mid: wh, max: wh }, profile, c)[METRICS[metric].key].mid;
+  return [at(ref.low), at(ref.high)];
+}
+
+export const levelOf = (value, [low, high]) => (value < low ? 'green' : value < high ? 'yellow' : 'red');

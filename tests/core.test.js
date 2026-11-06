@@ -31,3 +31,30 @@ test('contentLength e badgeText', () => {
   assert.equal(badgeText(5 * 1024 * 1024), '5M');
   assert.equal(badgeText(3 * 1024 ** 3), '3.0G');
 });
+
+import { badgeValue } from '../src/core.js';
+import { thresholdsFor, levelOf, estimateDay, metricOf, resolveProfile } from '../src/engine.js';
+import { readFileSync } from 'node:fs';
+
+test('badgeValue per metrica', () => {
+  assert.equal(badgeValue('co2e', 2.4), '2.4g');
+  assert.equal(badgeValue('co2e', 125), '125g');
+  assert.equal(badgeValue('co2e', 1800), '1.8k');
+  assert.equal(badgeValue('water', 45), '45m');
+  assert.equal(badgeValue('water', 1200), '1.2L');
+  assert.equal(badgeValue('cost', 0.25), '0.25');
+  assert.equal(badgeValue('co2e', 0), '0');
+});
+
+test('soglie: derivate dal riferimento, override utente, semaforo', () => {
+  const c = JSON.parse(readFileSync(new URL('../data/coefficients.json', import.meta.url)));
+  const p = resolveProfile(c, {});
+  const [lo, hi] = thresholdsFor('co2e', {}, p, c);
+  assert.ok(Math.abs(lo - 0.15 * 331) < 1e-6 && Math.abs(hi - 0.4 * 331) < 1e-6);
+  assert.deepEqual(thresholdsFor('co2e', { thresholds: { co2e: [1, 2] } }, p, c), [1, 2]);
+  assert.equal(levelOf(1, [5, 10]), 'green');
+  assert.equal(levelOf(5, [5, 10]), 'yellow');
+  assert.equal(levelOf(10, [5, 10]), 'red');
+  assert.equal(metricOf({ metric: 'boh' }), 'co2e');
+  assert.equal(estimateDay({}, {}, () => 'other', c).wh.mid, 0);
+});

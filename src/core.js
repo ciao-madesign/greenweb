@@ -79,3 +79,18 @@ export function badgeText(bytes) {
   const gb = mb / 1024;
   return gb < 10 ? `${gb.toFixed(1)}G` : `${Math.round(gb)}G`;
 }
+
+function compact(x) {
+  if (x >= 10) return String(Math.round(x));
+  if (x >= 1) return x.toFixed(1);
+  if (x >= 0.1) return x.toFixed(2);
+  return x > 0 ? '<.1' : '0';
+}
+
+/** Testo del badge per la metrica scelta (breve, indipendente dalla lingua). g/kg, mL/L, costo senza simbolo. */
+export function badgeValue(metric, v) {
+  if (!(v > 0)) return '0';
+  if (metric === 'co2e') return v >= 1000 ? `${compact(v / 1000)}k` : `${compact(v)}g`;
+  if (metric === 'water') return v >= 1000 ? `${compact(v / 1000)}L` : `${compact(v)}m`;
+  return compact(v);
+}

@@ -1,6 +1,9 @@
 // Service worker: raccoglie byte e tempo attivo per dominio. Nessuna rete, nessun contenuto di pagina.
 import { api, action } from './compat.js';
-import { hostFromUrl, dayKey, addSample, mergeStats, pruneOld, contentLength, badgeText } from './core.js';
+import { hostFromUrl, dayKey, addSample, mergeStats, pruneOld, contentLength, classify, badgeValue } from './core.js';
+import { estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
+import { loadStrings, t } from './i18n.js';
+import { makeFormatter } from './format.js';
 
 const FLUSH_DELAY_MS = 20000;   // salvataggio aggregato (non a ogni richiesta)
 const MAX_TICK_MS = 120000;     // tetto di tempo attribuibile tra due eventi
@@ -94,23 +97,47 @@ function flush() {
   const batch = pending;
   pending = {};
   queue = queue.then(async () => {
-    if (!Object.keys(batch).length) return;
-    const { stats = {} } = await api.storage.local.get('stats');
-    mergeStats(stats, batch);
-    pruneOld(stats, KEEP_DAYS);
-    await api.storage.local.set({ stats });
-    updateBadge(stats);
+    if (Object.keys(batch).length) {
+      const { stats = {} } = await api.storage.local.get('stats');
+      mergeStats(stats, batch);
+      pruneOld(stats, KEEP_DAYS);
+      await api.storage.local.set({ stats });
+    }
+    await refreshBadge(); // anche senza nuovi dati: cambia il giorno, il badge si riallinea
   }).catch(() => {});
   return queue;
 }
 
-function updateBadge(stats) {
-  const today = stats[dayKey()] ?? {};
-  const bytes = Object.values(today).reduce((s, e) => s + e.b, 0);
-  action.setBadgeText({ text: badgeText(bytes) });
-  action.setBadgeBackgroundColor({ color: '#2e7d32' });
-  action.setTitle({ title: 'Digital Footprint Counter' });
+// --- Indicatore (foglia + badge) ---------------------------------------------
+const data = {};
+const loadJson = (p) => (data[p] ??= fetch(api.runtime.getURL(p)).then((r) => r.json()));
+const COLORS = { green: '#2e7d32', yellow: '#f9a825', red: '#c62828' };
+const iconSet = (lvl) => Object.fromEntries([16, 32, 48, 128].map((n) => [n, `icons/leaf-${lvl}-${n}.png`]));
+let strings = null;
+
+async function refreshBadge() {
+  const [{ stats = {}, settings = {} }, catalog, coeffs] = await Promise.all([
+    api.storage.local.get(['stats', 'settings']), loadJson('data/catalog.json'), loadJson('data/coefficients.json'),
+  ]);
+  const lang = await (strings ??= loadStrings());
+  const profile = resolveProfile(coeffs, settings);
+  const metric = metricOf(settings);
+  const est = estimateDay(stats[dayKey()], catalog.domains, classify, coeffs);
+  const value = convert(est.wh, profile, coeffs)[METRICS[metric].key].mid;
+  const level = levelOf(value, thresholdsFor(metric, settings, profile, coeffs));
+  const shown = makeFormatter(lang, profile.currency)(value, METRICS[metric].unit);
+  action.setBadgeText({ text: badgeValue(metric, value) });
+  action.setBadgeBackgroundColor({ color: COLORS[level] });
+  action.setIcon({ path: iconSet(level) });
+  action.setTitle({ title: t('tooltip', { metric: t(`metric.${metric}`), value: shown, profile: t(`profile.${settings.profile in coeffs.profiles ? settings.profile : 'it'}`) }) });
 }
+
+// Cambi di impostazioni o cancellazione dati: aggiorna subito.
+api.storage.onChanged.addListener((changes, area) => {
+  if (area !== 'local') return;
+  if (changes.settings) { strings = null; refreshBadge().catch(() => {}); }
+  if (changes.stats && changes.stats.newValue === undefined) { pending = {}; refreshBadge().catch(() => {}); }
+});
 
 // --- Avvio ------------------------------------------------------------------
 // Un solo allarme al minuto: accredita il tempo e salva. Nessun altro polling.
@@ -121,4 +148,4 @@ action.onClicked.addListener(() => api.tabs.create({ url: api.runtime.getURL('da
 
 api.tabs.query({ audible: true }).then((tabs) => tabs.forEach((t) => audible.set(t.id, hostFromUrl(t.url)))).catch(() => {});
 api.idle.queryState(60).then((s) => { state.idle = s === 'active' ? 'active' : 'idle'; refreshActive(); });
-api.storage.local.get('stats').then(({ stats }) => { if (stats) updateBadge(stats); });
+refreshBadge().catch(() => {});

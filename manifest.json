@@ -3,19 +3,46 @@
   "name": "Digital Footprint Counter",
   "version": "0.1.0",
   "description": "Estimates the environmental footprint of your browsing. Local only, no account, no telemetry.",
-  "permissions": ["webRequest", "idle", "storage", "alarms"],
-  "host_permissions": ["http://*/*", "https://*/*"],
+  "permissions": [
+    "webRequest",
+    "idle",
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
   "background": {
     "service_worker": "src/background.js",
-    "scripts": ["src/background.js"],
+    "scripts": [
+      "src/background.js"
+    ],
     "type": "module"
   },
   "action": {
     "default_title": "Digital Footprint Counter",
-    "default_icon": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" }
+    "default_icon": {
+      "16": "icons/leaf-green-16.png",
+      "32": "icons/leaf-green-32.png",
+      "48": "icons/leaf-green-48.png",
+      "128": "icons/leaf-green-128.png"
+    }
   },
-  "icons": { "16": "icons/16.png", "32": "icons/32.png", "48": "icons/48.png", "128": "icons/128.png" },
+  "icons": {
+    "16": "icons/leaf-green-16.png",
+    "32": "icons/leaf-green-32.png",
+    "48": "icons/leaf-green-48.png",
+    "128": "icons/leaf-green-128.png"
+  },
   "browser_specific_settings": {
-    "gecko": { "id": "digital-footprint-counter@greenweb.local", "strict_min_version": "121.0" }
+    "gecko": {
+      "id": "digital-footprint-counter@greenweb.local",
+      "strict_min_version": "121.0"
+    }
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
   }
 }
