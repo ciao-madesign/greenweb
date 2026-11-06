@@ -10,13 +10,19 @@ let pending = {};               // dati non ancora salvati
 let flushTimer = null;
 let queue = Promise.resolve();  // serializza le scritture
 const tabHost = new Map();      // tabId -> dominio del sito aperto
+const audible = new Map();      // tabId -> dominio, per le schede che stanno emettendo audio
 const active = { host: null, since: 0 };
 const state = { idle: 'active', focused: true };
 
 // --- Tempo attivo -----------------------------------------------------------
+// Il tempo va alla scheda attiva (finestra a fuoco, utente non inattivo) e alle schede che
+// riproducono audio (musica/video in secondo piano). Le altre schede in background non contano.
 function accrue(now = Date.now()) {
-  if (active.host && now > active.since) {
-    addSample(pending, dayKey(), active.host, { ms: Math.min(now - active.since, MAX_TICK_MS) });
+  const dt = Math.min(now - active.since, MAX_TICK_MS);
+  if (dt > 0) {
+    const hosts = new Set(audible.values());
+    if (active.host) hosts.add(active.host);
+    for (const h of hosts) if (h) addSample(pending, dayKey(), h, { ms: dt });
   }
   active.since = now;
 }
@@ -50,6 +56,7 @@ api.webRequest.onBeforeRequest.addListener((d) => {
 api.webRequest.onCompleted.addListener((d) => {
   if (d.tabId < 0) return; // richieste del browser/estensioni: ignorate
   const bytes = contentLength(d.responseHeaders);
+  if (d.type === 'main_frame') tabHost.set(d.tabId, hostFromUrl(d.url)); // dominio finale dopo eventuali redirect
   if (tabHost.has(d.tabId)) return record(tabHost.get(d.tabId), bytes);
   api.tabs.get(d.tabId).then((t) => {
     const h = hostFromUrl(t.url);
@@ -58,10 +65,14 @@ api.webRequest.onCompleted.addListener((d) => {
   }).catch(() => {});
 }, FILTER, ['responseHeaders']);
 
-api.tabs.onRemoved.addListener((id) => tabHost.delete(id));
+api.tabs.onRemoved.addListener((id) => { accrue(); tabHost.delete(id); audible.delete(id); });
 api.tabs.onActivated.addListener(refreshActive);
 api.tabs.onUpdated.addListener((id, change, tab) => {
   if (change.url) tabHost.set(id, hostFromUrl(change.url));
+  if ('audible' in change || (change.url && audible.has(id))) {
+    accrue();
+    if (tab.audible) audible.set(id, hostFromUrl(tab.url)); else audible.delete(id);
+  }
   if (tab.active && change.url) refreshActive();
 });
 api.windows.onFocusChanged.addListener((id) => {
@@ -108,5 +119,6 @@ api.alarms.onAlarm.addListener((a) => { if (a.name === 'tick') flush(); });
 
 action.onClicked.addListener(() => api.tabs.create({ url: api.runtime.getURL('dashboard/dashboard.html') }));
 
+api.tabs.query({ audible: true }).then((tabs) => tabs.forEach((t) => audible.set(t.id, hostFromUrl(t.url)))).catch(() => {});
 api.idle.queryState(60).then((s) => { state.idle = s === 'active' ? 'active' : 'idle'; refreshActive(); });
 api.storage.local.get('stats').then(({ stats }) => { if (stats) updateBadge(stats); });
