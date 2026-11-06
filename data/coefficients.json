@@ -1,35 +1,35 @@
 {
   "version": 1,
   "updated": "2026-11-06",
-  "notes": "Valori provvisori. status: sourced = da fonte citata; to_verify = fonte secondaria/datata, da verificare sul dato primario; assumption = ipotesi dichiarata. Intervalli min/mid/max: il motore li propaga fino al risultato.",
+  "notes": "Provisional values. status: sourced = from the cited source; to_verify = secondary or dated source, to be checked against the primary data; assumption = declared assumption. Ranges min/mid/max are propagated by the engine up to the final result.",
   "sources": {
     "swd": {
-      "title": "Sustainable Web Design model v4 (0.055 kWh/GB data center, 0.059 kWh/GB rete)",
+      "title": "Sustainable Web Design model v4 (0.055 kWh/GB data center, 0.059 kWh/GB network)",
       "url": "https://sustainablewebdesign.org/estimating-digital-emissions/",
       "year": 2024
     },
     "kirkeby": {
-      "title": "Kirkeby & Lagermann, Power Assumptions Matter (laptop in navigazione: ~9-13 W)",
+      "title": "Kirkeby & Lagermann, Power Assumptions Matter (laptop while browsing: ~9-13 W)",
       "url": "https://arxiv.org/abs/2510.12566",
       "year": 2025
     },
     "fraunhofer": {
-      "title": "Fraunhofer / Microsoft, studio su consumo browser (desktop ~38 W base; fonte secondaria, datata)",
+      "title": "Fraunhofer / Microsoft study on browser power (desktop ~38 W baseline; secondary, dated source)",
       "url": "https://www.silicon.co.uk/workspace/microsoft-ie-browser-energy-power-saving-118619/amp",
       "year": 2011
     },
     "iea_stream": {
-      "title": "IEA, The carbon footprint of streaming video: fact-checking the headlines (~0.08 kWh per ora)",
+      "title": "IEA, The carbon footprint of streaming video: fact-checking the headlines (~0.08 kWh per hour)",
       "url": "https://www.iea.org/commentaries/the-carbon-footprint-of-streaming-video-fact-checking-the-headlines",
       "year": 2020
     },
     "google": {
-      "title": "Google, Measuring the environmental impact of delivering AI at Google Scale (mediana prompt Gemini: 0,24 Wh)",
+      "title": "Google, Measuring the environmental impact of delivering AI at Google Scale (median Gemini text prompt: 0.24 Wh)",
       "url": "https://arxiv.org/abs/2508.15734",
       "year": 2025
     },
     "luccioni": {
-      "title": "Luccioni et al., Power Hungry Processing (generazione immagini: ~1,35-11,5 kWh / 1000 immagini; valori da fonti secondarie)",
+      "title": "Luccioni et al., Power Hungry Processing (image generation: ~1.35-11.5 kWh per 1000 images; values from secondary sources)",
       "url": "https://arxiv.org/abs/2311.16863",
       "year": 2023
     },
@@ -39,32 +39,32 @@
       "year": 2025
     },
     "ember_it": {
-      "title": "Ember via Statista: intensità carbonica del settore elettrico italiano (2023)",
+      "title": "Ember via Statista: carbon intensity of the Italian power sector",
       "url": "https://statista.com/statistics/1290244/carbon-intensity-power-sector-italy",
       "year": 2023
     },
     "owid2020": {
-      "title": "Our World in Data, intensità elettrica per paese (tabella 2020; fonte secondaria)",
+      "title": "Our World in Data, electricity carbon intensity by country (2020 table; secondary source)",
       "url": "https://www.drorpoleg.com/charts/global-electricity-carbon-intensity/",
       "year": 2020
     },
     "eurostat": {
-      "title": "Eurostat, prezzi dell'elettricità per le famiglie (2024)",
+      "title": "Eurostat, household electricity prices (2024)",
       "url": "https://ec.europa.eu/eurostat/de/web/products-eurostat-news/w/ddn-20250506-2",
       "year": 2024
     },
     "eia": {
-      "title": "U.S. EIA, prezzo medio residenziale 2024: 16,5 c$/kWh",
+      "title": "U.S. EIA, average residential price 2024: 16.5 cents/kWh",
       "url": "https://www.eia.gov/todayinEnergy/detail.php?id=65244",
       "year": 2024
     },
     "gpp_jp": {
-      "title": "GlobalPetrolPrices, prezzo residenziale Giappone (anno non indicato)",
+      "title": "GlobalPetrolPrices, Japan residential price (year not stated)",
       "url": "https://www.globalpetrolprices.com/Japan/electricity_prices/",
       "year": null
     },
     "lbnl": {
-      "title": "LBNL, United States Data Center Energy Usage Report (2016): ~1,8 L/kWh in sito (fonte secondaria)",
+      "title": "LBNL, United States Data Center Energy Usage Report (2016): ~1.8 L/kWh on site (secondary source)",
       "url": null,
       "year": 2016
     }
@@ -80,7 +80,7 @@
         "ember_it",
         "eurostat"
       ],
-      "reference": "CO2 2023; prezzo H1 2024 (Eurostat: oltre 0,32 €/kWh)"
+      "reference": "CO2: 2023; price: H1 2024 (Eurostat: above 0.32 EUR/kWh)"
     },
     "eu": {
       "label": "Unione Europea",
@@ -92,7 +92,7 @@
         "owid2020",
         "eurostat"
       ],
-      "reference": "CO2: valore 2020 'Europa', da aggiornare; prezzo H2 2024"
+      "reference": "CO2: 2020 'Europe' value, to be updated; price: H2 2024"
     },
     "us": {
       "label": "USA",
@@ -104,7 +104,7 @@
         "ember",
         "eia"
       ],
-      "reference": "CO2 2023; prezzo 2024"
+      "reference": "CO2: 2023; price: 2024"
     },
     "cn": {
       "label": "Cina",
@@ -115,7 +115,7 @@
       "sources": [
         "ember"
       ],
-      "reference": "CO2: media gen-ott 2025; prezzo: stima in CNY da verificare (NDRC/NEA)"
+      "reference": "CO2: Jan-Oct 2025 average; price: CNY estimate to be verified (NDRC/NEA)"
     },
     "jp": {
       "label": "Giappone",
@@ -127,7 +127,7 @@
         "owid2020",
         "gpp_jp"
       ],
-      "reference": "CO2: valore 2020, da aggiornare; prezzo senza anno (METI)"
+      "reference": "CO2: 2020 value, to be updated; price: no year stated (METI)"
     },
     "world": {
       "label": "Media mondiale",
@@ -138,7 +138,7 @@
       "sources": [
         "ember"
       ],
-      "reference": "CO2 2023 (Ember Global Electricity Review 2024); prezzo: ordine di grandezza da verificare"
+      "reference": "CO2: 2023 (Ember Global Electricity Review 2024); price: order of magnitude, to be verified"
     }
   },
   "energy": {
@@ -155,7 +155,7 @@
       ],
       "reliability": "low",
       "status": "assumption",
-      "method": "Potenza del dispositivo mentre la scheda è attiva. Laptop ~9-13 W; desktop+monitor più alto. Il valore centrale è un'ipotesi tra i due casi; sarà configurabile."
+      "method": "Device power while the tab is active. Laptop ~9-13 W; desktop+monitor higher. The central value is an assumption between the two cases; it will become configurable."
     },
     "network_dc_kwh_per_gb": {
       "unit": "kWh/GB",
@@ -169,7 +169,7 @@
       ],
       "reliability": "medium",
       "status": "assumption",
-      "method": "Data center 0,055 + rete 0,059 kWh/GB (SWD v4, solo operativo). Il segmento 'dispositivo' di SWD NON è usato: il dispositivo è calcolato dal tempo, per evitare doppi conteggi. Intervallo = x0,5 / x2 (ipotesi, il modello kWh/GB è discusso in letteratura)."
+      "method": "Data center 0.055 + network 0.059 kWh/GB (SWD v4, operational only). The SWD 'device' segment is NOT used: the device is computed from time to avoid double counting. Range = x0.5 / x2 (assumption: the kWh/GB model is debated in the literature)."
     },
     "streaming_kwh_per_hour": {
       "unit": "kWh/h",
@@ -183,7 +183,7 @@
       ],
       "reliability": "medium",
       "status": "to_verify",
-      "method": "Rete + data center per ora di streaming; sostituisce il calcolo a byte (che sovrastimerebbe lo streaming). Max = stima IEA precedente (0,12-0,24). Possibile lieve doppio conteggio con il dispositivo."
+      "method": "Network + data center per hour of streaming; replaces the byte-based calculation (which would overestimate streaming). Max = earlier IEA estimate (0.12-0.24). Possible slight double counting with the device."
     },
     "ai_text_wh_per_prompt": {
       "unit": "Wh",
@@ -197,7 +197,7 @@
       ],
       "reliability": "low",
       "status": "assumption",
-      "method": "Mediana Gemini 0,24 Wh (metodo completo); 0,10 Wh = solo chip attivi. Max = ipotesi (x3) per modelli più pesanti."
+      "method": "Gemini median 0.24 Wh (comprehensive method); 0.10 Wh = active chips only. Max = assumption (x3) for heavier models."
     },
     "ai_text_prompts_per_hour": {
       "unit": "prompt/h",
@@ -209,7 +209,7 @@
       "sources": [],
       "reliability": "low",
       "status": "assumption",
-      "method": "Il browser non vede i prompt: si assume un ritmo d'uso per ora di sessione attiva. DA APPROFONDIRE."
+      "method": "The browser cannot see prompts: a usage rate per hour of active session is assumed. TO BE DEEPENED."
     },
     "ai_image_wh_per_image": {
       "unit": "Wh",
@@ -223,10 +223,10 @@
       ],
       "reliability": "low",
       "status": "to_verify",
-      "method": "Da 1,35 (mediana) a 11,49 kWh/1000 immagini; valori da fonti secondarie. Dipende da modello e dimensione."
+      "method": "From 1.35 (median) to 11.49 kWh per 1000 images; values from secondary sources. Depends on model and image size."
     },
     "ai_image_images_per_hour": {
-      "unit": "immagini/h",
+      "unit": "images/h",
       "value": {
         "min": 1,
         "mid": 5,
@@ -235,7 +235,7 @@
       "sources": [],
       "reliability": "low",
       "status": "assumption",
-      "method": "Ritmo d'uso assunto per ora attiva. DA APPROFONDIRE."
+      "method": "Assumed usage rate per active hour. TO BE DEEPENED."
     },
     "ai_video": {
       "unit": "-",
@@ -243,7 +243,7 @@
       "sources": [],
       "reliability": "unavailable",
       "status": "to_verify",
-      "method": "Nessun coefficiente affidabile raccolto: la parte remota non è stimata (sono contati solo dispositivo e rete). DA APPROFONDIRE."
+      "method": "No reliable coefficient collected: the remote part is not estimated (only device and network are counted). TO BE DEEPENED."
     }
   },
   "water_l_per_kwh": {
@@ -258,7 +258,7 @@
     ],
     "reliability": "low",
     "status": "to_verify",
-    "method": "Acqua diretta (raffreddamento, ~1,8 L/kWh) e indiretta (generazione elettrica, fino a ~7,6 L/kWh) da fonti secondarie. Il centro è un punto medio assunto; da raffinare per paese."
+    "method": "Direct water (cooling, ~1.8 L/kWh) and indirect water (power generation, up to ~7.6 L/kWh) from secondary sources. The central value is an assumed midpoint; to be refined per country."
   },
   "categories": {
     "browsing": {
@@ -307,6 +307,6 @@
     "low": 150,
     "high": 400,
     "status": "assumption",
-    "method": "Soglie predefinite del semaforo (verde/giallo/rosso) espresse in energia giornaliera, convertite con il profilo scelto. Riferimento: ~8 h di dispositivo a 20 W = 160 Wh. NON sono soglie scientifiche o normative: l'utente può impostare le proprie."
+    "method": "Default traffic-light thresholds (green/yellow/red) expressed as daily energy, converted with the selected profile. Reference: ~8 h of device at 20 W = 160 Wh. These are NOT scientific or regulatory thresholds: users can set their own."
   }
 }

@@ -86,3 +86,17 @@ export function thresholdsFor(metric, settings, profile, c) {
 }
 
 export const levelOf = (value, [low, high]) => (value < low ? 'green' : value < high ? 'yellow' : 'red');
+
+// --- Equivalenze quotidiane ---------------------------------------------------
+/** total = { wh, co2_g, water_ml, cost } (valori centrali). Parametri e fonti in data/equivalences.json. */
+export function equivalences(total, profile, eq) {
+  const p = (id) => eq.params[id].value;
+  const f = {
+    car_km: () => total.co2_g / p('car_g_per_km'),
+    light_hours_co2: () => total.co2_g / ((p('led_w') / 1000) * profile.co2_g_per_kwh),
+    led_hours: () => total.wh / p('led_w'),
+    bottles: () => total.water_ml / p('bottle_ml'),
+    washing_cycles: () => total.cost / (p('washing_kwh') * profile.price_per_kwh),
+  };
+  return eq.items.map((it) => ({ id: it.id, value: f[it.id]?.(), params: it.params })).filter((x) => Number.isFinite(x.value));
+}

@@ -12,3 +12,15 @@ export function makeFormatter(lang, currency) {
     }
   };
 }
+
+/** Unità di misura per le equivalenze (Intl, localizzate). */
+export function makeUnits(lang) {
+  const u = (unit) => new Intl.NumberFormat(lang, { style: 'unit', unit, unitDisplay: 'short', maximumSignificantDigits: 2 });
+  const [km, m, h, min, s] = ['kilometer', 'meter', 'hour', 'minute', 'second'].map(u);
+  const n = new Intl.NumberFormat(lang, { maximumSignificantDigits: 2 });
+  return {
+    num: (v) => n.format(v),
+    distanceKm: (v) => (v >= 1 ? km.format(v) : m.format(v * 1000)),
+    hours: (v) => (v >= 1 ? h.format(v) : v * 60 >= 1 ? min.format(v * 60) : s.format(v * 3600)),
+  };
+}

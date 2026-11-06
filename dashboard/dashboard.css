@@ -10,3 +10,16 @@ td.num { text-align: end; font-variant-numeric: tabular-nums; }
 .note { color: var(--muted); font-size: .9rem; margin-block-start: 1.5rem; }
 tr.total td { font-weight: 600; border-block-start: 2px solid var(--line); }
 td[title] { cursor: help; }
+header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: .5rem; }
+a { color: var(--accent); }
+.scroll { overflow-x: auto; }
+.controls { display: flex; flex-wrap: wrap; gap: 1rem; margin-block: 1.5rem .5rem; }
+.controls label { display: grid; gap: .2rem; }
+select { font: inherit; padding: .3rem .5rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
+.bar-row { display: grid; grid-template-columns: minmax(6rem, 10rem) 1fr minmax(4.5rem, auto); align-items: center; gap: .6rem; margin-block: .3rem; }
+.track { background: var(--line); border-radius: 4px; block-size: .9rem; }
+.fill { background: var(--accent); block-size: 100%; border-radius: 4px; }
+.rel-low, .rel-unavailable { color: #c62828; }
+.rel-medium { color: #b26a00; }
+@media (prefers-color-scheme: dark) { .rel-low, .rel-unavailable { color: #ef9a9a; } .rel-medium { color: #ffcc80; } }
+#equivalences { padding-inline-start: 1.2rem; }

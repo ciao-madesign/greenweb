@@ -58,3 +58,28 @@ test('soglie: derivate dal riferimento, override utente, semaforo', () => {
   assert.equal(metricOf({ metric: 'boh' }), 'co2e');
   assert.equal(estimateDay({}, {}, () => 'other', c).wh.mid, 0);
 });
+
+import { lastNDays, aggregateDays } from '../src/core.js';
+import { equivalences } from '../src/engine.js';
+
+test('lastNDays e aggregateDays', () => {
+  const days = lastNDays(3, new Date('2026-03-02T12:00:00'));
+  assert.deepEqual(days, ['2026-03-02', '2026-03-01', '2026-02-28']);
+  const stats = { '2026-03-02': { 'a.com': { n: 1, b: 10, ms: 5 } }, '2026-03-01': { 'a.com': { n: 2, b: 5, ms: 1 }, 'b.com': { n: 1, b: 1, ms: 1 } }, '2020-01-01': { 'x.com': { n: 9, b: 9, ms: 9 } } };
+  const agg = aggregateDays(stats, days);
+  assert.deepEqual(agg['a.com'], { n: 3, b: 15, ms: 6 });
+  assert.equal(agg['x.com'], undefined);
+});
+
+test('equivalenze: auto, lampadina, bottiglie, lavatrice', () => {
+  const c = JSON.parse(readFileSync(new URL('../data/coefficients.json', import.meta.url)));
+  const eq = JSON.parse(readFileSync(new URL('../data/equivalences.json', import.meta.url)));
+  const p = resolveProfile(c, {});
+  const r = Object.fromEntries(equivalences({ wh: 100, co2_g: 106.4, water_ml: 1000, cost: 0.32 }, p, eq).map((x) => [x.id, x.value]));
+  assert.ok(Math.abs(r.car_km - 1) < 1e-9);
+  assert.ok(Math.abs(r.led_hours - 10) < 1e-9);
+  assert.ok(Math.abs(r.bottles - 2) < 1e-9);
+  assert.ok(Math.abs(r.washing_cycles - 1) < 1e-9);
+  assert.ok(Math.abs(r.light_hours_co2 - 106.4 / (0.01 * 331)) < 1e-9);
+  for (const it of eq.items) for (const id of it.params) assert.ok(eq.params[id]);
+});

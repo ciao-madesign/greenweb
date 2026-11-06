@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital Footprint Counter</title>
+  <link rel="stylesheet" href="../dashboard/dashboard.css">
+  <link rel="stylesheet" href="methodology.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1 data-i18n="nav.methodology"></h1>
+      <nav><a href="../dashboard/dashboard.html" data-i18n="nav.dashboard"></a></nav>
+    </header>
+    <p data-i18n="m.intro"></p>
+
+    <h2 id="detect" data-i18n="m1.title"></h2><p data-i18n="m1.body"></p>
+    <h2 id="info" data-i18n="m2.title"></h2><p data-i18n="m2.body"></p>
+    <h2 id="classify" data-i18n="m3.title"></h2><p data-i18n="m3.body"></p>
+    <h2 id="estimate" data-i18n="m4.title"></h2>
+    <p data-i18n="m4.body1"></p><p data-i18n="m4.body2"></p><p data-i18n="m4.body3"></p><p data-i18n="m4.body4"></p>
+
+    <h2 id="coefficients" data-i18n="m5.title"></h2><p class="note" data-i18n="m5.hint"></p>
+    <div class="scroll"><table id="coef-table"><thead><tr>
+      <th data-i18n="mt.coef"></th><th data-i18n="mt.value"></th><th data-i18n="col.reliability"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
+    </tr></thead><tbody></tbody></table></div>
+
+    <h3 id="profiles" data-i18n="mt.profiles"></h3>
+    <div class="scroll"><table id="profile-table"><thead><tr>
+      <th data-i18n="mt.region"></th><th>gCO₂e/kWh</th><th data-i18n="mt.price"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
+    </tr></thead><tbody></tbody></table></div>
+
+    <h3 id="equivalences" data-i18n="mt.equivalences"></h3>
+    <div class="scroll"><table id="eq-table"><thead><tr>
+      <th data-i18n="mt.coef"></th><th data-i18n="mt.value"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
+    </tr></thead><tbody></tbody></table></div>
+
+    <h2 id="sources" data-i18n="m6.title"></h2><ol id="source-list"></ol>
+    <h2 id="margins" data-i18n="m7.title"></h2>
+    <p data-i18n="m7.body"></p>
+    <ul>
+      <li data-i18n="reliability.def.high"></li><li data-i18n="reliability.def.medium"></li>
+      <li data-i18n="reliability.def.low"></li><li data-i18n="reliability.def.unavailable"></li>
+    </ul>
+    <h2 id="limits" data-i18n="m8.title"></h2><ul id="limits-list"></ul>
+    <p class="note" data-i18n="m.license"></p>
+  </main>
+  <script type="module" src="methodology.js"></script>
+</body>
+</html>

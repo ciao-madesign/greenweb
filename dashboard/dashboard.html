@@ -8,18 +8,39 @@
 </head>
 <body>
   <main>
-    <h1 data-i18n="app.title"></h1>
-    <p><a href="#" id="settings-link" data-i18n="options.title"></a></p>
-    <h2 data-i18n="dashboard.today"></h2>
+    <header>
+      <h1 data-i18n="app.title"></h1>
+      <nav><a href="#" id="settings-link" data-i18n="options.title"></a> · <a href="../methodology/methodology.html" data-i18n="nav.methodology"></a></nav>
+    </header>
     <p class="note" id="profile"></p>
+
+    <h2 data-i18n="dash.summary"></h2>
+    <div class="scroll"><table id="summary"><thead><tr>
+      <th data-i18n="dash.period"></th><th data-i18n="col.energy"></th><th data-i18n="col.co2e"></th><th data-i18n="col.water"></th><th data-i18n="col.cost"></th><th data-i18n="col.reliability"></th>
+    </tr></thead><tbody></tbody></table></div>
+    <p class="note"><a href="../methodology/methodology.html#estimate" data-i18n="dash.howto"></a></p>
+
+    <div class="controls">
+      <label><span data-i18n="dash.period"></span><select id="period"></select></label>
+      <label><span data-i18n="dash.metric"></span><select id="metric"></select></label>
+    </div>
     <p id="empty" hidden data-i18n="dashboard.empty"></p>
-    <table id="table" hidden>
-      <thead><tr>
-        <th data-i18n="col.domain"></th><th data-i18n="col.category"></th>
+
+    <section id="detail">
+      <h2 data-i18n="dash.activities"></h2>
+      <div id="chart"></div>
+
+      <h2 data-i18n="dash.sites"></h2>
+      <div class="scroll"><table id="sites"><thead><tr>
+        <th data-i18n="col.domain"></th><th data-i18n="col.category"></th><th data-i18n="col.ops"></th>
         <th data-i18n="col.energy"></th><th data-i18n="col.co2e"></th><th data-i18n="col.water"></th><th data-i18n="col.cost"></th><th data-i18n="col.reliability"></th>
-      </tr></thead>
-      <tbody></tbody>
-    </table>
+      </tr></thead><tbody></tbody></table></div>
+
+      <h2 data-i18n="dash.equivalences"></h2>
+      <ul id="equivalences"></ul>
+      <p class="note"><span data-i18n="dash.eq_note"></span> <a href="../methodology/methodology.html#equivalences" data-i18n="nav.methodology"></a></p>
+    </section>
+
     <p class="note" data-i18n="dashboard.note"></p>
   </main>
   <script type="module" src="dashboard.js"></script>

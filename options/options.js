@@ -58,7 +58,7 @@ async function save() {
 $('lang').addEventListener('change', save);
 $('delete').addEventListener('click', async () => {
   if (!confirm(t('options.delete_confirm'))) return;
-  await api.storage.local.remove('stats');
+  await api.storage.local.remove(['stats', 'session']);
   $('status').textContent = t('options.deleted');
 });
 refreshFields();

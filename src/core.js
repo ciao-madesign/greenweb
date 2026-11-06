@@ -94,3 +94,21 @@ export function badgeValue(metric, v) {
   if (metric === 'water') return v >= 1000 ? `${compact(v / 1000)}L` : `${compact(v)}m`;
   return compact(v);
 }
+
+/** Chiavi dei giorni degli ultimi n giorni (oggi incluso). */
+export function lastNDays(n, now = new Date()) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    out.push(dayKey(d));
+  }
+  return out;
+}
+
+/** Somma per dominio i giorni indicati: { dominio: { n, b, ms } }. */
+export function aggregateDays(stats, days) {
+  const out = {};
+  for (const day of days) for (const [host, e] of Object.entries(stats[day] ?? {})) addSample(out, 'all', host, e);
+  return out.all ?? {};
+}

@@ -1,0 +1,5 @@
+main { max-width: 64rem; }
+td, th { vertical-align: top; font-size: .9rem; }
+td.method { min-inline-size: 16rem; }
+h2, h3 { scroll-margin-block-start: 1rem; }
+tr:target { outline: 2px solid var(--accent); }

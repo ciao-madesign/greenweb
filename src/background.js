@@ -98,10 +98,11 @@ function flush() {
   pending = {};
   queue = queue.then(async () => {
     if (Object.keys(batch).length) {
-      const { stats = {} } = await api.storage.local.get('stats');
+      const { stats = {}, session = { start: Date.now(), stats: {} } } = await api.storage.local.get(['stats', 'session']);
       mergeStats(stats, batch);
       pruneOld(stats, KEEP_DAYS);
-      await api.storage.local.set({ stats });
+      for (const hosts of Object.values(batch)) for (const [host, e] of Object.entries(hosts)) addSample(session.stats, 'all', host, e);
+      await api.storage.local.set({ stats, session });
     }
     await refreshBadge(); // anche senza nuovi dati: cambia il giorno, il badge si riallinea
   }).catch(() => {});
@@ -143,6 +144,9 @@ api.storage.onChanged.addListener((changes, area) => {
 // Un solo allarme al minuto: accredita il tempo e salva. Nessun altro polling.
 api.alarms.get('tick').then((a) => { if (!a) api.alarms.create('tick', { periodInMinutes: 1 }); });
 api.alarms.onAlarm.addListener((a) => { if (a.name === 'tick') flush(); });
+
+// La sessione corrente riparte a ogni avvio del browser.
+api.runtime.onStartup.addListener(() => api.storage.local.set({ session: { start: Date.now(), stats: {} } }));
 
 action.onClicked.addListener(() => api.tabs.create({ url: api.runtime.getURL('dashboard/dashboard.html') }));
 
