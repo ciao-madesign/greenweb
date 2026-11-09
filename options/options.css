@@ -12,3 +12,9 @@ button { font: inherit; padding: .5rem 1rem; border-radius: 8px; cursor: pointer
 button.plain { border-color: var(--line); color: var(--fg); }
 .note { color: var(--muted); font-size: .9rem; margin: .3rem 0; }
 details summary { font-weight: 600; cursor: pointer; }
+
+fieldset.ai { border: 1px solid var(--line); border-radius: 12px; margin: 1rem 0; padding: .6rem 1rem 1rem; }
+fieldset.ai legend { font-weight: 600; padding-inline: .4rem; }
+.ai-row { display: flex; gap: .6rem; align-items: center; margin-block: .35rem; }
+.ai-row input { inline-size: 1.1rem; block-size: 1.1rem; accent-color: var(--accent); }
+.ai-row small { color: var(--muted); }

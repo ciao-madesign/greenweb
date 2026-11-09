@@ -331,7 +331,7 @@
       "sources": [],
       "reliability": "low",
       "status": "assumption",
-      "method": "The browser cannot see prompts: a usage rate per hour of active session is assumed (product-design assumption, no industry measurement). TO BE DEEPENED with per-service counting."
+      "method": "The browser cannot see prompts, so a usage rate per hour of active session is assumed (product-design assumption, no industry measurement). It is used only for time not covered by per-service message counting (Settings, AI usage), which replaces it with real counts."
     },
     "ai_image": {
       "unit": "-",

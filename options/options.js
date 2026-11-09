@@ -1,13 +1,13 @@
 import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
 import { resolveProfile, metricOf, METRICS, thresholdsFor, DEFAULT_PROFILE } from '../src/engine.js';
-import { privacyOf, parseDomainList, purgeHosts, csvFromDays, RETENTION_OPTIONS } from '../src/core.js';
+import { privacyOf, parseDomainList, purgeHosts, csvFromDays, stripAiFields, RETENTION_OPTIONS } from '../src/core.js';
 
 await initI18n();
 translateDom();
 
 const load = (p) => fetch(api.runtime.getURL(p)).then((r) => r.json());
-const [coeffs, languages] = await Promise.all([load('data/coefficients.json'), load('data/languages.json')]);
+const [coeffs, languages, aiFile] = await Promise.all([load('data/coefficients.json'), load('data/languages.json'), load('data/ai_adapters.json')]);
 const { settings: stored = {} } = await api.storage.local.get('settings');
 const settings = { ...stored };
 const priv = privacyOf(settings);
@@ -24,6 +24,16 @@ fill($('lang'), [['', t('options.auto')], ...languages.map((l) => [l.code, l.nam
 fill($('retention'), RETENTION_OPTIONS.map((d) => [d, t(`retention.${d}`)]), priv.retentionDays);
 $('paused').checked = priv.paused;
 $('excluded').value = priv.excluded.join('\n');
+// Conteggio dei messaggi AI: un'opzione per servizio, tutte spente di default.
+$('ai-list').replaceChildren(...aiFile.adapters.map((a) => {
+  const row = document.createElement('label');
+  row.className = 'ai-row';
+  const box = Object.assign(document.createElement('input'), { type: 'checkbox', id: `ai-${a.id}`, checked: !!priv.aiServices[a.id] });
+  box.dataset.service = a.id;
+  box.addEventListener('change', save);
+  row.append(box, Object.assign(document.createElement('span'), { textContent: a.label }), Object.assign(document.createElement('small'), { textContent: a.domain }));
+  return row;
+}));
 
 function refreshFields() {
   const base = coeffs.profiles[$('profile').value];
@@ -70,6 +80,7 @@ async function save() {
   const next = {
     ...settings, metric, profile: $('profile').value, device: $('device').value,
     paused: $('paused').checked, retentionDays: Number($('retention').value), excluded,
+    aiServices: Object.fromEntries([...document.querySelectorAll('#ai-list input')].filter((b) => b.checked).map((b) => [b.dataset.service, true])),
   };
   next.overrides = { ...(co2 !== undefined && { co2_g_per_kwh: co2 }), ...(price !== undefined && { price_per_kwh: price }) };
   const th = { ...(settings.thresholds ?? {}) };
@@ -90,6 +101,15 @@ async function save() {
 
 ['co2', 'price', 'low', 'high', 'lang', 'device', 'paused', 'retention', 'excluded'].forEach((id) => $(id).addEventListener('change', save));
 ['metric', 'profile'].forEach((id) => $(id).addEventListener('change', async () => { await save(); refreshFields(); }));
+
+$('ai-delete').addEventListener('click', async () => {
+  const all = await api.storage.local.get(null);
+  const out = {};
+  for (const k of dayKeys(all)) out[k] = stripAiFields(all[k]);
+  if (all.session) out.session = { ...all.session, stats: { all: stripAiFields(all.session.stats?.all) } };
+  await api.storage.local.set(out);
+  $('status').textContent = t('options.ai_deleted');
+});
 
 $('delete').addEventListener('click', async () => {
   if (!confirm(t('options.delete_confirm'))) return;

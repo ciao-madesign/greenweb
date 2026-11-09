@@ -36,6 +36,9 @@ export function addSample(stats, day, host, delta) {
   e.n += delta.n ?? 0;
   e.b += delta.b ?? 0;
   e.ms += delta.ms ?? 0;
+  // Campi facoltativi del conteggio AI (solo numeri): p = messaggi inviati, msc = tempo coperto dal conteggio.
+  if (delta.p) e.p = (e.p ?? 0) + delta.p;
+  if (delta.msc) e.msc = (e.msc ?? 0) + delta.msc;
 }
 
 /** Chiave di archiviazione del giorno: un record { dominio: { n, b, ms } } per giorno. */
@@ -122,6 +125,7 @@ export function privacyOf(settings = {}) {
     paused: !!settings.paused,
     retentionDays: RETENTION_OPTIONS.includes(settings.retentionDays) ? settings.retentionDays : 90,
     excluded: Array.isArray(settings.excluded) ? settings.excluded : [],
+    aiServices: settings.aiServices && typeof settings.aiServices === 'object' ? settings.aiServices : {},
   };
 }
 
@@ -162,4 +166,35 @@ export function csvFromDays(days) {
     for (const [host, e] of Object.entries(days[day]).sort()) rows.push([day, q(host), e.n, e.b, Math.round(e.ms / 1000)].join(','));
   }
   return `${rows.join('\n')}\n`;
+}
+
+// --- Conteggio AI per servizio (facoltativo, solo numeri) -------------------------------
+const rxCache = new Map();
+
+/**
+ * L'adattatore del servizio a cui appartiene una richiesta (metodo, dominio e percorso), oppure null.
+ * Si guarda solo l'indirizzo della richiesta: il corpo non viene mai letto.
+ */
+export function matchAdapter(method, url, adapters) {
+  let u;
+  try { u = new URL(url); } catch { return null; }
+  const host = u.hostname.replace(/^www\./, '');
+  for (const a of adapters) {
+    if (a.domain !== host || a.method !== method || typeof a.path !== 'string' || a.path.length > 200) continue;
+    let rx = rxCache.get(a.path);
+    if (rx === undefined) {
+      try { rx = new RegExp(a.path); } catch { rx = null; }
+      rxCache.set(a.path, rx);
+    }
+    if (rx && rx.test(u.pathname)) return a;
+  }
+  return null;
+}
+
+/** Copia dei record dei giorni senza i campi del conteggio AI (p, msc). */
+export function stripAiFields(record) {
+  return Object.fromEntries(Object.entries(record ?? {}).map(([host, e]) => {
+    const { p, msc, ...rest } = e; // eslint-disable-line no-unused-vars
+    return [host, rest];
+  }));
 }

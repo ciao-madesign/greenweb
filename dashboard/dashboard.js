@@ -167,6 +167,7 @@ function renderDetails() {
     cell(tr, r.host, '', false);
     cell(tr, t(`category.${r.cat}`), '', false);
     cell(tr, new Intl.NumberFormat(lang).format(r.e.n));
+    cell(tr, r.e.p ? new Intl.NumberFormat(lang).format(r.e.p) : '–');
     metricCells(tr, r.est);
   }
 }

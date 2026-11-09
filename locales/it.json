@@ -128,7 +128,7 @@
   "flow.cost": "Costo",
   "flow.cost.sub": "× prezzo dell'elettricità",
   "card.see.title": "Cosa vediamo",
-  "card.see.body": "Il dominio del sito, il numero di richieste, la loro dimensione quando il server la dichiara e il tuo tempo attivo. Nient'altro.",
+  "card.see.body": "Il dominio del sito, il numero di richieste, la loro dimensione quando il server la dichiara e il tuo tempo attivo. Se attivi l'uso dell'AI per un servizio, anche quanti messaggi gli invii (un numero, mai il contenuto). Nient'altro.",
   "card.sure.title": "Quanto siamo sicuri",
   "card.sure.body": "Ogni valore è un intervallo. Ogni stima ha un livello di affidabilità:",
   "card.cant.title": "Cosa non possiamo sapere",
@@ -168,5 +168,10 @@
   "pause.on": "Sospendi",
   "pause.off": "Riprendi",
   "pause.banner": "Il monitoraggio è sospeso. Non si registra nulla.",
-  "tooltip.paused": "Monitoraggio sospeso"
+  "tooltip.paused": "Monitoraggio sospeso",
+  "options.ai": "Uso dell'AI (facoltativo)",
+  "options.ai_hint": "Conta quanti messaggi invii a un servizio, per sostituire l'ipotesi con numeri reali. Si conserva solo il numero, mai ciò che scrivi. Spento di default, una scelta per servizio. Gli indirizzi dei servizi cambiano: il conteggio può smettere di funzionare finché l'estensione non viene aggiornata.",
+  "options.ai_delete": "Elimina i conteggi AI",
+  "options.ai_deleted": "Conteggi AI eliminati.",
+  "col.prompts": "Messaggi AI"
 }

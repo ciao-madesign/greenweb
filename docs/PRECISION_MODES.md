@@ -15,7 +15,7 @@ Obiettivo: stime più precise **solo se l'utente lo sceglie**, senza chiedere pi
 | **0 Base** (oggi) | Stima da dominio, byte dichiarati, tempo | `webRequest` in sola lettura | accesso ai siti + `webRequest` | Basso: solo dominio e conteggi | Sempre |
 | **1 Dati più completi** | Profilo del dispositivo (fatto). Byte inviati e andamento orario della rete elettrica: **non realizzabili ora** | Scelta manuale portatile/desktop/telefono. I browser non espongono la dimensione delle richieste nelle intestazioni: servirebbe leggere il corpo (`requestBody`), che non facciamo. Mancano i dati orari affidabili per le curve | Nessuno nuovo | Molto basso | Fatto per il dispositivo; il resto si riprende se emergono dati o API adatte |
 | **2 Streaming preciso** | Risoluzione reale del video → energia per ora molto più accurata | Script minimo su siti scelti (YouTube, Netflix, Twitch…) che legge solo altezza del video, riproduzione/pausa | Permesso di sito **per sito**, opzionale | Medio-basso: non legge titoli né URL | Sì, opt-in per sito |
-| **3 AI per servizio** | Sostituisce l'ipotesi "prompt all'ora" con conteggi reali di prompt e generazioni | Riconosce l'endpoint del servizio (solo metodo e percorso) e incrementa un contatore | Già coperto dal livello 0; in modalità Light, per sito | Medio: rivela quanto usi l'AI, in locale | Sì, opt-in per servizio. Il valore più alto per l'accuratezza |
+| **3 AI per servizio** (fatto per il testo) | Sostituisce l'ipotesi "messaggi all'ora" con conteggi reali dei messaggi inviati | Riconosce l'indirizzo della richiesta (metodo, dominio, percorso) e incrementa un contatore; il corpo non viene mai letto | Già coperto dal livello 0; in modalità Light, per sito | Medio: rivela quanto usi l'AI, in locale | Sì, opt-in per servizio. **Attivo**: ChatGPT, Claude, Gemini, Perplexity, DeepSeek (indirizzi da verificare con traffico reale); immagini e video non contati perché mancano i coefficienti |
 | **4 Carico del dispositivo** | Potenza reale al posto dell'ipotesi 9–50 W | Un campione al minuto del carico CPU | `system.cpu` opzionale (solo Chrome/Edge) | Medio-basso: non identifica contenuti | Facoltativo avanzato |
 
 ## Da non fare
@@ -39,3 +39,11 @@ Obiettivo: stime più precise **solo se l'utente lo sceglie**, senza chiedere pi
 4. Livello 4 solo se serve davvero, dopo aver misurato quanto migliora la stima.
 
 Ogni livello deve arrivare con: testo di consenso, voce nella Metodologia, test che non vengano letti contenuti, e un confronto prima/dopo dell'accuratezza.
+
+## Livello 3: come funziona oggi
+- Impostazioni → Privacy e dati → *Uso dell'AI*: una casella per servizio, tutte spente di default.
+- Si conta una richiesta `POST` riuscita (stato 2xx) verso l'indirizzo del servizio. Nessun permesso nuovo e nessun accesso al corpo (nessun `requestBody`: c'è un test che lo vieta).
+- Si salvano due numeri per giorno e servizio: messaggi contati (`p`) e tempo coperto dal conteggio (`msc`).
+- Il motore usa i conteggi per il tempo coperto e l'ipotesi di messaggi all'ora per il resto; con il tempo quasi tutto coperto e almeno un messaggio visto l'affidabilità sale a "media".
+- "Elimina i conteggi AI" toglie solo questi due numeri.
+- **Limite**: gli indirizzi dei servizi cambiano. Se un adattatore smette di funzionare il conteggio resta a zero: in quel caso il motore **non** si fida della copertura (un falso zero sarebbe peggio) e torna all'ipotesi dei messaggi all'ora. Gli indirizzi vanno comunque verificati con traffico reale prima della pubblicazione e tenuti aggiornati (`data/ai_adapters.json`).

@@ -4,7 +4,8 @@ Digital Footprint Counter works entirely on your device.
 
 **What it stores (locally, in the browser's extension storage)**
 - For each day and each website domain: number of requests, bytes transferred (when the server declares them) and active time.
-- Your settings (region, language, metric, thresholds).
+- Your settings (region, language, device, metric, thresholds).
+- Only if you turn it on for a service (off by default): the number of messages you send to that AI service per day, and the time covered by that counting. Never what you write or what it answers.
 - Data older than your retention setting (7, 30 or 90 days; 90 by default) is deleted automatically.
 
 **What it never collects**

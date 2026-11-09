@@ -33,9 +33,15 @@ export function estimateEntry(entry, category, c, device) {
         net = remote - dc;
         break;
       }
-      case 'ai_text':
-        dc = hours * e.ai_text_prompts_per_hour.value[k] * e.ai_text_wh_per_prompt.value[k];
+      case 'ai_text': {
+        // Messaggi contati (p) per il tempo coperto dal conteggio; per il resto, l'ipotesi di messaggi all'ora.
+        // Il conteggio è considerato affidabile solo se ha visto almeno un messaggio: con zero messaggi
+        // potrebbe essere un adattatore non più valido, e un falso zero sarebbe peggio dell'ipotesi.
+        const covered = (entry.p ?? 0) > 0 ? (entry.msc ?? 0) : 0;
+        const uncovered = Math.max(entry.ms - covered, 0) / 3.6e6;
+        dc = ((entry.p ?? 0) + uncovered * e.ai_text_prompts_per_hour.value[k]) * e.ai_text_wh_per_prompt.value[k];
         break;
+      }
       default: // 'bytes': navigazione, e AI immagini/video (solo rete: la parte remota non è stimabile)
         net = gb * e.network_kwh_per_gb.value[k] * 1000;
         dc = gb * e.datacenter_kwh_per_gb.value[k] * 1000;
@@ -44,6 +50,7 @@ export function estimateEntry(entry, category, c, device) {
   });
   let reliability = cat.reliability;
   if (cat.model === 'bytes' && entry.b === 0 && entry.n > 0) reliability = worst(reliability, 'low'); // dimensioni non esposte
+  if (cat.model === 'ai_text' && entry.ms > 0 && (entry.p ?? 0) > 0 && (entry.msc ?? 0) >= 0.9 * entry.ms) reliability = 'medium'; // messaggi realmente contati
   return { wh: tri((k) => parts[k].total), dc_wh: tri((k) => parts[k].dc), reliability, incomplete: !!cat.incomplete };
 }
 

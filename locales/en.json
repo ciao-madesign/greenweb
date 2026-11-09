@@ -128,7 +128,7 @@
   "flow.cost": "Cost",
   "flow.cost.sub": "× electricity price",
   "card.see.title": "What we see",
-  "card.see.body": "The website domain, the number of requests, their size when the server declares it, and your active time. Nothing else.",
+  "card.see.body": "The website domain, the number of requests, their size when the server declares it, and your active time. If you turn on AI usage for a service, also how many messages you send to it (a number, never the content). Nothing else.",
   "card.sure.title": "How sure we are",
   "card.sure.body": "Every value is a range. Each estimate carries a reliability level:",
   "card.cant.title": "What we can't know",
@@ -168,5 +168,10 @@
   "pause.on": "Pause",
   "pause.off": "Resume",
   "pause.banner": "Tracking is paused. Nothing is being recorded.",
-  "tooltip.paused": "Tracking paused"
+  "tooltip.paused": "Tracking paused",
+  "options.ai": "AI usage (optional)",
+  "options.ai_hint": "Counts how many messages you send to a service, to replace the assumed rate with real numbers. Only the number is kept, never what you write. Off by default, one choice per service. Service addresses change, so counting may stop working until the extension is updated.",
+  "options.ai_delete": "Delete AI counts",
+  "options.ai_deleted": "AI counts deleted.",
+  "col.prompts": "AI messages"
 }

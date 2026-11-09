@@ -10,6 +10,7 @@ Free, open source browser extension that **estimates** the environmental footpri
 - Toolbar **leaf** (green / yellow / red) with a badge showing today's value for your chosen metric (CO₂e, water or cost).
 - **Dashboard**: current session, today, 7 and 30 days; breakdown by activity and by site; everyday equivalences.
 - **Methodology** page generated from the same JSON the engine uses: every number traces back to a method and a source.
+- Optional, per-service count of AI messages (ChatGPT, Claude, Gemini, Perplexity, DeepSeek) to replace the assumed usage rate with real numbers: only the number is kept, never the content.
 - Six regional profiles (Italy by default, EU, USA, China, Japan, world average), all overridable.
 - Interface in English and Italian; more languages by adding one JSON file.
 

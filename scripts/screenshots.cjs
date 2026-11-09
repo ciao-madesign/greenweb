@@ -8,11 +8,11 @@ const OUT = path.join(EXT, 'docs', 'screenshots');
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const TODAY = {
-  'youtube.com': [1100, 1.6e9, 48], 'github.com': [300, 40e6, 40], 'chatgpt.com': [180, 14e6, 35],
+  'youtube.com': [1100, 1.6e9, 48], 'github.com': [300, 40e6, 40], 'chatgpt.com': [180, 14e6, 35, 18],
   'mail.google.com': [260, 22e6, 25], 'instagram.com': [600, 210e6, 20], 'reddit.com': [420, 95e6, 18],
   'ilpost.it': [380, 60e6, 16], 'midjourney.com': [80, 160e6, 12], 'google.com': [140, 9e6, 14], 'wikipedia.org': [90, 12e6, 9],
 };
-const scaled = (f) => Object.fromEntries(Object.entries(TODAY).map(([h, [n, b, m]]) => [h, { n: Math.round(n * f), b: Math.round(b * f), ms: Math.round(m * f * 60000) }]));
+const scaled = (f) => Object.fromEntries(Object.entries(TODAY).map(([h, [n, b, m, p]]) => [h, { n: Math.round(n * f), b: Math.round(b * f), ms: Math.round(m * f * 60000), ...(p ? { p: Math.round(p * f), msc: Math.round(m * f * 60000) } : {}) }]));
 const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 (async () => {
@@ -21,7 +21,7 @@ const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
   const coeffs = JSON.parse(fs.readFileSync(path.join(EXT, 'data/coefficients.json')));
   const catalog = JSON.parse(fs.readFileSync(path.join(EXT, 'data/catalog.json')));
 
-  const seed = { settings: { profile: 'it', metric: 'co2e', lang: 'en' }, session: { start: Date.now() - 5 * 3600e3, stats: { all: scaled(0.6) } } };
+  const seed = { settings: { profile: 'it', metric: 'co2e', lang: 'en', aiServices: { chatgpt: true, claude: true } }, session: { start: Date.now() - 5 * 3600e3, stats: { all: scaled(0.6) } } };
   for (let i = 0; i < 30; i++) {
     const d = new Date(); d.setDate(d.getDate() - i);
     seed[`day:${dayKey(d)}`] = scaled(i === 0 ? 1 : 0.35 + ((i * 37) % 80) / 100);

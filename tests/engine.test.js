@@ -32,6 +32,22 @@ test('AI testuale: 1 ora = dispositivo + prompt/h x Wh per prompt (tutta energia
   near(r.dc_wh.mid, remote);
 });
 
+test('AI testuale con messaggi contati: usa i conteggi per il tempo coperto, l\'ipotesi per il resto', () => {
+  const wh = E.ai_text_wh_per_prompt.value.mid, rate = E.ai_text_prompts_per_hour.value.mid;
+  // 1 ora, tutta coperta dal conteggio: 3 messaggi reali, nessuna ipotesi
+  const full = estimateEntry({ n: 1, b: 0, ms: 3.6e6, msc: 3.6e6, p: 3 }, 'ai_text', c);
+  near(full.dc_wh.mid, 3 * wh);
+  assert.equal(full.reliability, 'medium');
+  // 1 ora, metà coperta: 2 messaggi + mezz'ora di ipotesi
+  const half = estimateEntry({ n: 1, b: 0, ms: 3.6e6, msc: 1.8e6, p: 2 }, 'ai_text', c);
+  near(half.dc_wh.mid, (2 + 0.5 * rate) * wh);
+  assert.equal(half.reliability, 'low');
+  // conteggio a zero messaggi: potrebbe essere un adattatore rotto, quindi si usa l'ipotesi
+  near(estimateEntry({ n: 1, b: 0, ms: 3.6e6, msc: 3.6e6, p: 0 }, 'ai_text', c).dc_wh.mid, rate * wh);
+  // senza conteggio (comportamento di prima)
+  near(estimateEntry({ n: 1, b: 0, ms: 3.6e6 }, 'ai_text', c).dc_wh.mid, rate * wh);
+});
+
 test('conversioni: CO2e e costo con intervallo del profilo; acqua = data center + elettricità', () => {
   const p = resolveProfile(c, {});
   const r = convert({ min: 0, mid: 1000, max: 2000 }, p, c);

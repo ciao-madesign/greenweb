@@ -1,6 +1,6 @@
 // Service worker: raccoglie byte e tempo attivo per dominio. Nessuna rete, nessun contenuto di pagina.
 import { api, action } from './compat.js';
-import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, privacyOf, isExcluded, purgeHosts } from './core.js';
+import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, privacyOf, isExcluded, purgeHosts, matchAdapter } from './core.js';
 import { estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
 import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
@@ -29,7 +29,11 @@ function accrue(now = Date.now()) {
   if (dt > 0) {
     const hosts = new Set(audible.values());
     if (active.host) hosts.add(active.host);
-    for (const h of hosts) if (h && allowed(h)) addSample(pending, dayKey(), h, { ms: dt });
+    for (const h of hosts) {
+      if (!h || !allowed(h)) continue;
+      // msc: parte del tempo in cui i messaggi AI di questo sito vengono contati (opt-in per servizio).
+      addSample(pending, dayKey(), h, { ms: dt, msc: cfg.activeAdapters?.some((a) => a.domain === h) ? dt : 0 });
+    }
   }
   active.since = now;
 }
@@ -68,8 +72,22 @@ api.webRequest.onBeforeRequest.addListener((d) => {
 }, FILTER);
 
 
+/**
+ * Conteggio dei messaggi inviati a un servizio AI scelto dall'utente: una richiesta riuscita che
+ * corrisponde all'adattatore incrementa un contatore. Il corpo della richiesta non viene mai letto.
+ */
+function countPrompt(d) {
+  if (!cfgReady || d.method !== 'POST' || d.statusCode >= 300 || !cfg.activeAdapters?.length) return;
+  const a = matchAdapter(d.method, d.url, cfg.activeAdapters);
+  if (!a || !allowed(a.domain)) return;
+  addSample(pending, dayKey(), a.domain, { p: 1 });
+  scheduleFlush();
+  scheduleLive();
+}
+
 api.webRequest.onCompleted.addListener((d) => {
   if (d.tabId < 0 || privateTabs.has(d.tabId)) return; // richieste del browser/estensioni e finestre private: ignorate
+  countPrompt(d);
   const bytes = contentLength(d.responseHeaders);
   if (d.type === 'main_frame') tabHost.set(d.tabId, hostFromUrl(d.url)); // dominio finale dopo eventuali redirect
   if (tabHost.has(d.tabId)) return record(tabHost.get(d.tabId), bytes);
@@ -227,6 +245,10 @@ api.tabs.query({}).then((tabs) => tabs.forEach((t) => t.incognito && privateTabs
 async function loadCfg() {
   const { settings = {} } = await api.storage.local.get('settings');
   cfg = privacyOf(settings);
+  const file = await loadJson('data/ai_adapters.json');
+  // Gli adattatori aggiuntivi (avanzato, anche per i test) devono avere un identificativo e un dominio.
+  const extra = Array.isArray(settings.aiExtraAdapters) ? settings.aiExtraAdapters.filter((a) => a && a.id && a.domain) : [];
+  cfg.activeAdapters = [...file.adapters, ...extra].filter((a) => cfg.aiServices[a.id]);
   cfgReady = true;
   for (const day of Object.keys(pending)) pending[day] = purgeHosts(pending[day], cfg.excluded);
   for (const [host, bytes, count] of early.splice(0)) record(host, bytes, count);

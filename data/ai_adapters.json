@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "notes": "Riconoscimento dei messaggi inviati ai servizi AI: solo metodo, dominio e percorso della richiesta, mai il contenuto. Gli indirizzi dei servizi cambiano: ogni voce è da verificare con traffico reale (status to_verify). Se un adattatore smette di funzionare, il conteggio resta a zero e il motore torna all'ipotesi sui messaggi all'ora. Disponibili solo adattatori di testo: per immagini e video mancano coefficienti energetici affidabili.",
+  "adapters": [
+    {
+      "id": "chatgpt",
+      "label": "ChatGPT",
+      "domain": "chatgpt.com",
+      "kind": "text",
+      "method": "POST",
+      "path": "^/backend-api/(f/)?conversation$",
+      "status": "to_verify"
+    },
+    {
+      "id": "claude",
+      "label": "Claude",
+      "domain": "claude.ai",
+      "kind": "text",
+      "method": "POST",
+      "path": "^/api/organizations/[^/]+/chat_conversations/[^/]+/completion$",
+      "status": "to_verify"
+    },
+    {
+      "id": "gemini",
+      "label": "Gemini",
+      "domain": "gemini.google.com",
+      "kind": "text",
+      "method": "POST",
+      "path": "/StreamGenerate$",
+      "status": "to_verify"
+    },
+    {
+      "id": "perplexity",
+      "label": "Perplexity",
+      "domain": "perplexity.ai",
+      "kind": "text",
+      "method": "POST",
+      "path": "^/rest/sse/perplexity_ask$",
+      "status": "to_verify"
+    },
+    {
+      "id": "deepseek",
+      "label": "DeepSeek",
+      "domain": "chat.deepseek.com",
+      "kind": "text",
+      "method": "POST",
+      "path": "^/api/v0/chat/completion$",
+      "status": "to_verify"
+    }
+  ]
+}

@@ -101,7 +101,7 @@ test('manifest: nessuna connessione esterna consentita dalla CSP', () => {
 import { privacyOf, normalizeDomain, parseDomainList, isExcluded, purgeHosts, csvFromDays } from '../src/core.js';
 
 test('privacyOf: valori predefiniti prudenti e validazione', () => {
-  assert.deepEqual(privacyOf({}), { paused: false, retentionDays: 90, excluded: [] });
+  assert.deepEqual(privacyOf({}), { paused: false, retentionDays: 90, excluded: [], aiServices: {} });
   assert.equal(privacyOf({ retentionDays: 5 }).retentionDays, 90);
   assert.equal(privacyOf({ retentionDays: 30, paused: true }).paused, true);
 });
@@ -127,4 +127,34 @@ test('purgeHosts e csvFromDays', () => {
   const rec = { 'banca.it': { n: 1, b: 2, ms: 3000 }, 'app.banca.it': { n: 1, b: 1, ms: 1 }, 'a.com': { n: 4, b: 5, ms: 6000 } };
   assert.deepEqual(Object.keys(purgeHosts(rec, ['banca.it'])), ['a.com']);
   assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,active_seconds\n2026-11-09,"a.com",4,5,6\n');
+});
+
+import { matchAdapter, stripAiFields } from '../src/core.js';
+
+test('matchAdapter: metodo, dominio e percorso; mai altro', () => {
+  const ad = JSON.parse(readFileSync(new URL('../data/ai_adapters.json', import.meta.url))).adapters;
+  assert.equal(matchAdapter('POST', 'https://chatgpt.com/backend-api/conversation', ad)?.id, 'chatgpt');
+  assert.equal(matchAdapter('POST', 'https://chatgpt.com/backend-api/f/conversation?x=1', ad)?.id, 'chatgpt');
+  assert.equal(matchAdapter('GET', 'https://chatgpt.com/backend-api/conversation', ad), null);
+  assert.equal(matchAdapter('POST', 'https://chatgpt.com/backend-api/conversations', ad), null);
+  assert.equal(matchAdapter('POST', 'https://claude.ai/api/organizations/o1/chat_conversations/c9/completion', ad)?.id, 'claude');
+  assert.equal(matchAdapter('POST', 'https://www.perplexity.ai/rest/sse/perplexity_ask', ad)?.id, 'perplexity');
+  assert.equal(matchAdapter('POST', 'https://altro.example/backend-api/conversation', ad), null);
+  assert.equal(matchAdapter('POST', 'non un url', ad), null);
+  assert.equal(matchAdapter('POST', 'https://x.test/a', [{ domain: 'x.test', method: 'POST', path: '(' }]), null); // regex non valida
+  for (const a of ad) assert.ok(a.id && a.label && a.domain && a.path && a.kind === 'text' && a.status === 'to_verify');
+});
+
+test('addSample con conteggio AI e stripAiFields', () => {
+  const m = {};
+  addSample(m, 'd', 'chatgpt.com', { ms: 60000, msc: 60000 });
+  addSample(m, 'd', 'chatgpt.com', { p: 2 });
+  assert.deepEqual(m.d['chatgpt.com'], { n: 0, b: 0, ms: 60000, p: 2, msc: 60000 });
+  assert.deepEqual(stripAiFields(m.d), { 'chatgpt.com': { n: 0, b: 0, ms: 60000 } });
+});
+
+test('il service worker non legge mai il corpo delle richieste', () => {
+  const sw = readFileSync(new URL('../src/background.js', import.meta.url), 'utf8');
+  assert.doesNotMatch(sw, /requestBody/);
+  assert.doesNotMatch(sw, /filterResponseData|debugger/);
 });
