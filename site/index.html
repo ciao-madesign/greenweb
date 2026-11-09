@@ -1,0 +1,220 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digital Footprint Counter</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one calm column on a green-tinted ground; real product frames carry the page; a printed-receipt block explains one number. */
+:root {
+  --bg: #f3f6f2; --surface: #ffffff; --ink: #14211a; --muted: #55645b; --line: #d9e2d9;
+  --leaf: #2e7d32; --leaf-ink: #ffffff; --warn: #b26a00; --alert: #c62828; --code-bg: #eaf0e9;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0f1712; --surface: #17221b; --ink: #e8f0e9; --muted: #9db0a2; --line: #2a3a2f;
+  --leaf: #66bb6a; --leaf-ink: #0f1712; --warn: #ffcc80; --alert: #ef9a9a; --code-bg: #1c2a21; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0f1712; --surface: #17221b; --ink: #e8f0e9; --muted: #9db0a2; --line: #2a3a2f;
+  --leaf: #66bb6a; --leaf-ink: #0f1712; --warn: #ffcc80; --alert: #ef9a9a; --code-bg: #1c2a21; color-scheme: dark; }
+* { box-sizing: border-box; }
+img { max-width: 100%; height: auto; }
+body { background: var(--bg); color: var(--ink); font: 17px/1.6 var(--body); margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.wrap { max-width: 68rem; margin: 0 auto; }
+a { color: var(--leaf); }
+h1, h2, h3 { font-family: var(--display); line-height: 1.1; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); font-weight: 700; letter-spacing: -0.02em; }
+h2 { font-size: clamp(1.7rem, 3.5vw, 2.4rem); font-weight: 700; letter-spacing: -0.01em; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0; max-width: 42rem; }
+.eyebrow { font: 500 .8rem/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+section { padding-block: clamp(2.5rem, 6vw, 4.5rem); border-top: 1px solid var(--line); display: grid; gap: 1.6rem; }
+header.top { padding-block: 1.2rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: .6rem; font: 700 1.05rem var(--display); }
+.brand img { width: 28px; height: 28px; }
+nav a { margin-inline-start: 1.2rem; text-decoration: none; color: var(--muted); font-size: .95rem; }
+nav a:hover { color: var(--ink); }
+.hero { border-top: 0; padding-block: clamp(1.5rem, 5vw, 3.5rem) clamp(2.5rem, 6vw, 4.5rem); }
+.lead { font-size: 1.25rem; color: var(--muted); }
+.cta { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
+.btn { display: inline-block; padding: .75rem 1.2rem; border-radius: 8px; font-weight: 600; text-decoration: none; border: 1px solid var(--leaf); }
+.btn.primary { background: var(--leaf); color: var(--leaf-ink); }
+.btn.ghost { color: var(--leaf); }
+.btn:focus-visible, a:focus-visible { outline: 3px solid var(--leaf); outline-offset: 2px; }
+.status { font: 400 .85rem var(--mono); color: var(--muted); }
+.frame { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.frame .bar { display: flex; gap: 6px; padding: 9px 12px; border-bottom: 1px solid var(--line); background: var(--code-bg); }
+.frame .bar i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); display: block; }
+.frame img { display: block; width: 100%; height: auto; }
+.crop { max-height: 34rem; overflow: hidden; }
+.crop img { object-position: top; }
+.toolbar-shot { display: block; width: 100%; border-radius: 10px; border: 1px solid var(--line); }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.2rem; }
+.fact { border-top: 3px solid var(--leaf); padding-top: .8rem; display: grid; gap: .4rem; }
+.fact .num { font: 500 2rem/1 var(--mono); }
+.steps { display: grid; gap: 2.4rem; counter-reset: s; padding: 0; list-style: none; margin: 0; }
+.step { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr); gap: 1.6rem; align-items: center; counter-increment: s; }
+.step:nth-child(even) .txt { order: 2; }
+.step .txt { display: grid; gap: .6rem; }
+.step .txt::before { content: "Step " counter(s); font: 500 .8rem var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--leaf); }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 1.2rem; }
+.receipt { font: 400 .95rem/1.7 var(--mono); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 1.4rem 1.6rem; overflow-x: auto; max-width: 46rem; }
+.receipt .row { display: flex; justify-content: space-between; gap: 2rem; white-space: nowrap; }
+.receipt .rule { border-top: 1px dashed var(--line); margin-block: .5rem; }
+.receipt .total { font-weight: 500; color: var(--leaf); }
+.receipt .dim { color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+th, td { text-align: start; padding: .55rem .7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 .8rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.scroll { overflow-x: auto; }
+ul.plain { margin: 0; padding-inline-start: 1.2rem; display: grid; gap: .4rem; max-width: 42rem; }
+.cols2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: 2rem; }
+code { font-family: var(--mono); background: var(--code-bg); padding: .1em .35em; border-radius: 4px; font-size: .92em; }
+footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var(--muted); font-size: .9rem; display: grid; gap: .5rem; }
+@media (max-width: 760px) { .step { grid-template-columns: minmax(0, 1fr); } .step:nth-child(even) .txt { order: 0; } nav { display: none; } }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><img src="img/leaf.png" alt=""> Digital Footprint Counter</div>
+    <nav><a href="#how">How it works</a><a href="#number">One number, explained</a><a href="#privacy">Privacy</a><a href="#open">Open source</a></nav>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">Free browser extension · Open source · No account</p>
+    <h1>See what your browsing costs the planet.</h1>
+    <p class="lead">A small leaf in your toolbar estimates the energy, CO₂e and water behind what you do online. Everything is calculated on your device, and every number shows its range, its sources and its assumptions.</p>
+    <div class="cta">
+      <a class="btn primary" id="install" href="https://github.com/ciao-madesign/greenweb#install-development">Install now</a>
+      <a class="btn ghost" href="#how">See how it works</a>
+      <span class="status" id="install-status">Chrome · Edge · Brave · Firefox. Store listings are in preparation.</span>
+    </div>
+    <img class="toolbar-shot" src="img/toolbar.png" alt="Three toolbar states of the extension: a green leaf with 20 g, a yellow leaf with 56 g and a red leaf with 172 g, each with its tooltip.">
+  </section>
+
+  <section id="promises">
+    <p class="eyebrow">Three promises</p>
+    <div class="grid3">
+      <div class="fact"><div class="num">0</div><h3>Requests sent by the extension</h3><p>No account, no server, no telemetry. Only a domain, request count, bytes and active time are kept, on your device.</p></div>
+      <div class="fact"><div class="num">min–max</div><h3>A range on every number</h3><p>Browsers cannot see server consumption, so the extension never pretends to measure. Each estimate carries its reliability level.</p></div>
+      <div class="fact"><div class="num">&lt;0.5%</div><h3>Of the energy it observes</h3><p>Its own footprint, estimated from a first measurement of CPU use. To be repeated on real laptops.</p></div>
+    </div>
+  </section>
+
+  <section id="how">
+    <p class="eyebrow">From install to insight</p>
+    <h2>Four screens, no setup maze</h2>
+    <ol class="steps">
+      <li class="step">
+        <div class="txt"><h3>Pick your region</h3><p>On first run a welcome page asks for a region, a language and the metric to show. The region sets the electricity mix and price: Italy by default, plus EU, USA, China, Japan and the world average. Every value can be overridden.</p></div>
+        <div class="frame"><div class="bar"><i></i><i></i><i></i></div><div class="crop"><img src="img/welcome.png" alt="Welcome page with three steps and region, language and metric selectors."></div></div>
+      </li>
+      <li class="step">
+        <div class="txt"><h3>Browse as usual</h3><p>The leaf turns green, yellow or red as the day's footprint grows, and the badge shows the figure in the metric you chose: CO₂e, water or cost. Thresholds are adjustable and are not presented as a scientific standard.</p></div>
+        <div class="frame"><img src="img/toolbar.png" alt="Leaf icon states with tooltips."></div>
+      </li>
+      <li class="step">
+        <div class="txt"><h3>Open the dashboard</h3><p>One click on the leaf shows today at a glance, then session, 7 and 30 days, a breakdown by activity and by site, and everyday equivalences such as metres driven by car or hours of an LED bulb.</p></div>
+        <div class="frame"><div class="bar"><i></i><i></i><i></i></div><div class="crop"><img src="img/dashboard.png" alt="Dashboard with today's CO₂e, summary table, bars by activity and ranking of sites."></div></div>
+      </li>
+      <li class="step">
+        <div class="txt"><h3>Check the method</h3><p>The Methodology page is built from the same files the engine uses. Every coefficient lists its range, status (sourced, to verify or assumption) and links to its source.</p></div>
+        <div class="frame"><div class="bar"><i></i><i></i><i></i></div><div class="crop"><img src="img/methodology-coefficients.png" alt="Methodology page with the table of coefficients, ranges, statuses and sources."></div></div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="views">
+    <p class="eyebrow">Light, dark, any metric</p>
+    <h2>Same data, the view you need</h2>
+    <div class="pair">
+      <div class="frame"><div class="bar"><i></i><i></i><i></i></div><div class="crop"><img src="img/dashboard-dark.png" alt="Dashboard in dark theme."></div></div>
+      <div class="frame"><div class="bar"><i></i><i></i><i></i></div><div class="crop"><img src="img/dashboard-week-water.png" alt="Dashboard for the last 7 days with water as the metric."></div></div>
+    </div>
+    <p>The interface follows the system theme. Period and metric selectors change the charts only; all three metrics are always computed and stored.</p>
+  </section>
+
+  <section id="number">
+    <p class="eyebrow">One number, explained</p>
+    <h2>How 48 minutes of video becomes 26 g of CO₂e</h2>
+    <p>An example from the demo dashboard, using the Italian profile. Every line maps to a row in the Methodology page.</p>
+    <div class="receipt" role="group" aria-label="Worked calculation">
+      <div class="row"><span>Device: 0.8 h × 20 W</span><span>16 Wh</span></div>
+      <div class="row"><span>Network + data center: 0.8 h × 77 Wh/h</span><span>62 Wh</span></div>
+      <div class="rule"></div>
+      <div class="row total"><span>Energy</span><span>78 Wh</span></div>
+      <div class="row"><span>× 331 gCO₂e/kWh (Italy)</span><span>26 g CO₂e</span></div>
+      <div class="row"><span>× 4.0 L/kWh (water, midpoint)</span><span>310 mL</span></div>
+      <div class="row"><span>× 0.32 €/kWh</span><span>€0.025</span></div>
+      <div class="rule"></div>
+      <div class="row dim"><span>Shown with its min–max range and a Medium reliability</span><span></span></div>
+    </div>
+  </section>
+
+  <section id="limits">
+    <p class="eyebrow">What it cannot know</p>
+    <h2>Credibility before coverage</h2>
+    <div class="cols2">
+      <ul class="plain">
+        <li>The real consumption of remote servers for each request.</li>
+        <li>Whether a request to an AI service is a chat message or an image generation.</li>
+        <li>The remote energy of AI video generation: no reliable coefficient yet.</li>
+      </ul>
+      <ul class="plain">
+        <li>Servers that do not declare a response size count as zero bytes and lower the reliability.</li>
+        <li>Several values are marked <code>to verify</code> or <code>assumption</code>, and listed publicly.</li>
+        <li>The model is a simplification, and the Methodology page says where it is weakest.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <p class="eyebrow">Privacy</p>
+    <h2>Private by construction</h2>
+    <div class="scroll"><table>
+      <thead><tr><th>Kept on your device</th><th>Never collected</th></tr></thead>
+      <tbody><tr>
+        <td>Domain · number of requests · bytes · active time, per day, for 90 days</td>
+        <td>Page content · full addresses · prompts · cookies · passwords · any personal data</td>
+      </tr></tbody>
+    </table></div>
+    <p>Permissions are limited to observing requests (read-only), idle detection, local storage and a one-minute alarm. You can delete all data from Settings at any time.</p>
+  </section>
+
+  <section id="open">
+    <p class="eyebrow">Open source</p>
+    <h2>Built to be checked and improved</h2>
+    <div class="cols2">
+      <ul class="plain">
+        <li>MIT licensed. Please keep the copyright notice and consider citing the project.</li>
+        <li>Languages today: English and Italian. A new language is one JSON file; Chinese and Japanese are structurally supported and need native review.</li>
+      </ul>
+      <ul class="plain">
+        <li>Coefficients, domains and equivalences live in plain JSON files with sources.</li>
+        <li>Reviews by energy and web-sustainability researchers are especially welcome.</li>
+      </ul>
+    </div>
+    <div class="cta"><a class="btn primary" href="https://github.com/ciao-madesign/greenweb">View on GitHub</a><a class="btn ghost" href="https://github.com/ciao-madesign/greenweb/blob/main/docs/OPEN_QUESTIONS.md">Open questions</a></div>
+  </section>
+
+  <footer>
+    <div>Digital Footprint Counter v0.1.0 · MIT © Michele Aldeni</div>
+    <div>Screens in this page are real captures of the extension running with demo data.</div>
+  </footer>
+</div>
+
+<script>
+/* One button for every browser: it points to the right store once the listing exists. */
+(function () {
+  var STORES = { chrome: null, edge: null, firefox: null }; // fill with the store URLs when listings go live
+  var ua = navigator.userAgent, key = /Firefox\//.test(ua) ? 'firefox' : /Edg\//.test(ua) ? 'edge' : /Chrome\//.test(ua) ? 'chrome' : null;
+  var names = { firefox: 'Firefox', edge: 'Edge', chrome: 'Chrome or Brave' };
+  var btn = document.getElementById('install'), note = document.getElementById('install-status');
+  if (!btn || !key) return;
+  if (STORES[key]) { btn.href = STORES[key]; btn.textContent = 'Add to ' + names[key]; if (note) note.textContent = 'Free · one click · updates automatically'; }
+  else if (note) note.textContent = 'Detected ' + names[key] + '. Store listing in preparation: install from source for now.';
+})();
+</script>
+</body></html>

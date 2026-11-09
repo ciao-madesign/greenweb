@@ -2,7 +2,7 @@ import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
 import { classify, lastNDays, aggregateDays, dayStorageKey } from '../src/core.js';
 import { makeFormatter, makeUnits } from '../src/format.js';
-import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
+import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
 
 const lang = await initI18n();
 translateDom();
@@ -107,15 +107,28 @@ function renderDetail() {
     metricCells(tr, r.est);
   }
 
-  // Equivalenze sul periodo scelto.
+  $('equivalences').replaceChildren(...eqList(total).map((text) => Object.assign(document.createElement('li'), { textContent: text })));
+}
+
+// Equivalenze quotidiane (valori centrali) come testi già localizzati.
+function eqList(total) {
   const c = convert(total.wh, profile, coeffs);
   const totals = { wh: total.wh.mid, co2_g: c.co2_g.mid, water_ml: c.water_ml.mid, cost: c.cost.mid };
   const show = { car_km: units.distanceKm, light_hours_co2: units.hours, led_hours: units.hours, bottles: units.num, washing_cycles: units.num };
-  $('equivalences').replaceChildren(...equivalences(totals, profile, eq).map((x) => {
-    const li = document.createElement('li');
-    li.textContent = t(`eq.${x.id}`, { v: show[x.id](x.value) });
-    return li;
-  }));
+  return equivalences(totals, profile, eq).map((x) => t(`eq.${x.id}`, { v: show[x.id](x.value) }));
+}
+
+// Sintesi di oggi: foglia, valore grande e livello (soglie modificabili).
+function renderHero() {
+  const m = metricOf(settings);
+  const { total } = analyse('day');
+  const v = triOf(total, m);
+  const level = levelOf(v.mid, thresholdsFor(m, settings, profile, coeffs));
+  $('hero-leaf').src = `../icons/leaf-${level}-128.png`;
+  $('hero-value').textContent = fmt(v.mid, unitOf(m));
+  $('hero-value').title = rangeText(v, unitOf(m));
+  $('hero-label').textContent = `${t('hero.label', { metric: t(`metric.${m}`) })} · ${t(`hero.level.${level}`)}`;
+  $('hero-eq').textContent = eqList(total)[0] ?? '';
 }
 
 // --- Avvio -------------------------------------------------------------------------
@@ -126,5 +139,6 @@ $('period').onchange = (e) => { state.period = e.target.value; renderDetail(); }
 $('metric').onchange = (e) => { state.metric = e.target.value; renderDetail(); };
 $('settings-link').onclick = (e) => { e.preventDefault(); api.runtime.openOptionsPage(); };
 $('profile').textContent = `${t(`profile.${profileId}`)} · ${profile.co2_g_per_kwh} gCO₂e/kWh · ${profile.currency}`;
+renderHero();
 renderSummary();
 renderDetail();

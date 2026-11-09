@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital Footprint Counter</title>
+  <link rel="stylesheet" href="../dashboard/dashboard.css">
+  <link rel="stylesheet" href="../options/options.css">
+  <link rel="stylesheet" href="welcome.css">
+</head>
+<body>
+  <main>
+    <img class="logo" src="../icons/leaf-green-128.png" alt="" width="72" height="72">
+    <h1 data-i18n="welcome.title"></h1>
+    <p class="lead" data-i18n="welcome.lead"></p>
+    <ol class="steps">
+      <li><h2 data-i18n="welcome.step1.title"></h2><p data-i18n="welcome.step1.body"></p></li>
+      <li>
+        <h2 data-i18n="welcome.step2.title"></h2><p data-i18n="welcome.step2.body"></p>
+        <label><span data-i18n="options.profile"></span><select id="profile"></select></label>
+        <label><span data-i18n="options.language"></span><select id="lang"></select></label>
+        <label><span data-i18n="options.metric"></span><select id="metric"></select></label>
+      </li>
+      <li><h2 data-i18n="welcome.step3.title"></h2><p data-i18n="welcome.step3.body"></p></li>
+    </ol>
+    <p class="privacy" data-i18n="welcome.privacy"></p>
+    <p><button id="start" class="primary" data-i18n="welcome.start"></button> <a href="#" id="skip" data-i18n="welcome.skip"></a></p>
+  </main>
+  <script type="module" src="welcome.js"></script>
+</body>
+</html>

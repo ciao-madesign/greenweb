@@ -1,0 +1,10 @@
+main { max-width: 40rem; }
+.logo { display: block; margin-block-end: .5rem; }
+.lead { font-size: 1.15rem; }
+.steps { padding-inline-start: 1.4rem; }
+.steps li { margin-block: 1.4rem; }
+.steps h2 { margin-block: 0 .2rem; }
+.steps p { margin-block: 0 .4rem; }
+.privacy { background: var(--line); border-radius: 8px; padding: .8rem 1rem; }
+button.primary { color: #fff; background: var(--accent); border-color: var(--accent); }
+@media (prefers-color-scheme: dark) { button.primary { color: #111; } }

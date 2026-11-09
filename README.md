@@ -4,6 +4,8 @@ Free, open source browser extension that **estimates** the environmental footpri
 
 > Estimates, not measurements. Browsers cannot see server consumption, so every value is a documented range with a reliability level. See the in-extension **Methodology** page (`methodology/`) for formulas, coefficients and sources.
 
+![Dashboard](docs/screenshots/dashboard.png)
+
 ## Features
 - Toolbar **leaf** (green / yellow / red) with a badge showing today's value for your chosen metric (CO₂e, water or cost).
 - **Dashboard**: current session, today, 7 and 30 days; breakdown by activity and by site; everyday equivalences.
@@ -33,6 +35,9 @@ npm run package   # dist/digital-footprint-counter-<version>.zip
 - **Language**: copy `locales/en.json` to `locales/<code>.json`, translate, add it to `data/languages.json`.
 - **Domains**: add `"domain": "category"` to `data/catalog.json` (most specific match wins).
 - **Coefficients**: edit `data/coefficients.json`. Every value needs a source, a `min/mid/max` range, a reliability and a `status` (`sourced`, `to_verify`, `assumption`). No unsourced numbers presented as facts.
+
+## Distribution
+Plan and checklist: [`docs/DISTRIBUTION.md`](docs/DISTRIBUTION.md). Store texts and images: [`store/`](store/). Privacy policy: [`PRIVACY.md`](PRIVACY.md).
 
 ## License and citation
 MIT © Michele Aldeni. Keep the copyright notice in copies (see `LICENSE`); a citation is welcome, see `CITATION.cff`.

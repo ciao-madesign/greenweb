@@ -133,5 +133,21 @@
   "m8.item4": "Traffico e attività fuori dal browser, ed energia incorporata nei dispositivi.",
   "m8.item5": "Il tempo di elaborazione locale delle pagine web.",
   "m8.item6": "Le risorse i cui server non dichiarano la dimensione.",
-  "m.license": "Open source (MIT). Dati e formule sono nella cartella data/ del progetto."
+  "m.license": "Open source (MIT). Dati e formule sono nella cartella data/ del progetto.",
+  "welcome.title": "Benvenuto in Digital Footprint Counter",
+  "welcome.lead": "Scopri l'impatto ambientale della tua navigazione, stimato sul tuo dispositivo. Nessun account, nessun server, nessun tracciamento.",
+  "welcome.step1.title": "Fissa la foglia",
+  "welcome.step1.body": "Apri il menu delle estensioni (icona a puzzle) del browser e fissa Digital Footprint Counter: la foglia resterà sempre nella barra degli strumenti.",
+  "welcome.step2.title": "Scegli la tua regione",
+  "welcome.step2.body": "Determina il mix elettrico e il prezzo usati per le stime. Puoi cambiarla in ogni momento dalle Impostazioni.",
+  "welcome.step3.title": "Naviga come sempre",
+  "welcome.step3.body": "La foglia e il suo badge si aggiornano da soli: verde, gialla o rossa man mano che cresce l'impatto della giornata. Cliccala per aprire la dashboard.",
+  "welcome.privacy": "Privacy per progetto: si conservano solo domini, numero di richieste, byte e tempo attivo, su questo dispositivo. Mai contenuti delle pagine, indirizzi completi, prompt o password.",
+  "welcome.start": "Salva e apri la dashboard",
+  "welcome.skip": "Più tardi",
+  "hero.label": "{metric} oggi",
+  "hero.level.green": "Basso",
+  "hero.level.yellow": "Medio",
+  "hero.level.red": "Alto",
+  "hero.hint": "Il livello segue soglie modificabili (Impostazioni), non uno standard scientifico."
 }

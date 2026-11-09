@@ -172,6 +172,11 @@ api.alarms.onAlarm.addListener((a) => { if (a.name === 'tick') flush(); });
 // La sessione corrente riparte a ogni avvio del browser.
 api.runtime.onStartup.addListener(() => api.storage.local.set({ session: { start: Date.now(), stats: {} } }));
 
+// Prima installazione: pagina di benvenuto (regione, lingua, come fissare la foglia).
+api.runtime.onInstalled.addListener((d) => {
+  if (d.reason === 'install') api.tabs.create({ url: api.runtime.getURL('welcome/welcome.html') });
+});
+
 action.onClicked.addListener(() => api.tabs.create({ url: api.runtime.getURL('dashboard/dashboard.html') }));
 
 api.tabs.query({ audible: true }).then((tabs) => tabs.forEach((t) => audible.set(t.id, hostFromUrl(t.url)))).catch(() => {});
