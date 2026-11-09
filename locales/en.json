@@ -151,5 +151,22 @@
   "device.tablet": "Tablet",
   "device.phone": "Smartphone",
   "options.device": "Device",
-  "hero.incomplete": "* Includes activities whose remote energy cannot be estimated yet (AI images and video)."
+  "hero.incomplete": "* Includes activities whose remote energy cannot be estimated yet (AI images and video).",
+  "options.general": "General",
+  "options.privacy": "Privacy and data",
+  "options.private_note": "Private windows are never tracked. Nothing leaves this device.",
+  "options.pause": "Pause tracking",
+  "options.pause_hint": "Nothing is recorded while paused. The leaf turns grey.",
+  "options.retention": "Keep data for",
+  "retention.7": "7 days",
+  "retention.30": "30 days",
+  "retention.90": "90 days",
+  "options.excluded": "Never track these sites",
+  "options.excluded_hint": "One domain per line, for example mybank.com. Subdomains are included. Data already collected for a site you add is deleted.",
+  "options.export": "Export my data (CSV)",
+  "options.summary": "{days} days · {domains} sites · {size} stored on this device",
+  "pause.on": "Pause",
+  "pause.off": "Resume",
+  "pause.banner": "Tracking is paused. Nothing is being recorded.",
+  "tooltip.paused": "Tracking paused"
 }

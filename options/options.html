@@ -9,22 +9,42 @@
 </head>
 <body>
   <main>
-    <h1 data-i18n="options.title"></h1>
-    <label><span data-i18n="options.metric"></span><select id="metric"></select></label>
-    <label><span data-i18n="options.profile"></span><select id="profile"></select></label>
-    <label><span data-i18n="options.device"></span><select id="device"></select></label>
-    <label><span data-i18n="options.language"></span><select id="lang"></select></label>
+    <header class="top">
+      <div class="brand"><img src="../icons/leaf-green-48.png" alt="" width="26" height="26"><span data-i18n="options.title"></span></div>
+      <nav><a href="../dashboard/dashboard.html" data-i18n="nav.dashboard"></a></nav>
+    </header>
 
-    <h2 data-i18n="options.advanced"></h2>
-    <p class="note" data-i18n="options.advanced_hint"></p>
-    <label><span data-i18n="options.co2factor"></span><input id="co2" type="number" min="0" step="any"></label>
-    <label><span id="price-label"></span><input id="price" type="number" min="0" step="any"></label>
-    <label><span data-i18n="options.threshold_low"></span><input id="low" type="number" min="0" step="any"></label>
-    <label><span data-i18n="options.threshold_high"></span><input id="high" type="number" min="0" step="any"></label>
-    <p class="note" data-i18n="options.threshold_hint"></p>
+    <section class="card">
+      <h2 data-i18n="options.general"></h2>
+      <label><span data-i18n="options.metric"></span><select id="metric"></select></label>
+      <label><span data-i18n="options.profile"></span><select id="profile"></select></label>
+      <label><span data-i18n="options.device"></span><select id="device"></select></label>
+      <label><span data-i18n="options.language"></span><select id="lang"></select></label>
+    </section>
 
-    <h2 data-i18n="options.data"></h2>
-    <button id="delete" data-i18n="options.delete"></button>
+    <section class="card" id="privacy">
+      <h2 data-i18n="options.privacy"></h2>
+      <p class="note" data-i18n="options.private_note"></p>
+      <label class="check"><input type="checkbox" id="paused"><span><b data-i18n="options.pause"></b><small data-i18n="options.pause_hint"></small></span></label>
+      <label><span data-i18n="options.retention"></span><select id="retention"></select></label>
+      <label><span data-i18n="options.excluded"></span><textarea id="excluded" rows="4" spellcheck="false" placeholder="mybank.com"></textarea><small data-i18n="options.excluded_hint"></small></label>
+      <p class="note" id="summary"></p>
+      <div class="row">
+        <button id="export" class="plain" data-i18n="options.export"></button>
+        <button id="delete" data-i18n="options.delete"></button>
+      </div>
+    </section>
+
+    <details class="card">
+      <summary data-i18n="options.advanced"></summary>
+      <p class="note" data-i18n="options.advanced_hint"></p>
+      <label><span data-i18n="options.co2factor"></span><input id="co2" type="number" min="0" step="any"></label>
+      <label><span id="price-label"></span><input id="price" type="number" min="0" step="any"></label>
+      <label><span data-i18n="options.threshold_low"></span><input id="low" type="number" min="0" step="any"></label>
+      <label><span data-i18n="options.threshold_high"></span><input id="high" type="number" min="0" step="any"></label>
+      <p class="note" data-i18n="options.threshold_hint"></p>
+    </details>
+
     <p id="status" class="note" role="status"></p>
   </main>
   <script type="module" src="options.js"></script>

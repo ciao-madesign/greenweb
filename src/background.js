@@ -1,13 +1,12 @@
 // Service worker: raccoglie byte e tempo attivo per dominio. Nessuna rete, nessun contenuto di pagina.
 import { api, action } from './compat.js';
-import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue } from './core.js';
+import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, privacyOf, isExcluded, purgeHosts } from './core.js';
 import { estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
 import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
 
 const FLUSH_DELAY_MS = 20000;   // salvataggio aggregato (non a ogni richiesta)
 const MAX_TICK_MS = 120000;     // tetto di tempo attribuibile tra due eventi
-const KEEP_DAYS = 90;
 
 let pending = {};               // dati non ancora salvati
 let inflight = {};              // dati in scrittura (contano ancora nel badge finché la scrittura non finisce)
@@ -15,7 +14,11 @@ let flushTimer = null;
 let queue = Promise.resolve();  // serializza le scritture
 const tabHost = new Map();      // tabId -> dominio del sito aperto
 const audible = new Map();      // tabId -> dominio, per le schede che stanno emettendo audio
+const privateTabs = new Set();  // schede in finestre private: mai monitorate
 const active = { host: null, since: 0 };
+let cfg = privacyOf({});        // pausa, esclusioni, conservazione (da impostazioni)
+let cfgReady = false;
+const early = [];               // richieste arrivate prima del caricamento delle impostazioni
 const state = { idle: 'active', focused: true };
 
 // --- Tempo attivo -----------------------------------------------------------
@@ -26,7 +29,7 @@ function accrue(now = Date.now()) {
   if (dt > 0) {
     const hosts = new Set(audible.values());
     if (active.host) hosts.add(active.host);
-    for (const h of hosts) if (h) addSample(pending, dayKey(), h, { ms: dt });
+    for (const h of hosts) if (h && allowed(h)) addSample(pending, dayKey(), h, { ms: dt });
   }
   active.since = now;
 }
@@ -35,19 +38,24 @@ async function refreshActive() {
   accrue();
   scheduleLive();
   active.host = null;
-  if (state.idle === 'active' && state.focused) {
+  if (state.idle === 'active' && state.focused && !cfg.paused) {
     try {
       const [tab] = await api.tabs.query({ active: true, lastFocusedWindow: true });
-      active.host = tab ? hostFromUrl(tab.url) : null;
+      active.host = tab && !tab.incognito ? hostFromUrl(tab.url) : null;
     } catch { /* tab non disponibile */ }
   }
   active.since = Date.now();
 }
 
 // --- Byte trasferiti --------------------------------------------------------
-function record(host, bytes) {
+/** Sito monitorabile: non in pausa e non escluso dall'utente. */
+const allowed = (host) => !cfg.paused && !isExcluded(host, cfg.excluded);
+
+function record(host, bytes, countRequest = true) {
   if (!host) return;
-  addSample(pending, dayKey(), host, { n: 1, b: bytes });
+  if (!cfgReady) { if (early.length < 500) early.push([host, bytes, countRequest]); return; }
+  if (!allowed(host)) return;
+  addSample(pending, dayKey(), host, { n: countRequest ? 1 : 0, b: bytes });
   scheduleFlush();
   scheduleLive();
 }
@@ -56,24 +64,28 @@ const FILTER = { urls: ['http://*/*', 'https://*/*'] };
 
 // La navigazione principale fissa il dominio della scheda prima dei sotto-caricamenti.
 api.webRequest.onBeforeRequest.addListener((d) => {
-  if (d.type === 'main_frame' && d.tabId >= 0) tabHost.set(d.tabId, hostFromUrl(d.url));
+  if (d.type === 'main_frame' && d.tabId >= 0) tabHost.set(d.tabId, privateTabs.has(d.tabId) ? null : hostFromUrl(d.url));
 }, FILTER);
 
+
 api.webRequest.onCompleted.addListener((d) => {
-  if (d.tabId < 0) return; // richieste del browser/estensioni: ignorate
+  if (d.tabId < 0 || privateTabs.has(d.tabId)) return; // richieste del browser/estensioni e finestre private: ignorate
   const bytes = contentLength(d.responseHeaders);
   if (d.type === 'main_frame') tabHost.set(d.tabId, hostFromUrl(d.url)); // dominio finale dopo eventuali redirect
   if (tabHost.has(d.tabId)) return record(tabHost.get(d.tabId), bytes);
   api.tabs.get(d.tabId).then((t) => {
+    if (t.incognito) { privateTabs.add(t.id); tabHost.set(d.tabId, null); return; }
     const h = hostFromUrl(t.url);
     tabHost.set(d.tabId, h);
     record(h, bytes);
   }).catch(() => {});
 }, FILTER, ['responseHeaders']);
 
-api.tabs.onRemoved.addListener((id) => { accrue(); tabHost.delete(id); audible.delete(id); });
+api.tabs.onRemoved.addListener((id) => { accrue(); tabHost.delete(id); audible.delete(id); privateTabs.delete(id); });
+api.tabs.onCreated.addListener((tab) => { if (tab.incognito) privateTabs.add(tab.id); });
 api.tabs.onActivated.addListener(refreshActive);
 api.tabs.onUpdated.addListener((id, change, tab) => {
+  if (tab.incognito) { privateTabs.add(id); tabHost.set(id, null); audible.delete(id); return; }
   if (change.url) tabHost.set(id, hostFromUrl(change.url));
   if ('audible' in change || (change.url && audible.has(id))) {
     accrue();
@@ -128,12 +140,12 @@ function flush() {
 
 // Elimina i giorni più vecchi di KEEP_DAYS; una volta al giorno per avvio del worker.
 let lastPrune = '';
-async function pruneOldDays() {
+async function pruneOldDays(force = false) {
   const today = dayKey();
-  if (lastPrune === today) return;
+  if (!force && lastPrune === today) return;
   lastPrune = today;
   const all = await api.storage.local.get(null);
-  const old = expiredDayKeys(Object.keys(all), KEEP_DAYS);
+  const old = expiredDayKeys(Object.keys(all), cfg.retentionDays);
   if (old.length) await api.storage.local.remove(old);
 }
 
@@ -171,6 +183,17 @@ async function refreshBadge() {
   await ensureCache();
   const lang = await (strings ??= loadStrings());
   const settings = cache.settings;
+  if (cfg.paused) { // pausa: foglia grigia e nessun valore
+    const title = t('tooltip.paused');
+    if (last !== `paused|${title}`) {
+      last = `paused|${title}`;
+      action.setBadgeText({ text: 'II' });
+      action.setBadgeBackgroundColor({ color: '#8a958e' });
+      action.setIcon({ path: iconSet('gray') });
+      action.setTitle({ title });
+    }
+    return;
+  }
   const profile = resolveProfile(coeffs, settings);
   const metric = metricOf(settings);
   const est = estimateDay(todayNow(), catalog.domains, classify, coeffs, settings.device);
@@ -195,14 +218,27 @@ function scheduleLive() {
   liveTimer = setTimeout(() => {
     liveTimer = null;
     accrue();
-    refreshBadge().catch(() => {});
+    loadCfg().then(() => refreshBadge()).catch(() => {});
+api.tabs.query({}).then((tabs) => tabs.forEach((t) => t.incognito && privateTabs.add(t.id))).catch(() => {});
   }, LIVE_MS);
+}
+
+/** Carica pausa, esclusioni e conservazione; svuota ciò che ora è escluso. */
+async function loadCfg() {
+  const { settings = {} } = await api.storage.local.get('settings');
+  cfg = privacyOf(settings);
+  cfgReady = true;
+  for (const day of Object.keys(pending)) pending[day] = purgeHosts(pending[day], cfg.excluded);
+  for (const [host, bytes, count] of early.splice(0)) record(host, bytes, count);
 }
 
 // Cambi di impostazioni o cancellazione dati: aggiorna subito.
 api.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
-  if (changes.settings) { strings = null; cache.settings = null; last = ''; refreshBadge().catch(() => {}); }
+  if (changes.settings) {
+    strings = null; cache.settings = null; last = '';
+    loadCfg().then(() => { pruneOldDays(true).catch(() => {}); return refreshBadge(); }).catch(() => {});
+  }
   // Chiave 'session' rimossa = l'utente ha cancellato i dati: scarta anche quelli in attesa.
   if (changes.session && changes.session.newValue === undefined) { pending = {}; inflight = {}; cache.day = null; last = ''; refreshBadge().catch(() => {}); }
 });
@@ -222,6 +258,7 @@ api.runtime.onInstalled.addListener((d) => {
 
 action.onClicked.addListener(() => api.tabs.create({ url: api.runtime.getURL('dashboard/dashboard.html') }));
 
-api.tabs.query({ audible: true }).then((tabs) => tabs.forEach((t) => audible.set(t.id, hostFromUrl(t.url)))).catch(() => {});
+api.tabs.query({ audible: true }).then((tabs) => tabs.forEach((t) => !t.incognito && audible.set(t.id, hostFromUrl(t.url)))).catch(() => {});
 api.idle.queryState(60).then((s) => { state.idle = s === 'active' ? 'active' : 'idle'; refreshActive(); });
-refreshBadge().catch(() => {});
+loadCfg().then(() => refreshBadge()).catch(() => {});
+api.tabs.query({}).then((tabs) => tabs.forEach((t) => t.incognito && privateTabs.add(t.id))).catch(() => {});

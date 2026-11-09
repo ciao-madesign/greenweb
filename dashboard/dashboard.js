@@ -189,6 +189,12 @@ function render() {
 segmented($('period'), ['day', 'week', 'month'].map((p) => [p, t(`period.${p}`)]), state.period, (p) => { state.period = p; render(); });
 segmented($('metric'), Object.keys(METRICS).map((m) => [m, t(`metric.${m}`)]), state.metric, (m) => { state.metric = m; render(); });
 $('details').addEventListener('toggle', () => { if ($('details').open) renderDetails(); });
+function showPause() {
+  $('pause').textContent = t(settings.paused ? 'pause.off' : 'pause.on');
+  $('paused-banner').hidden = !settings.paused;
+}
+$('pause').onclick = async () => { settings.paused = !settings.paused; await api.storage.local.set({ settings }); showPause(); };
+showPause();
 $('settings-link').onclick = (e) => { e.preventDefault(); api.runtime.openOptionsPage(); };
 $('profile').textContent = `${t(`profile.${profileId}`)} · ${profile.co2_g_per_kwh} gCO₂e/kWh`;
 render();

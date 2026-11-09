@@ -112,3 +112,54 @@ export function aggregateDays(stats, days) {
   for (const day of days) for (const [host, e] of Object.entries(stats[day] ?? {})) addSample(out, 'all', host, e);
   return out.all ?? {};
 }
+
+// --- Privacy: impostazioni, esclusioni, esportazione ---------------------------------
+export const RETENTION_OPTIONS = [7, 30, 90];
+
+/** Impostazioni di privacy con i valori predefiniti (nessuna voce avanzata attiva senza scelta dell'utente). */
+export function privacyOf(settings = {}) {
+  return {
+    paused: !!settings.paused,
+    retentionDays: RETENTION_OPTIONS.includes(settings.retentionDays) ? settings.retentionDays : 90,
+    excluded: Array.isArray(settings.excluded) ? settings.excluded : [],
+  };
+}
+
+/** Dominio da un testo libero ("https://www.Banca.it/x" -> "banca.it"); null se non valido. */
+export function normalizeDomain(input) {
+  let s = String(input ?? '').trim().toLowerCase();
+  if (!s) return null;
+  s = s.replace(/^[a-z][a-z0-9+.-]*:\/\//, '').split(/[/?#]/)[0].replace(/^www\./, '').replace(/:\d+$/, '').replace(/\.$/, '');
+  if (s === 'localhost') return s;
+  return /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(s) ? s : null;
+}
+
+/** Elenco di domini da un testo (uno per riga o separati da virgola/spazio), senza duplicati. */
+export function parseDomainList(text) {
+  const out = new Set();
+  for (const part of String(text ?? '').split(/[\s,;]+/)) {
+    const d = normalizeDomain(part);
+    if (d) out.add(d);
+  }
+  return [...out];
+}
+
+/** Il dominio (o un suo sottodominio) è nell'elenco delle esclusioni? */
+export function isExcluded(host, list) {
+  return list.some((d) => host === d || host.endsWith(`.${d}`));
+}
+
+/** Copia del record di un giorno senza i domini esclusi. */
+export function purgeHosts(record, list) {
+  return Object.fromEntries(Object.entries(record ?? {}).filter(([host]) => !isExcluded(host, list)));
+}
+
+/** CSV leggibile di tutto ciò che è memorizzato: giorno, dominio, richieste, byte, secondi attivi. */
+export function csvFromDays(days) {
+  const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
+  const rows = ['day,domain,requests,bytes,active_seconds'];
+  for (const day of Object.keys(days).sort()) {
+    for (const [host, e] of Object.entries(days[day]).sort()) rows.push([day, q(host), e.n, e.b, Math.round(e.ms / 1000)].join(','));
+  }
+  return `${rows.join('\n')}\n`;
+}

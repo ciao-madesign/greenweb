@@ -151,5 +151,22 @@
   "device.tablet": "Tablet",
   "device.phone": "Smartphone",
   "options.device": "Dispositivo",
-  "hero.incomplete": "* Include attività la cui energia remota non è ancora stimabile (AI immagini e video)."
+  "hero.incomplete": "* Include attività la cui energia remota non è ancora stimabile (AI immagini e video).",
+  "options.general": "Generali",
+  "options.privacy": "Privacy e dati",
+  "options.private_note": "Le finestre private non vengono mai monitorate. Niente lascia questo dispositivo.",
+  "options.pause": "Sospendi il monitoraggio",
+  "options.pause_hint": "Mentre è in pausa non si registra nulla. La foglia diventa grigia.",
+  "options.retention": "Conserva i dati per",
+  "retention.7": "7 giorni",
+  "retention.30": "30 giorni",
+  "retention.90": "90 giorni",
+  "options.excluded": "Non monitorare questi siti",
+  "options.excluded_hint": "Un dominio per riga, per esempio miabanca.it. I sottodomini sono inclusi. I dati già raccolti di un sito che aggiungi vengono cancellati.",
+  "options.export": "Esporta i miei dati (CSV)",
+  "options.summary": "{days} giorni · {domains} siti · {size} su questo dispositivo",
+  "pause.on": "Sospendi",
+  "pause.off": "Riprendi",
+  "pause.banner": "Il monitoraggio è sospeso. Non si registra nulla.",
+  "tooltip.paused": "Monitoraggio sospeso"
 }

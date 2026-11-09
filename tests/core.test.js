@@ -97,3 +97,34 @@ test('manifest: nessuna connessione esterna consentita dalla CSP', () => {
   assert.match(csp, /connect-src 'self'/);
   assert.doesNotMatch(csp, /https?:|\*/);
 });
+
+import { privacyOf, normalizeDomain, parseDomainList, isExcluded, purgeHosts, csvFromDays } from '../src/core.js';
+
+test('privacyOf: valori predefiniti prudenti e validazione', () => {
+  assert.deepEqual(privacyOf({}), { paused: false, retentionDays: 90, excluded: [] });
+  assert.equal(privacyOf({ retentionDays: 5 }).retentionDays, 90);
+  assert.equal(privacyOf({ retentionDays: 30, paused: true }).paused, true);
+});
+
+test('normalizeDomain / parseDomainList', () => {
+  assert.equal(normalizeDomain('https://www.Banca.it/conto?x=1'), 'banca.it');
+  assert.equal(normalizeDomain('  mail.example.com:8080 '), 'mail.example.com');
+  assert.equal(normalizeDomain('localhost'), 'localhost');
+  assert.equal(normalizeDomain('non un dominio'), null);
+  assert.equal(normalizeDomain('senzapunto'), null);
+  assert.deepEqual(parseDomainList('banca.it\nwww.banca.it, salute.example.org  https://x.com/a'), ['banca.it', 'salute.example.org', 'x.com']);
+});
+
+test('isExcluded: dominio e sottodomini, non omonimi parziali', () => {
+  const list = ['banca.it'];
+  assert.equal(isExcluded('banca.it', list), true);
+  assert.equal(isExcluded('app.banca.it', list), true);
+  assert.equal(isExcluded('labanca.it', list), false);
+  assert.equal(isExcluded('banca.it.evil.com', list), false);
+});
+
+test('purgeHosts e csvFromDays', () => {
+  const rec = { 'banca.it': { n: 1, b: 2, ms: 3000 }, 'app.banca.it': { n: 1, b: 1, ms: 1 }, 'a.com': { n: 4, b: 5, ms: 6000 } };
+  assert.deepEqual(Object.keys(purgeHosts(rec, ['banca.it'])), ['a.com']);
+  assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,active_seconds\n2026-11-09,"a.com",4,5,6\n');
+});

@@ -82,3 +82,7 @@ td.num { text-align: end; font-variant-numeric: tabular-nums; }
 .foot { text-align: center; }
 @media (max-width: 640px) { .hero { grid-template-columns: 1fr; } .controls { justify-content: center; } }
 @media (prefers-reduced-motion: no-preference) { .fill, .bar { transition: width .4s ease, height .4s ease, y .4s ease; } }
+
+.pause { font: inherit; font-size: .9rem; color: var(--muted); background: none; border: 1px solid var(--line); border-radius: 999px; padding: .2rem .8rem; cursor: pointer; }
+.pause:hover { color: var(--fg); }
+.banner { background: var(--card); border: 1px dashed var(--muted); border-radius: 12px; padding: .6rem 1rem; margin: 0; color: var(--muted); }

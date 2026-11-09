@@ -15,7 +15,8 @@ Free, open source browser extension that **estimates** the environmental footpri
 
 ## Privacy
 - Stores only **domain**, request count, bytes and active time, on your device (`storage.local`). Never full URLs, page content, prompts, cookies or passwords.
-- No network access of its own, no remote code, no analytics. *Delete all data* in Settings.
+- No network access of its own (enforced by the extension's security policy), no remote code, no analytics.
+- Controls in Settings: pause, sites to never track, retention (7/30/90 days), CSV export of everything stored, delete all. Private windows are never tracked.
 - Permissions: `webRequest` (observe requests, read-only), `idle` (stop counting when you are away), `storage`, `alarms` (one tick per minute) and access to http/https sites (needed by `webRequest`).
 
 ## Install (development)

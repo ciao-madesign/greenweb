@@ -14,18 +14,18 @@ Script: `node scripts/measure-impact.cjs <cartella-profilo>` (richiede Playwrigh
 
 | Scenario | Risultato |
 |---|---|
-| A riposo, 30 s | 0,01 s di CPU (~1 s/ora) |
-| 20 richieste/s per 60 s (1200 richieste) | 0,70 s di CPU, cioè ~0,58 ms per richiesta |
+| A riposo, 30 s | 0,01–0,02 s di CPU (~1–2 s/ora) |
+| 20 richieste/s per 60 s (1200 richieste) | 0,70–0,83 s di CPU, cioè ~0,6–0,7 ms per richiesta (due esecuzioni, dopo i controlli di privacy) |
 | Storage dopo la prova (1 dominio) | 162 byte |
 | Storage, caso peggiore stimato (150 domini × 90 giorni × ~60 B) | ~0,8 MB |
 
 ## Stima energetica
-Navigazione intensa: 5.000–20.000 richieste/ora → 3–12 s di CPU/ora, più ~1 s/ora a riposo.
-Con 10–25 W per secondo di CPU attiva (ipotesi): **0,01–0,09 Wh all'ora**.
-Il dispositivo, nello stesso intervallo di tempo, è stimato a 20 Wh/ora (valore centrale): l'estensione pesa **circa 0,05–0,5 %** di ciò che misura.
+Navigazione intensa: 5.000–20.000 richieste/ora → 3–14 s di CPU/ora, più ~1–2 s/ora a riposo.
+Con 10–25 W per secondo di CPU attiva (ipotesi): **0,01–0,1 Wh all'ora**.
+Il dispositivo, nello stesso intervallo di tempo, è stimato a 12 Wh/ora (portatile, valore centrale): l'estensione pesa **circa 0,1–1 %** di ciò che misura.
 
 ## Limiti della misura
 - Una sola esecuzione, in un ambiente condiviso e senza interfaccia: va ripetuta su hardware reale (laptop con batteria).
-- La memoria residente (~105–114 MB) comprende il runtime del browser per l'estensione: non è tutta attribuibile al nostro codice.
+- La memoria residente (~105–146 MB) comprende il runtime del browser per l'estensione: non è tutta attribuibile al nostro codice.
 - Firefox non è stato misurato.
 - Il costo per richiesta è dominato dal recapito degli eventi `webRequest` (intestazioni di risposta), non dal nostro calcolo.

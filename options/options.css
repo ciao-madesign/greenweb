@@ -1,3 +1,14 @@
-label { display: grid; gap: .2rem; margin-block: .8rem; max-width: 24rem; }
-select, input, button { font: inherit; padding: .4rem .5rem; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; }
-button { cursor: pointer; border-color: #c62828; color: #c62828; }
+main { max-width: 40rem; }
+.card h2 { margin-block-end: .4rem; }
+label { display: grid; gap: .25rem; margin-block: .9rem; }
+label small, .check small { color: var(--muted); font-size: .85rem; }
+select, input[type="number"], textarea { font: inherit; padding: .45rem .6rem; color: var(--fg); background: var(--card); border: 1px solid var(--line); border-radius: 8px; max-width: 100%; }
+textarea { resize: vertical; font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; font-size: .9rem; }
+label.check { display: flex; gap: .7rem; align-items: flex-start; }
+.check input { margin-block-start: .35rem; inline-size: 1.1rem; block-size: 1.1rem; accent-color: var(--accent); }
+.check span { display: grid; gap: .1rem; }
+.row { display: flex; flex-wrap: wrap; gap: .6rem; margin-block-start: .6rem; }
+button { font: inherit; padding: .5rem 1rem; border-radius: 8px; cursor: pointer; border: 1px solid var(--red); color: var(--red); background: none; }
+button.plain { border-color: var(--line); color: var(--fg); }
+.note { color: var(--muted); font-size: .9rem; margin: .3rem 0; }
+details summary { font-weight: 600; cursor: pointer; }

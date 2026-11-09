@@ -10,8 +10,10 @@
   <main>
     <header class="top">
       <div class="brand"><img src="../icons/leaf-green-48.png" alt="" width="26" height="26"><span data-i18n="app.title"></span></div>
-      <nav><a href="#" id="settings-link" data-i18n="options.title"></a><a href="../methodology/methodology.html" data-i18n="nav.methodology"></a></nav>
+      <nav><button type="button" id="pause" class="pause"></button><a href="#" id="settings-link" data-i18n="options.title"></a><a href="../methodology/methodology.html" data-i18n="nav.methodology"></a></nav>
     </header>
+
+    <p id="paused-banner" class="banner" hidden data-i18n="pause.banner"></p>
 
     <div class="controls">
       <div class="seg-ctl" id="period" role="group" aria-label="Period"></div>
