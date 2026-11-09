@@ -28,6 +28,7 @@ Free, open source browser extension that **estimates** the environmental footpri
 npm test          # unit tests (Node 20+)
 npm run lint      # web-ext lint (Firefox rules)
 npm run package   # dist/digital-footprint-counter-<version>.zip
+python3 -I scripts/update-ember.py   # grid carbon intensity from Ember's yearly data (--apply to update)
 ```
 
 ## How it works (short)

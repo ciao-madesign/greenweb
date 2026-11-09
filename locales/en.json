@@ -175,5 +175,8 @@
   "options.ai_deleted": "AI counts deleted.",
   "col.prompts": "AI messages",
   "coef.streaming_uhd_gb_per_hour": "Streaming: 4K data-rate threshold",
-  "coef.streaming_uhd_factor": "Streaming: 4K multiplier"
+  "coef.streaming_uhd_factor": "Streaming: 4K multiplier",
+  "mt.status_profile": "Status",
+  "mt.co2": "CO₂e",
+  "mt.pricecol": "price"
 }

@@ -175,5 +175,8 @@
   "options.ai_deleted": "Conteggi AI eliminati.",
   "col.prompts": "Messaggi AI",
   "coef.streaming_uhd_gb_per_hour": "Streaming: soglia di velocità per il 4K",
-  "coef.streaming_uhd_factor": "Streaming: moltiplicatore 4K"
+  "coef.streaming_uhd_factor": "Streaming: moltiplicatore 4K",
+  "mt.status_profile": "Stato",
+  "mt.co2": "CO₂e",
+  "mt.pricecol": "prezzo"
 }

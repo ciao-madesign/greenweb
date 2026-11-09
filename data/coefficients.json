@@ -29,14 +29,9 @@
       "year": 2023
     },
     "ember": {
-      "title": "Ember, Yearly Electricity Data (2025 values are a provisional extraction, to be recomputed from the dataset)",
+      "title": "Ember, yearly electricity generation data (2025; emissions intensity of total generation)",
       "url": "https://ember-energy.org/data/yearly-electricity-data/",
       "year": 2025
-    },
-    "owid2020": {
-      "title": "Our World in Data, electricity carbon intensity by country (2020 table; secondary source)",
-      "url": "https://www.drorpoleg.com/charts/global-electricity-carbon-intensity/",
-      "year": 2020
     },
     "eurostat": {
       "title": "Eurostat nrg_pc_204, household electricity prices",
@@ -113,97 +108,117 @@
     "it": {
       "label": "Italia",
       "currency": "EUR",
-      "co2_g_per_kwh": 284,
+      "co2_g_per_kwh": 285,
       "price_per_kwh": 0.311,
-      "status": "to_verify",
       "sources": [
         "ember",
         "eurostat"
       ],
-      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary values: 281-288, to reconcile from one dataset release); price: Dec 2024 household about 0.311 EUR/kWh incl. taxes (Eurostat nrg_pc_204, secondary extraction)",
       "co2_range": {
-        "min": 270,
-        "max": 300
+        "min": 281,
+        "max": 323
       },
       "price_range": {
         "min": 0.29,
         "max": 0.34
-      }
+      },
+      "price_status": "to_verify",
+      "price_reference": "Price: Dec 2024 household about 0.311 EUR/kWh incl. taxes (Eurostat nrg_pc_204, secondary extraction)",
+      "co2_status": "sourced",
+      "co2_reference": "Ember yearly generation data, 2025 (generation-based, Ember emission factors incl. lifecycle); range = 2023-2025 minimum and maximum; file last modified Tue, 03 Nov 2026 19:06:27 GMT"
     },
     "eu": {
       "label": "Unione Europea",
       "currency": "EUR",
-      "co2_g_per_kwh": 265,
+      "co2_g_per_kwh": 211,
       "price_per_kwh": 0.2872,
-      "status": "to_verify",
       "sources": [
-        "owid2020",
+        "ember",
         "eurostat"
       ],
-      "reference": "CO2: 2020 'Europe' value, to be updated (lowcarbonpower.org lists EU ~194, year not stated); price: H2 2024"
+      "price_status": "sourced",
+      "price_reference": "Price: Eurostat H2 2024 household average 0.2872 EUR/kWh",
+      "co2_status": "sourced",
+      "co2_reference": "Ember yearly generation data, 2025 (generation-based, Ember emission factors incl. lifecycle); range = 2023-2025 minimum and maximum; file last modified Tue, 03 Nov 2026 19:06:27 GMT",
+      "co2_range": {
+        "min": 211,
+        "max": 236
+      }
     },
     "us": {
       "label": "USA",
       "currency": "USD",
       "co2_g_per_kwh": 384,
       "price_per_kwh": 0.1648,
-      "status": "to_verify",
       "sources": [
         "ember",
         "eia"
       ],
-      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary: 384); price: EIA 2024 residential average 16.48 c/kWh",
       "co2_range": {
-        "min": 370,
-        "max": 400
-      }
+        "min": 384,
+        "max": 393
+      },
+      "price_status": "sourced",
+      "price_reference": "Price: EIA 2024 residential average 16.48 c/kWh",
+      "co2_status": "sourced",
+      "co2_reference": "Ember yearly generation data, 2025 (generation-based, Ember emission factors incl. lifecycle); range = 2023-2025 minimum and maximum; file last modified Tue, 03 Nov 2026 19:06:27 GMT"
     },
     "cn": {
       "label": "Cina",
       "currency": "CNY",
       "co2_g_per_kwh": 528,
       "price_per_kwh": 0.542,
-      "status": "to_verify",
       "sources": [
         "ember",
         "cn_price"
       ],
-      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary: 559); price: 2021 national household average, tariffs are tiered and set by province (provincial tables needed)",
       "co2_range": {
-        "min": 510,
-        "max": 550
-      }
+        "min": 528,
+        "max": 586
+      },
+      "price_status": "to_verify",
+      "price_reference": "Price: 2021 national household average; tariffs are tiered and set by province (provincial tables needed)",
+      "co2_status": "sourced",
+      "co2_reference": "Ember yearly generation data, 2025 (generation-based, Ember emission factors incl. lifecycle); range = 2023-2025 minimum and maximum; file last modified Tue, 03 Nov 2026 19:06:27 GMT"
     },
     "jp": {
       "label": "Giappone",
       "currency": "JPY",
-      "co2_g_per_kwh": 477,
+      "co2_g_per_kwh": 474,
       "price_per_kwh": 32.8,
-      "status": "to_verify",
       "sources": [
         "ember",
         "fepc"
       ],
-      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary: 484); price: FEPC household average FY2024 32.80 JPY/kWh",
       "co2_range": {
-        "min": 460,
-        "max": 500
+        "min": 474,
+        "max": 493
       },
       "price_range": {
         "min": 30,
         "max": 35
-      }
+      },
+      "price_status": "sourced",
+      "price_reference": "Price: FEPC household average FY2024 32.80 JPY/kWh",
+      "co2_status": "sourced",
+      "co2_reference": "Ember yearly generation data, 2025 (generation-based, Ember emission factors incl. lifecycle); range = 2023-2025 minimum and maximum; file last modified Tue, 03 Nov 2026 19:06:27 GMT"
     },
     "world": {
       "label": "Media mondiale",
       "currency": "USD",
-      "co2_g_per_kwh": 480,
+      "co2_g_per_kwh": 460,
       "price_per_kwh": 0.16,
-      "status": "to_verify",
       "sources": [
         "ember"
       ],
-      "reference": "CO2: 2023 (Ember Global Electricity Review 2024); price: order of magnitude, to be verified"
+      "price_status": "to_verify",
+      "price_reference": "Price: order of magnitude, to be verified",
+      "co2_status": "sourced",
+      "co2_reference": "Ember yearly generation data, 2025 (generation-based, Ember emission factors incl. lifecycle); range = 2023-2025 minimum and maximum; file last modified Tue, 03 Nov 2026 19:06:27 GMT",
+      "co2_range": {
+        "min": 460,
+        "max": 486
+      }
     }
   },
   "energy": {

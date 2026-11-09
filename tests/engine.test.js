@@ -98,6 +98,8 @@ test('ogni coefficiente: min<=mid<=max e fonti esistenti', () => {
   for (const [k, x] of [...Object.entries(c.energy), ...Object.entries(c.water)]) check(x, k);
   for (const [k, p] of Object.entries(c.profiles)) {
     for (const s of p.sources) assert.ok(c.sources[s], `fonte mancante: ${s} in ${k}`);
+    assert.ok(['sourced', 'to_verify'].includes(p.co2_status) && ['sourced', 'to_verify'].includes(p.price_status), `stati del profilo ${k}`);
+    assert.ok(p.co2_reference && p.price_reference, `riferimenti del profilo ${k}`);
     if (p.co2_range) assert.ok(p.co2_range.min <= p.co2_g_per_kwh && p.co2_g_per_kwh <= p.co2_range.max, k);
     if (p.price_range) assert.ok(p.price_range.min <= p.price_per_kwh && p.price_per_kwh <= p.price_range.max, k);
   }

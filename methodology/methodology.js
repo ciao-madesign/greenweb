@@ -66,10 +66,10 @@ for (const [id, p] of Object.entries(c.profiles)) {
   const tr = profBody.insertRow();
   tr.id = `profile-${id}`;
   td(tr, t(`profile.${id}`));
-  td(tr, num.format(p.co2_g_per_kwh), 'num');
+  td(tr, p.co2_range ? `${num.format(p.co2_g_per_kwh)} (${num.format(p.co2_range.min)}–${num.format(p.co2_range.max)})` : num.format(p.co2_g_per_kwh), 'num');
   td(tr, `${num.format(p.price_per_kwh)} ${p.currency}/kWh`, 'num');
-  td(tr, status(p.status));
-  td(tr, p.reference, 'method');
+  td(tr, `${t('mt.co2')}: ${status(p.co2_status)} · ${t('mt.pricecol')}: ${status(p.price_status)}`);
+  td(tr, `${p.co2_reference}. ${p.price_reference}.`, 'method');
   td(tr, sourceLinks(p.sources));
 }
 

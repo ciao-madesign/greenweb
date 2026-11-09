@@ -9,7 +9,7 @@ Aggiornato con i risultati della ricerca del 9 novembre 2026: vedi `docs/RESEARC
 - **AI immagini e video**: nessun coefficiente remoto affidabile; la stima conta solo dispositivo e rete ed è marcata incompleta.
 
 ## Valori da verificare sul dato primario (status `to_verify`)
-- Intensità carbonica UE (valore 2020 "Europa") e Giappone (2020): aggiornare con Ember/IEA.
+- Intensità carbonica: verificata sul dataset Ember (vedi `docs/data-checks/ember-2026-11-09.md`). Aperte: intensità basata sul consumo e curve orarie.
 - Prezzi elettrici: Cina (media nazionale 2021, le province fissano le fasce), Giappone (senza anno) e media mondiale. Alternative trovate ma senza anno: UE ~194 e Giappone ~438 gCO₂e/kWh (lowcarbonpower.org).
 - Acqua: fattori diretto/indiretto da fonti secondarie (LBNL 2016); raffinare per paese.
 - Immagini AI: valori Luccioni da fonti secondarie.
