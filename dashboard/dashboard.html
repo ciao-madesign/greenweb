@@ -8,50 +8,66 @@
 </head>
 <body>
   <main>
-    <header>
-      <h1 data-i18n="app.title"></h1>
-      <nav><a href="#" id="settings-link" data-i18n="options.title"></a> · <a href="../methodology/methodology.html" data-i18n="nav.methodology"></a></nav>
+    <header class="top">
+      <div class="brand"><img src="../icons/leaf-green-48.png" alt="" width="26" height="26"><span data-i18n="app.title"></span></div>
+      <nav><a href="#" id="settings-link" data-i18n="options.title"></a><a href="../methodology/methodology.html" data-i18n="nav.methodology"></a></nav>
     </header>
-    <p class="note" id="profile"></p>
-
-    <section class="hero" id="hero">
-      <img id="hero-leaf" alt="" width="72" height="72">
-      <div>
-        <div class="hero-value" id="hero-value"></div>
-        <div id="hero-label"></div>
-        <div class="note" id="hero-eq"></div>
-      </div>
-    </section>
-    <p class="note" data-i18n="hero.hint"></p>
-
-    <h2 data-i18n="dash.summary"></h2>
-    <div class="scroll"><table id="summary"><thead><tr>
-      <th data-i18n="dash.period"></th><th data-i18n="col.energy"></th><th data-i18n="col.co2e"></th><th data-i18n="col.water"></th><th data-i18n="col.cost"></th><th data-i18n="col.reliability"></th>
-    </tr></thead><tbody></tbody></table></div>
-    <p class="note"><a href="../methodology/methodology.html#estimate" data-i18n="dash.howto"></a></p>
 
     <div class="controls">
-      <label><span data-i18n="dash.period"></span><select id="period"></select></label>
-      <label><span data-i18n="dash.metric"></span><select id="metric"></select></label>
+      <div class="seg-ctl" id="period" role="group" aria-label="Period"></div>
+      <div class="seg-ctl" id="metric" role="group" aria-label="Metric"></div>
     </div>
-    <p id="empty" hidden data-i18n="dashboard.empty"></p>
 
-    <section id="detail">
-      <h2 data-i18n="dash.activities"></h2>
-      <div id="chart"></div>
-
-      <h2 data-i18n="dash.sites"></h2>
-      <div class="scroll"><table id="sites"><thead><tr>
-        <th data-i18n="col.domain"></th><th data-i18n="col.category"></th><th data-i18n="col.ops"></th>
-        <th data-i18n="col.energy"></th><th data-i18n="col.co2e"></th><th data-i18n="col.water"></th><th data-i18n="col.cost"></th><th data-i18n="col.reliability"></th>
-      </tr></thead><tbody></tbody></table></div>
-
-      <h2 data-i18n="dash.equivalences"></h2>
-      <ul id="equivalences"></ul>
-      <p class="note"><span data-i18n="dash.eq_note"></span> <a href="../methodology/methodology.html#equivalences" data-i18n="nav.methodology"></a></p>
+    <section id="empty" class="empty" hidden>
+      <img src="../icons/leaf-green-128.png" alt="" width="72" height="72">
+      <p data-i18n="dashboard.empty"></p>
     </section>
 
-    <p class="note" data-i18n="dashboard.note"></p>
+    <div id="content">
+      <section class="card hero">
+        <div class="gauge-box"><div id="gauge"></div><div class="big" id="big"></div></div>
+        <div class="hero-text">
+          <div class="level" id="level"></div>
+          <div class="muted" id="range"></div>
+          <div class="muted" id="confidence"></div>
+        </div>
+      </section>
+
+      <section>
+        <h2 data-i18n="dash.eq"></h2>
+        <div class="eq-grid" id="eq"></div>
+      </section>
+
+      <section class="two">
+        <div class="card">
+          <h2 data-i18n="dash.where"></h2>
+          <div class="donut-box"><div id="donut"></div><ul class="legend" id="legend"></ul></div>
+        </div>
+        <div class="card">
+          <h2 data-i18n="dash.top"></h2>
+          <div id="top"></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 data-i18n="dash.trend"></h2>
+        <div id="trend"></div>
+        <p class="muted small" data-i18n="dash.trend_hint"></p>
+      </section>
+
+      <details id="details">
+        <summary data-i18n="dash.details"></summary>
+        <div class="scroll"><table id="summary"><thead><tr>
+          <th data-i18n="dash.period"></th><th data-i18n="col.energy"></th><th data-i18n="col.co2e"></th><th data-i18n="col.water"></th><th data-i18n="col.cost"></th><th data-i18n="col.reliability"></th>
+        </tr></thead><tbody></tbody></table></div>
+        <div class="scroll"><table id="sites"><thead><tr>
+          <th data-i18n="col.domain"></th><th data-i18n="col.category"></th><th data-i18n="col.ops"></th>
+          <th data-i18n="col.energy"></th><th data-i18n="col.co2e"></th><th data-i18n="col.water"></th><th data-i18n="col.cost"></th><th data-i18n="col.reliability"></th>
+        </tr></thead><tbody></tbody></table></div>
+      </details>
+    </div>
+
+    <p class="muted small foot"><span id="profile"></span> · <span data-i18n="dash.foot"></span> <a href="../methodology/methodology.html" data-i18n="nav.methodology"></a></p>
   </main>
   <script type="module" src="dashboard.js"></script>
 </body>

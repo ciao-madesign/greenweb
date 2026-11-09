@@ -3,6 +3,7 @@ import { initI18n, t, translateDom } from '../src/i18n.js';
 import { classify, lastNDays, aggregateDays, dayStorageKey } from '../src/core.js';
 import { makeFormatter, makeUnits } from '../src/format.js';
 import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
+import { gauge, donut, bars, icon } from './charts.js';
 
 const lang = await initI18n();
 translateDom();
@@ -10,33 +11,129 @@ translateDom();
 const load = (p) => fetch(api.runtime.getURL(p)).then((r) => r.json());
 const days30 = lastNDays(30);
 const [raw, catalog, coeffs, eq] = await Promise.all([
-  api.storage.local.get([...days30.map(dayStorageKey), 'settings', 'session']), load('data/catalog.json'), load('data/coefficients.json'), load('data/equivalences.json'),
+  api.storage.local.get([...days30.map(dayStorageKey), 'settings']), load('data/catalog.json'), load('data/coefficients.json'), load('data/equivalences.json'),
 ]);
-const { settings = {}, session } = raw;
+const settings = raw.settings ?? {};
 const stats = Object.fromEntries(days30.map((d) => [d, raw[dayStorageKey(d)] ?? {}]));
 const profileId = settings.profile in coeffs.profiles ? settings.profile : DEFAULT_PROFILE;
 const profile = resolveProfile(coeffs, settings);
 const fmt = makeFormatter(lang, profile.currency);
 const units = makeUnits(lang);
-const PERIODS = ['session', 'day', 'week', 'month'];
-const DAYS = { day: 1, week: 7, month: 30 };
-const state = { period: 'day', metric: settings.metric in METRICS ? settings.metric : 'co2e' };
+const pct = new Intl.NumberFormat(lang, { style: 'percent', maximumFractionDigits: 0 });
+const PERIOD_DAYS = { day: 1, week: 7, month: 30 };
+const state = { period: 'day', metric: metricOf(settings) };
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => Object.assign(document.createElement(tag), cls ? { className: cls } : {}, text !== undefined ? { textContent: text } : {});
 
-// --- Dati -----------------------------------------------------------------------
-const hostsFor = (p) => (p === 'session' ? (session?.stats?.all ?? {}) : aggregateDays(stats, lastNDays(DAYS[p])));
-function analyse(p) {
-  const rows = Object.entries(hostsFor(p)).map(([host, e]) => {
+// --- Calcoli ----------------------------------------------------------------------
+function analyse(hosts) {
+  const rows = Object.entries(hosts).map(([host, e]) => {
     const cat = classify(host, catalog.domains);
     return { host, cat, e, est: estimateEntry(e, cat, coeffs) };
   });
   return { rows, total: rows.length ? sumEstimates(rows.map((r) => r.est)) : zeroEstimate() };
 }
-const unitOf = (m) => (m === 'energy' ? 'Wh' : METRICS[m].unit);
-const triOf = (est, m) => (m === 'energy' ? est.wh : convert(est.wh, profile, coeffs)[METRICS[m].key]);
+const analysePeriod = (p) => analyse(aggregateDays(stats, lastNDays(PERIOD_DAYS[p])));
+const triOf = (est, m) => convert(est.wh, profile, coeffs)[METRICS[m].key];
+const unitOf = (m) => METRICS[m].unit;
+const dailyThresholds = (m) => thresholdsFor(m, settings, profile, coeffs);
 
-// --- Helpers DOM -----------------------------------------------------------------
-const $ = (id) => document.getElementById(id);
-const rangeText = (v, unit) => `${fmt(v.min, unit)} – ${fmt(v.max, unit)}`;
+// --- Controlli --------------------------------------------------------------------
+function segmented(host, items, current, onPick) {
+  host.replaceChildren(...items.map(([value, label]) => {
+    const b = el('button', '', label);
+    b.type = 'button';
+    b.setAttribute('aria-pressed', String(value === current));
+    b.onclick = () => { onPick(value); [...host.children].forEach((c, i) => c.setAttribute('aria-pressed', String(items[i][0] === value))); };
+    return b;
+  }));
+}
+
+// --- Sezioni ----------------------------------------------------------------------
+function renderHero(a) {
+  const m = state.metric, n = PERIOD_DAYS[state.period];
+  const v = triOf(a.total, m);
+  const [lo, hi] = dailyThresholds(m).map((x) => x * n);
+  const level = levelOf(v.mid, [lo, hi]);
+  const text = fmt(v.mid, unitOf(m));
+  $('gauge').replaceChildren(gauge(v.mid, [lo, hi], `${t(`metric.${m}`)}: ${text}`));
+  $('big').textContent = text;
+  $('level').textContent = t(`hero.level.${level}`);
+  $('level').className = `level ${level}`;
+  $('range').textContent = t('hero.range', { a: fmt(v.min, unitOf(m)), b: fmt(v.max, unitOf(m)) });
+  $('confidence').textContent = t('hero.confidence', { level: t(`reliability.${a.total.reliability}`).toLowerCase() }) + (a.total.incomplete ? ' *' : '');
+}
+
+function renderEquivalences(a) {
+  const c = convert(a.total.wh, profile, coeffs);
+  const totals = { wh: a.total.wh.mid, co2_g: c.co2_g.mid, water_ml: c.water_ml.mid, cost: c.cost.mid };
+  const by = Object.fromEntries(equivalences(totals, profile, eq).map((x) => [x.id, x.value]));
+  const cards = [['car', units.distanceKm(by.car_km), 'card.car'], ['bulb', units.hours(by.led_hours), 'card.bulb'], ['bottle', units.num(by.bottles), 'card.bottle']];
+  $('eq').replaceChildren(...cards.map(([ic, value, key]) => {
+    const card = el('div', 'eq');
+    const txt = el('div');
+    txt.append(el('div', 'v', value), el('div', 'c', t(key)));
+    card.append(icon(ic), txt);
+    return card;
+  }));
+}
+
+function renderWhere(a) {
+  const m = state.metric;
+  const groups = new Map();
+  for (const r of a.rows) (groups.get(r.cat) ?? groups.set(r.cat, []).get(r.cat)).push(r.est);
+  const all = [...groups].map(([id, ests]) => ({ id, value: triOf(sumEstimates(ests), m).mid })).filter((g) => g.value > 0).sort((x, y) => y.value - x.value);
+  // Le prime 5 categorie; il resto e "Altro" si uniscono in un'unica voce.
+  const named = all.filter((g) => g.id !== 'other');
+  const top = named.slice(0, 5);
+  const rest = named.slice(5).reduce((s, g) => s + g.value, 0) + (all.find((g) => g.id === 'other')?.value ?? 0);
+  if (rest > 0) top.push({ id: 'other', value: rest });
+  const total = top.reduce((s, g) => s + g.value, 0) || 1;
+  $('donut').replaceChildren(donut(top, t('dash.where')));
+  $('legend').replaceChildren(...top.map((g) => {
+    const li = el('li');
+    const dot = el('i');
+    dot.style.background = `var(--cat-${g.id})`;
+    li.append(dot, el('span', '', t(`category.${g.id}`)), el('span', 'pct', pct.format(g.value / total)));
+    return li;
+  }));
+}
+
+function renderTop(a) {
+  const m = state.metric;
+  const rows = a.rows.map((r) => ({ ...r, v: triOf(r.est, m).mid })).sort((x, y) => y.v - x.v).slice(0, 5);
+  const max = rows[0]?.v || 1;
+  $('top').replaceChildren(...rows.map((r) => {
+    const row = el('div', 'top-row');
+    const name = el('span', 'name', r.host);
+    name.title = `${r.host} · ${fmt(r.v, unitOf(m))}`;
+    const track = el('div', 'track');
+    const fill = el('div', 'fill');
+    fill.style.inlineSize = `${Math.max(3, (r.v / max) * 100)}%`;
+    fill.style.background = `var(--cat-${r.cat})`;
+    track.append(fill);
+    row.append(name, track);
+    return row;
+  }));
+}
+
+function renderTrend() {
+  const m = state.metric;
+  const n = state.period === 'month' ? 30 : 14;
+  const th = dailyThresholds(m);
+  const weekday = new Intl.DateTimeFormat(lang, { weekday: 'narrow' });
+  const dayNum = new Intl.DateTimeFormat(lang, { day: 'numeric' });
+  const items = lastNDays(n).reverse().map((d, i, arr) => {
+    const hosts = stats[d] ?? {};
+    const est = Object.keys(hosts).length ? analyse(hosts).total : zeroEstimate();
+    const v = triOf(est, m).mid;
+    const date = new Date(`${d}T12:00:00`);
+    return { label: n > 14 ? (i % 5 === 4 || i === arr.length - 1 ? dayNum.format(date) : '') : weekday.format(date), value: v, level: levelOf(v, th), today: i === arr.length - 1, title: `${d}: ${fmt(v, unitOf(m))}` };
+  });
+  $('trend').replaceChildren(bars(items, th, t('dash.trend')));
+}
+
+// Dettagli (tabelle) solo quando l'utente apre la sezione.
 function cell(tr, text, title, num = true) {
   const td = tr.insertCell();
   td.textContent = text;
@@ -44,101 +141,53 @@ function cell(tr, text, title, num = true) {
   if (title) td.title = title;
   return td;
 }
+const rangeText = (v, unit) => `${fmt(v.min, unit)} – ${fmt(v.max, unit)}`;
 function metricCells(tr, est) {
-  const conv = convert(est.wh, profile, coeffs);
+  const c = convert(est.wh, profile, coeffs);
   cell(tr, fmt(est.wh.mid, 'Wh'), rangeText(est.wh, 'Wh'));
-  cell(tr, fmt(conv.co2_g.mid, 'g'), rangeText(conv.co2_g, 'g'));
-  cell(tr, fmt(conv.water_ml.mid, 'mL'), rangeText(conv.water_ml, 'mL'));
-  cell(tr, fmt(conv.cost.mid, 'cur'), rangeText(conv.cost, 'cur'));
-  const r = cell(tr, t(`reliability.${est.reliability}`) + (est.incomplete ? ' *' : ''), est.incomplete ? t('dashboard.incomplete') : '', false);
-  r.className = `rel rel-${est.reliability}`;
+  cell(tr, fmt(c.co2_g.mid, 'g'), rangeText(c.co2_g, 'g'));
+  cell(tr, fmt(c.water_ml.mid, 'mL'), rangeText(c.water_ml, 'mL'));
+  cell(tr, fmt(c.cost.mid, 'cur'), rangeText(c.cost, 'cur'));
+  cell(tr, t(`reliability.${est.reliability}`) + (est.incomplete ? ' *' : ''), '', false).className = `rel rel-${est.reliability}`;
 }
-
-// --- Sezioni ----------------------------------------------------------------------
-function renderSummary() {
-  const body = $('summary').tBodies[0];
-  body.replaceChildren();
-  for (const p of PERIODS) {
-    const tr = body.insertRow();
-    const label = p === 'session' && session?.start
-      ? `${t('period.session')} (${new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' }).format(session.start)}–)` : t(`period.${p}`);
-    cell(tr, label, '', false);
-    metricCells(tr, analyse(p).total);
+function renderDetails() {
+  const sum = $('summary').tBodies[0];
+  sum.replaceChildren();
+  for (const p of ['day', 'week', 'month']) {
+    const tr = sum.insertRow();
+    cell(tr, t(`period.${p}`), '', false);
+    metricCells(tr, analysePeriod(p).total);
   }
-}
-
-function renderDetail() {
-  const { rows, total } = analyse(state.period);
-  $('empty').hidden = rows.length > 0;
-  $('detail').hidden = rows.length === 0;
-  if (!rows.length) return;
-  const m = state.metric, unit = unitOf(m);
-
-  // Per attività: barre CSS, accessibili (testo + valore).
-  const groups = new Map();
-  for (const r of rows) (groups.get(r.cat) ?? groups.set(r.cat, []).get(r.cat)).push(r.est);
-  const bars = [...groups].map(([cat, ests]) => ({ cat, est: sumEstimates(ests) }))
-    .map((g) => ({ ...g, v: triOf(g.est, m) })).filter((g) => g.v.mid > 0).sort((a, b) => b.v.mid - a.v.mid);
-  const max = bars[0]?.v.mid || 1;
-  $('chart').replaceChildren(...bars.map((g) => {
-    const row = document.createElement('div');
-    row.className = 'bar-row';
-    const label = Object.assign(document.createElement('span'), { textContent: t(`category.${g.cat}`) });
-    const track = document.createElement('div');
-    track.className = 'track';
-    const fill = document.createElement('div');
-    fill.className = 'fill';
-    fill.style.inlineSize = `${Math.max(2, (g.v.mid / max) * 100)}%`;
-    track.append(fill);
-    const val = Object.assign(document.createElement('span'), { textContent: fmt(g.v.mid, unit), title: rangeText(g.v, unit) });
-    val.className = 'num';
-    row.append(label, track, val);
-    return row;
-  }));
-
-  // Per sito (primi 20, ordinati sulla metrica scelta).
   const body = $('sites').tBodies[0];
   body.replaceChildren();
-  for (const r of [...rows].sort((a, b) => triOf(b.est, m).mid - triOf(a.est, m).mid).slice(0, 20)) {
+  const a = analysePeriod(state.period);
+  for (const r of [...a.rows].sort((x, y) => y.est.wh.mid - x.est.wh.mid).slice(0, 20)) {
     const tr = body.insertRow();
     cell(tr, r.host, '', false);
     cell(tr, t(`category.${r.cat}`), '', false);
     cell(tr, new Intl.NumberFormat(lang).format(r.e.n));
     metricCells(tr, r.est);
   }
-
-  $('equivalences').replaceChildren(...eqList(total).map((text) => Object.assign(document.createElement('li'), { textContent: text })));
 }
 
-// Equivalenze quotidiane (valori centrali) come testi già localizzati.
-function eqList(total) {
-  const c = convert(total.wh, profile, coeffs);
-  const totals = { wh: total.wh.mid, co2_g: c.co2_g.mid, water_ml: c.water_ml.mid, cost: c.cost.mid };
-  const show = { car_km: units.distanceKm, light_hours_co2: units.hours, led_hours: units.hours, bottles: units.num, washing_cycles: units.num };
-  return equivalences(totals, profile, eq).map((x) => t(`eq.${x.id}`, { v: show[x.id](x.value) }));
+function render() {
+  const a = analysePeriod(state.period);
+  const empty = a.rows.length === 0 && !days30.some((d) => Object.keys(stats[d]).length);
+  $('empty').hidden = !empty;
+  $('content').hidden = empty;
+  if (empty) return;
+  renderHero(a);
+  renderEquivalences(a);
+  renderWhere(a);
+  renderTop(a);
+  renderTrend();
+  if ($('details').open) renderDetails();
 }
 
-// Sintesi di oggi: foglia, valore grande e livello (soglie modificabili).
-function renderHero() {
-  const m = metricOf(settings);
-  const { total } = analyse('day');
-  const v = triOf(total, m);
-  const level = levelOf(v.mid, thresholdsFor(m, settings, profile, coeffs));
-  $('hero-leaf').src = `../icons/leaf-${level}-128.png`;
-  $('hero-value').textContent = fmt(v.mid, unitOf(m));
-  $('hero-value').title = rangeText(v, unitOf(m));
-  $('hero-label').textContent = `${t('hero.label', { metric: t(`metric.${m}`) })} · ${t(`hero.level.${level}`)}`;
-  $('hero-eq').textContent = eqList(total)[0] ?? '';
-}
-
-// --- Avvio -------------------------------------------------------------------------
-const fill = (sel, items, current) => sel.replaceChildren(...items.map(([v, l]) => Object.assign(new Option(l, v), { selected: v === current })));
-fill($('period'), PERIODS.map((p) => [p, t(`period.${p}`)]), state.period);
-fill($('metric'), ['energy', ...Object.keys(METRICS)].map((m) => [m, t(`metric.${m}`)]), state.metric);
-$('period').onchange = (e) => { state.period = e.target.value; renderDetail(); };
-$('metric').onchange = (e) => { state.metric = e.target.value; renderDetail(); };
+// --- Avvio ------------------------------------------------------------------------
+segmented($('period'), ['day', 'week', 'month'].map((p) => [p, t(`period.${p}`)]), state.period, (p) => { state.period = p; render(); });
+segmented($('metric'), Object.keys(METRICS).map((m) => [m, t(`metric.${m}`)]), state.metric, (m) => { state.metric = m; render(); });
+$('details').addEventListener('toggle', () => { if ($('details').open) renderDetails(); });
 $('settings-link').onclick = (e) => { e.preventDefault(); api.runtime.openOptionsPage(); };
-$('profile').textContent = `${t(`profile.${profileId}`)} · ${profile.co2_g_per_kwh} gCO₂e/kWh · ${profile.currency}`;
-renderHero();
-renderSummary();
-renderDetail();
+$('profile').textContent = `${t(`profile.${profileId}`)} · ${profile.co2_g_per_kwh} gCO₂e/kWh`;
+render();

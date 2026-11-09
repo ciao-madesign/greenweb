@@ -1,7 +1,7 @@
 {
   "app.title": "Digital Footprint Counter",
   "dashboard.today": "Oggi",
-  "dashboard.empty": "Ancora nessun dato. Naviga un po' e ritorna.",
+  "dashboard.empty": "Ancora niente. Naviga un po' e la foglia inizierà a muoversi.",
   "dashboard.note": "Stime, non misure: ogni valore è un intervallo basato su coefficienti documentati. Passa il mouse o tocca i valori per vedere min–max; la pagina Metodologia spiega ogni passaggio.",
   "col.domain": "Sito",
   "col.category": "Categoria",
@@ -68,8 +68,8 @@
   "dash.howto": "Come vengono calcolati questi valori?",
   "period.session": "Sessione corrente",
   "period.day": "Oggi",
-  "period.week": "Ultimi 7 giorni",
-  "period.month": "Ultimi 30 giorni",
+  "period.week": "7 giorni",
+  "period.month": "30 giorni",
   "metric.energy": "Energia",
   "col.ops": "Operazioni",
   "eq.car_km": "Guidare un'auto per {v} (CO₂e)",
@@ -149,5 +149,17 @@
   "hero.level.green": "Basso",
   "hero.level.yellow": "Medio",
   "hero.level.red": "Alto",
-  "hero.hint": "Il livello segue soglie modificabili (Impostazioni), non uno standard scientifico."
+  "hero.hint": "Il livello segue soglie modificabili (Impostazioni), non uno standard scientifico.",
+  "dash.eq": "In parole semplici",
+  "dash.where": "Da dove arriva",
+  "dash.top": "Siti principali",
+  "dash.trend": "Giorno per giorno",
+  "dash.trend_hint": "Le linee tratteggiate indicano le soglie gialla e rossa.",
+  "dash.details": "Dettagli e numeri",
+  "dash.foot": "Stime, non misure.",
+  "hero.range": "Probabilmente tra {a} e {b}",
+  "hero.confidence": "Affidabilità: {level}",
+  "card.car": "alla guida di un'auto",
+  "card.bulb": "di lampadina LED",
+  "card.bottle": "bottiglie da 500 mL"
 }

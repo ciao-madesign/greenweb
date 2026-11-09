@@ -1,7 +1,7 @@
 {
   "app.title": "Digital Footprint Counter",
   "dashboard.today": "Today",
-  "dashboard.empty": "No data yet. Browse a little and come back.",
+  "dashboard.empty": "Nothing yet. Browse a little and the leaf will start to move.",
   "dashboard.note": "Estimates, not measurements: every value is a range (hover to see min–max) based on documented coefficients. Hover or tap values for the range; the Methodology page explains every step.",
   "col.domain": "Site",
   "col.category": "Category",
@@ -68,8 +68,8 @@
   "dash.howto": "How are these values calculated?",
   "period.session": "Current session",
   "period.day": "Today",
-  "period.week": "Last 7 days",
-  "period.month": "Last 30 days",
+  "period.week": "7 days",
+  "period.month": "30 days",
   "metric.energy": "Energy",
   "col.ops": "Operations",
   "eq.car_km": "Driving a car for {v} (CO₂e)",
@@ -149,5 +149,17 @@
   "hero.level.green": "Low",
   "hero.level.yellow": "Medium",
   "hero.level.red": "High",
-  "hero.hint": "The level follows adjustable thresholds (Settings), not a scientific standard."
+  "hero.hint": "The level follows adjustable thresholds (Settings), not a scientific standard.",
+  "dash.eq": "In everyday terms",
+  "dash.where": "Where it comes from",
+  "dash.top": "Top sites",
+  "dash.trend": "Day by day",
+  "dash.trend_hint": "Dashed lines mark the yellow and red thresholds.",
+  "dash.details": "Details and numbers",
+  "dash.foot": "Estimates, not measurements.",
+  "hero.range": "Likely between {a} and {b}",
+  "hero.confidence": "Confidence: {level}",
+  "card.car": "driving a car",
+  "card.bulb": "of an LED bulb",
+  "card.bottle": "bottles of 500 mL"
 }
