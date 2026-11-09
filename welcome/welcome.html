@@ -4,28 +4,46 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Digital Footprint Counter</title>
-  <link rel="stylesheet" href="../dashboard/dashboard.css">
-  <link rel="stylesheet" href="../options/options.css">
   <link rel="stylesheet" href="welcome.css">
 </head>
 <body>
-  <main>
-    <img class="logo" src="../icons/leaf-green-128.png" alt="" width="72" height="72">
-    <h1 data-i18n="welcome.title"></h1>
-    <p class="lead" data-i18n="welcome.lead"></p>
-    <ol class="steps">
-      <li><h2 data-i18n="welcome.step1.title"></h2><p data-i18n="welcome.step1.body"></p></li>
-      <li>
-        <h2 data-i18n="welcome.step2.title"></h2><p data-i18n="welcome.step2.body"></p>
-        <label><span data-i18n="options.profile"></span><select id="profile"></select></label>
-        <label><span data-i18n="options.language"></span><select id="lang"></select></label>
-        <label><span data-i18n="options.metric"></span><select id="metric"></select></label>
-      </li>
-      <li><h2 data-i18n="welcome.step3.title"></h2><p data-i18n="welcome.step3.body"></p></li>
-    </ol>
-    <p class="privacy" data-i18n="welcome.privacy"></p>
-    <p><button id="start" class="primary" data-i18n="welcome.start"></button> <a href="#" id="skip" data-i18n="welcome.skip"></a></p>
-  </main>
+  <div class="page">
+    <aside class="scene">
+      <div class="brand">
+        <svg viewBox="0 0 32 32" width="26" height="26" aria-hidden="true"><path d="M6 27C6 13 14 5 27 4c0 13-6 21-19 21" fill="#f4f6f1"/><path d="M5 28 16 15" stroke="#1c3a2a" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        <span>Digital Footprint Counter</span>
+      </div>
+      <div class="words">
+        <h1 data-i18n="welcome.title"></h1>
+        <p data-i18n="welcome.lead"></p>
+      </div>
+      <svg class="land" viewBox="0 0 800 420" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <circle cx="610" cy="140" r="52" fill="#f2c14e"/>
+        <circle cx="610" cy="140" r="84" fill="none" stroke="#f4f6f1" stroke-opacity=".14"/>
+        <circle cx="610" cy="140" r="118" fill="none" stroke="#f4f6f1" stroke-opacity=".08"/>
+        <path d="M0 300C150 232 300 262 450 232S700 204 800 242V420H0Z" fill="#2a5238"/>
+        <path d="M0 345C200 292 350 332 520 294S720 284 800 304V420H0Z" fill="#356a49"/>
+        <path d="M0 388C220 346 420 376 800 336V420H0Z" fill="#447f58"/>
+      </svg>
+    </aside>
+
+    <main class="panel">
+      <ol class="steps">
+        <li><b data-i18n="welcome.step1.title"></b><span data-i18n="welcome.step1.body"></span></li>
+        <li>
+          <b data-i18n="welcome.step2.title"></b><span data-i18n="welcome.step2.body"></span>
+          <div class="fields">
+            <select id="profile" aria-label="Region"></select>
+            <select id="lang" aria-label="Language"></select>
+            <select id="metric" aria-label="Metric"></select>
+          </div>
+        </li>
+        <li><b data-i18n="welcome.step3.title"></b><span data-i18n="welcome.step3.body"></span></li>
+      </ol>
+      <p class="privacy"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M7 10V8a5 5 0 0 1 10 0v2m-11 0h12v10H6z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg><span data-i18n="welcome.privacy"></span></p>
+      <div class="actions"><button id="start" data-i18n="welcome.start"></button><a href="#" id="skip" data-i18n="welcome.skip"></a></div>
+    </main>
+  </div>
   <script type="module" src="welcome.js"></script>
 </body>
 </html>
