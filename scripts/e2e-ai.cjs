@@ -72,6 +72,26 @@ const MOCK = { id: 'mock', label: 'Mock', domain: 'localhost', method: 'POST', p
   assert.ok(st[KEY].localhost.n > 0, 'gli altri dati devono restare');
   ok('"Elimina i conteggi AI" rimuove solo p e msc');
 
+  // 4. Verifica con traffico reale: richieste di invio verso un solo dominio, identificativi mascherati
+  await setSettings({ aiServices: { mock: true }, aiExtraAdapters: [MOCK] });
+  await wait(1500);
+  assert.strictEqual((await o.evaluate(() => chrome.runtime.sendMessage({ type: 'diag:start', domain: 'non un dominio' }))).ok, false);
+  assert.strictEqual((await o.evaluate(() => chrome.runtime.sendMessage({ type: 'diag:start', domain: 'localhost' }))).ok, true);
+  await p.bringToFront();
+  await post('/api/chat');
+  await post('/api/chat');
+  await post('/api/chat/1234567/send');
+  await p.evaluate(() => fetch('/api/chat'));
+  await wait(800);
+  const r = await o.evaluate(() => chrome.runtime.sendMessage({ type: 'diag:read' }));
+  const by = Object.fromEntries(r.entries.map((x) => [x.request, x]));
+  assert.ok(r.active && r.remaining > 0, 'diagnosi non attiva');
+  assert.strictEqual(by['POST localhost/api/chat']?.n, 2);
+  assert.strictEqual(by['POST localhost/api/chat']?.matched, 'mock');
+  assert.ok(by['POST localhost/api/chat/:id/send'] && by['POST localhost/api/chat/:id/send'].matched === null, JSON.stringify(r.entries));
+  assert.ok(!Object.keys(by).some((k) => k.startsWith('GET')), 'le richieste GET non devono comparire');
+  ok('verifica: richieste di invio viste, identificativi nascosti, regola attuale riconosciuta (✓ mock)');
+
   console.log(`Corpi di richiesta ricevuti dal server: ${bodies} (l'estensione non li legge: nessun permesso requestBody)`);
   await ctx.close();
   srv.close();

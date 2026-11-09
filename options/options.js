@@ -26,14 +26,57 @@ $('paused').checked = priv.paused;
 $('excluded').value = priv.excluded.join('\n');
 // Conteggio dei messaggi AI: un'opzione per servizio, tutte spente di default.
 $('ai-list').replaceChildren(...aiFile.adapters.map((a) => {
-  const row = document.createElement('label');
+  const row = document.createElement('div');
   row.className = 'ai-row';
+  const label = document.createElement('label');
   const box = Object.assign(document.createElement('input'), { type: 'checkbox', id: `ai-${a.id}`, checked: !!priv.aiServices[a.id] });
   box.dataset.service = a.id;
   box.addEventListener('change', save);
-  row.append(box, Object.assign(document.createElement('span'), { textContent: a.label }), Object.assign(document.createElement('small'), { textContent: a.domain }));
+  label.append(box, Object.assign(document.createElement('span'), { textContent: a.label }), Object.assign(document.createElement('small'), { textContent: a.domain }));
+  const tag = a.status === 'verified' ? '' : Object.assign(document.createElement('span'), { className: 'tag', textContent: t('options.ai_unverified'), title: a.evidence?.[0]?.note ?? '' });
+  const today = Object.assign(document.createElement('span'), { className: 'ai-today', id: `ai-today-${a.id}` });
+  const check = Object.assign(document.createElement('button'), { type: 'button', className: 'plain', textContent: t('options.ai_diag') });
+  check.addEventListener('click', () => runDiag(a));
+  row.append(label, ...(tag ? [tag] : []), today, check);
   return row;
 }));
+
+/** Messaggi contati oggi per servizio: permette di verificare subito che il conteggio funzioni. */
+async function refreshAiToday() {
+  const k = `day:${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}`;
+  const day = (await api.storage.local.get(k))[k] ?? {};
+  for (const a of aiFile.adapters) $(`ai-today-${a.id}`).textContent = t('options.ai_today', { n: day[a.domain]?.p ?? 0 });
+}
+
+// Verifica con traffico reale: per 60 s si vedono le richieste di invio verso il servizio e se un adattatore le riconosce.
+let diagTimer = null;
+async function runDiag(a) {
+  clearInterval(diagTimer);
+  $('ai-diag').hidden = false;
+  $('ai-diag-table').tBodies[0].replaceChildren();
+  $('ai-diag-status').textContent = t('options.ai_diag_running', { service: a.label });
+  await api.runtime.sendMessage({ type: 'diag:start', domain: a.domain });
+  const poll = async () => {
+    const r = await api.runtime.sendMessage({ type: 'diag:read' });
+    const body = $('ai-diag-table').tBodies[0];
+    body.replaceChildren(...r.entries.map((e) => {
+      const tr = document.createElement('tr');
+      for (const text of [e.request, String(e.n), String(e.status), e.matched ? `✓ ${e.matched}` : '—']) tr.append(Object.assign(document.createElement('td'), { textContent: text }));
+      return tr;
+    }));
+    if (!r.active) {
+      clearInterval(diagTimer);
+      $('ai-diag-status').textContent = r.entries.length ? t('options.ai_diag_done', { n: r.entries.length }) : t('options.ai_diag_none');
+      refreshAiToday();
+    }
+  };
+  diagTimer = setInterval(poll, 2000);
+  poll();
+}
+$('ai-diag-copy').addEventListener('click', async () => {
+  const rows = [...$('ai-diag-table').tBodies[0].rows].map((r) => `${r.cells[0].textContent} | ${r.cells[1].textContent}x | ${r.cells[2].textContent} | ${r.cells[3].textContent}`);
+  try { await navigator.clipboard.writeText(`Requests seen (${new Date().toISOString().slice(0, 10)}):\n${rows.join('\n')}`); } catch { /* il testo resta visibile nella tabella */ }
+});
 
 function refreshFields() {
   const base = coeffs.profiles[$('profile').value];
@@ -131,3 +174,4 @@ $('export').addEventListener('click', async () => {
 
 refreshFields();
 refreshSummary();
+refreshAiToday();

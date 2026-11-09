@@ -18,3 +18,12 @@ fieldset.ai legend { font-weight: 600; padding-inline: .4rem; }
 .ai-row { display: flex; gap: .6rem; align-items: center; margin-block: .35rem; }
 .ai-row input { inline-size: 1.1rem; block-size: 1.1rem; accent-color: var(--accent); }
 .ai-row small { color: var(--muted); }
+
+.ai-row { flex-wrap: wrap; }
+.ai-row label { display: flex; gap: .6rem; align-items: center; margin: 0; }
+.ai-row .ai-today { color: var(--muted); font-size: .85rem; }
+.ai-row .tag { font-size: .75rem; border: 1px solid var(--line); border-radius: 999px; padding: 0 .5rem; color: var(--muted); }
+.ai-row button { padding: .15rem .7rem; font-size: .85rem; margin-inline-start: auto; }
+.diag { border-top: 1px solid var(--line); margin-block-start: .8rem; padding-block-start: .6rem; }
+.diag td, .diag th { font-size: .85rem; padding: .3rem .4rem; text-align: start; border-bottom: 1px solid var(--line); }
+.diag td:first-child { font-family: ui-monospace, "SFMono-Regular", Menlo, monospace; word-break: break-all; }

@@ -129,7 +129,7 @@ test('purgeHosts e csvFromDays', () => {
   assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,active_seconds\n2026-11-09,"a.com",4,5,6\n');
 });
 
-import { matchAdapter, stripAiFields } from '../src/core.js';
+import { matchAdapter, stripAiFields, maskPath } from '../src/core.js';
 
 test('matchAdapter: metodo, dominio e percorso; mai altro', () => {
   const ad = JSON.parse(readFileSync(new URL('../data/ai_adapters.json', import.meta.url))).adapters;
@@ -142,7 +142,7 @@ test('matchAdapter: metodo, dominio e percorso; mai altro', () => {
   assert.equal(matchAdapter('POST', 'https://altro.example/backend-api/conversation', ad), null);
   assert.equal(matchAdapter('POST', 'non un url', ad), null);
   assert.equal(matchAdapter('POST', 'https://x.test/a', [{ domain: 'x.test', method: 'POST', path: '(' }]), null); // regex non valida
-  for (const a of ad) assert.ok(a.id && a.label && a.domain && a.path && a.kind === 'text' && a.status === 'to_verify');
+  for (const a of ad) assert.ok(a.id && a.label && a.domain && a.path && a.kind === 'text' && ['reported', 'unconfirmed', 'verified'].includes(a.status) && Array.isArray(a.evidence));
 });
 
 test('addSample con conteggio AI e stripAiFields', () => {
@@ -157,4 +157,13 @@ test('il service worker non legge mai il corpo delle richieste', () => {
   const sw = readFileSync(new URL('../src/background.js', import.meta.url), 'utf8');
   assert.doesNotMatch(sw, /requestBody/);
   assert.doesNotMatch(sw, /filterResponseData|debugger/);
+});
+
+test('maskPath: nasconde gli identificativi, conserva il percorso', () => {
+  assert.equal(maskPath('/api/organizations/0b1c2d3e-1111-2222-3333-444455556666/chat_conversations/9f8e7d6c-aaaa-bbbb-cccc-ddddeeeeffff/completion'), '/api/organizations/:id/chat_conversations/:id/completion');
+  assert.equal(maskPath('/backend-api/conversation'), '/backend-api/conversation');
+  assert.equal(maskPath('/rest/sse/perplexity_ask'), '/rest/sse/perplexity_ask');
+  assert.equal(maskPath('/v1/threads/1234567/messages'), '/v1/threads/:id/messages');
+  assert.equal(maskPath('/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate'), '/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate');
+  assert.equal(maskPath('/a/AbCdEfGhIjKlMnOpQrStUvWx'), '/a/:id');
 });

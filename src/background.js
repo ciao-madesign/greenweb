@@ -1,6 +1,6 @@
 // Service worker: raccoglie byte e tempo attivo per dominio. Nessuna rete, nessun contenuto di pagina.
 import { api, action } from './compat.js';
-import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, privacyOf, isExcluded, purgeHosts, matchAdapter } from './core.js';
+import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, privacyOf, isExcluded, purgeHosts, matchAdapter, maskPath, normalizeDomain } from './core.js';
 import { estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
 import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
@@ -85,8 +85,54 @@ function countPrompt(d) {
   scheduleLive();
 }
 
+// --- Verifica degli indirizzi dei servizi AI (solo su richiesta dell'utente, in memoria, 60 s) ---------
+// Mostra metodo, indirizzo senza parametri e identificativi mascherati, e stato di risposta delle richieste
+// non-GET verso un solo dominio, così si può controllare con traffico reale se un adattatore riconosce i messaggi.
+let diag = null;
+const DIAG_MS = 60000;
+
+async function startDiag(input) {
+  const domain = normalizeDomain(input);
+  if (!domain) return { ok: false };
+  const { settings = {} } = await api.storage.local.get('settings');
+  const file = await loadJson('data/ai_adapters.json');
+  const extra = Array.isArray(settings.aiExtraAdapters) ? settings.aiExtraAdapters.filter((a) => a && a.id && a.domain) : [];
+  diag = { domain, until: Date.now() + DIAG_MS, seen: new Map(), adapters: [...file.adapters, ...extra] };
+  return { ok: true };
+}
+
+function diagCapture(d) {
+  if (!diag || Date.now() > diag.until || d.method === 'GET' || d.method === 'HEAD' || d.method === 'OPTIONS') return;
+  let u;
+  try { u = new URL(d.url); } catch { return; }
+  const host = u.hostname.replace(/^www\./, '');
+  if (host !== diag.domain && !host.endsWith(`.${diag.domain}`)) return;
+  const key = `${d.method} ${host}${maskPath(u.pathname)}`;
+  if (!diag.seen.has(key) && diag.seen.size >= 50) return;
+  const e = diag.seen.get(key) ?? { n: 0, status: 0, matched: null };
+  e.n += 1;
+  e.status = d.statusCode;
+  e.matched = matchAdapter(d.method, d.url, diag.adapters)?.id ?? e.matched;
+  diag.seen.set(key, e);
+}
+
+function readDiag() {
+  if (!diag) return { active: false, entries: [] };
+  return { active: Date.now() <= diag.until, domain: diag.domain, remaining: Math.max(0, diag.until - Date.now()),
+    entries: [...diag.seen].map(([request, e]) => ({ request, ...e })) };
+}
+
+// Solo le pagine dell'estensione possono usare la verifica.
+api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (sender.id !== api.runtime.id || typeof msg?.type !== 'string') return false;
+  if (msg.type === 'diag:start') { startDiag(msg.domain).then(sendResponse); return true; }
+  if (msg.type === 'diag:read') { sendResponse(readDiag()); }
+  return false;
+});
+
 api.webRequest.onCompleted.addListener((d) => {
   if (d.tabId < 0 || privateTabs.has(d.tabId)) return; // richieste del browser/estensioni e finestre private: ignorate
+  diagCapture(d);
   countPrompt(d);
   const bytes = contentLength(d.responseHeaders);
   if (d.type === 'main_frame') tabHost.set(d.tabId, hostFromUrl(d.url)); // dominio finale dopo eventuali redirect

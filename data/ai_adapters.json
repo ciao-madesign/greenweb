@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "notes": "Riconoscimento dei messaggi inviati ai servizi AI: solo metodo, dominio e percorso della richiesta, mai il contenuto. Gli indirizzi dei servizi cambiano: ogni voce è da verificare con traffico reale (status to_verify). Se un adattatore smette di funzionare, il conteggio resta a zero e il motore torna all'ipotesi sui messaggi all'ora. Disponibili solo adattatori di testo: per immagini e video mancano coefficienti energetici affidabili.",
+  "notes": "Riconoscimento dei messaggi inviati ai servizi AI: solo metodo, dominio e percorso della richiesta, mai il contenuto. Gli indirizzi dei servizi cambiano. Stati: verified = confermato con traffico reale; reported = segnalato da progetti pubblici non ufficiali; unconfirmed = nessuna conferma trovata. Nessuna voce è ancora 'verified': si conferma dalle Impostazioni (Uso dell'AI, pulsante Verifica). Se un adattatore non funziona il conteggio resta a zero e il motore torna all'ipotesi sui messaggi all'ora. Solo adattatori di testo: per immagini e video mancano coefficienti affidabili.",
   "adapters": [
     {
       "id": "chatgpt",
@@ -9,7 +9,13 @@
       "kind": "text",
       "method": "POST",
       "path": "^/backend-api/(f/)?conversation$",
-      "status": "to_verify"
+      "status": "reported",
+      "evidence": [
+        {
+          "note": "POST /backend-api/conversation reported by community documentation and a Keysight traffic analysis (2023). The newer /backend-api/f/conversation variant is not confirmed by any source found.",
+          "url": "https://www.keysight.com/blogs/tech/nwvs/2023/02/21/a-quick-look-into-chatgpts-network-traffic"
+        }
+      ]
     },
     {
       "id": "claude",
@@ -18,7 +24,13 @@
       "kind": "text",
       "method": "POST",
       "path": "^/api/organizations/[^/]+/chat_conversations/[^/]+/completion$",
-      "status": "to_verify"
+      "status": "unconfirmed",
+      "evidence": [
+        {
+          "note": "Only the creation and reading of conversations under /api/organizations/{id}/chat_conversations is reported by unofficial clients; the /completion path was not confirmed.",
+          "url": "https://pypi.org/project/unofficial-claude2-api/0.2.7"
+        }
+      ]
     },
     {
       "id": "gemini",
@@ -27,7 +39,13 @@
       "kind": "text",
       "method": "POST",
       "path": "/StreamGenerate$",
-      "status": "to_verify"
+      "status": "unconfirmed",
+      "evidence": [
+        {
+          "note": "No source found for the StreamGenerate request of the web app; only outdated unofficial Bard clients.",
+          "url": "https://github.com/BaksiLi/bard-api-server"
+        }
+      ]
     },
     {
       "id": "perplexity",
@@ -36,7 +54,13 @@
       "kind": "text",
       "method": "POST",
       "path": "^/rest/sse/perplexity_ask$",
-      "status": "to_verify"
+      "status": "reported",
+      "evidence": [
+        {
+          "note": "POST https://www.perplexity.ai/rest/sse/perplexity_ask reported by two unofficial projects (event-stream response).",
+          "url": "https://huggingface.co/spaces/MB-IDK/PerplexityAPI/blob/main/main.py"
+        }
+      ]
     },
     {
       "id": "deepseek",
@@ -45,7 +69,13 @@
       "kind": "text",
       "method": "POST",
       "path": "^/api/v0/chat/completion$",
-      "status": "to_verify"
+      "status": "unconfirmed",
+      "evidence": [
+        {
+          "note": "No source found for /api/v0/chat/completion on chat.deepseek.com; the official API is a different host (api.deepseek.com).",
+          "url": "https://api-docs.deepseek.com/"
+        }
+      ]
     }
   ]
 }

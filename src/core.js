@@ -198,3 +198,11 @@ export function stripAiFields(record) {
     return [host, rest];
   }));
 }
+
+/** Indirizzo senza identificativi (UUID, numeri lunghi, codici): per mostrare un percorso senza dati personali. */
+export function maskPath(pathname) {
+  return pathname.split('/').map((seg) => (
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(seg) || /^[0-9a-f]{16,}$/i.test(seg)
+    || /^\d{4,}$/.test(seg) || /^[A-Za-z0-9_-]{22,}$/.test(seg) ? ':id' : seg
+  )).join('/');
+}

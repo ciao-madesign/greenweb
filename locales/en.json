@@ -178,5 +178,17 @@
   "coef.streaming_uhd_factor": "Streaming: 4K multiplier",
   "mt.status_profile": "Status",
   "mt.co2": "CO₂e",
-  "mt.pricecol": "price"
+  "mt.pricecol": "price",
+  "options.ai_today": "Today: {n}",
+  "options.ai_unverified": "to verify",
+  "options.ai_diag": "Check",
+  "options.ai_diag_running": "Listening for 60 s. Use {service} now (send a message), then wait for the result.",
+  "options.ai_diag_done": "{n} sending request(s) seen. A tick means the current rule counts it.",
+  "options.ai_diag_none": "No sending request seen. Try again and send a message.",
+  "options.ai_diag_copy": "Copy report",
+  "options.ai_diag_note": "For one minute only, for this service only: method, address without parameters (identifiers hidden) and status. Nothing is stored and no content is read.",
+  "diag.request": "Request",
+  "diag.times": "Times",
+  "diag.status": "Status",
+  "diag.counted": "Counted as"
 }

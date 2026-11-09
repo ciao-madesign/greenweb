@@ -32,6 +32,14 @@
         <legend data-i18n="options.ai"></legend>
         <p class="note" data-i18n="options.ai_hint"></p>
         <div id="ai-list"></div>
+        <div id="ai-diag" class="diag" hidden>
+          <p class="note" id="ai-diag-status" role="status"></p>
+          <div class="scroll"><table id="ai-diag-table"><thead><tr>
+            <th data-i18n="diag.request"></th><th data-i18n="diag.times"></th><th data-i18n="diag.status"></th><th data-i18n="diag.counted"></th>
+          </tr></thead><tbody></tbody></table></div>
+          <button type="button" id="ai-diag-copy" class="plain" data-i18n="options.ai_diag_copy"></button>
+          <p class="note" data-i18n="options.ai_diag_note"></p>
+        </div>
         <button type="button" id="ai-delete" class="plain" data-i18n="options.ai_delete"></button>
       </fieldset>
       <p class="note" id="summary"></p>

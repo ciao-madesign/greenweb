@@ -54,3 +54,6 @@ Ogni livello deve arrivare con: testo di consenso, voce nella Metodologia, test 
 - **4K**: se i byte per ora attiva superano 4 GB/h (Netflix: HD circa 3 GB/h, 4K circa 7 GB/h) il riferimento sale di 1,5 volte.
 - **Mai al ribasso**: una velocità bassa non riduce la stima, perché i byte sono spesso sottostimati (server che non dichiarano la dimensione).
 - **Limite**: i valori per risoluzione della ricerca includono lo schermo e non sono usati direttamente; la musica (poche centinaia di MB all'ora) è stimata con lo stesso riferimento e quindi sovrastimata.
+
+## Livello 3: verifica degli indirizzi
+Stato delle regole, come verificarle con traffico reale e come segnalare correzioni: `docs/AI_ADAPTERS.md`. Nelle Impostazioni ogni servizio mostra *da verificare*, il contatore "Oggi: N" e il pulsante **Verifica** (60 s, in memoria).

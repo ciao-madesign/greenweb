@@ -178,5 +178,17 @@
   "coef.streaming_uhd_factor": "Streaming: moltiplicatore 4K",
   "mt.status_profile": "Stato",
   "mt.co2": "CO₂e",
-  "mt.pricecol": "prezzo"
+  "mt.pricecol": "prezzo",
+  "options.ai_today": "Oggi: {n}",
+  "options.ai_unverified": "da verificare",
+  "options.ai_diag": "Verifica",
+  "options.ai_diag_running": "In ascolto per 60 s. Usa {service} ora (invia un messaggio), poi attendi il risultato.",
+  "options.ai_diag_done": "{n} richiesta/e di invio rilevata/e. La spunta indica che la regola attuale la conta.",
+  "options.ai_diag_none": "Nessuna richiesta di invio rilevata. Riprova inviando un messaggio.",
+  "options.ai_diag_copy": "Copia il rapporto",
+  "options.ai_diag_note": "Solo per un minuto e solo per questo servizio: metodo, indirizzo senza parametri (identificativi nascosti) e stato. Non si salva nulla e non si legge alcun contenuto.",
+  "diag.request": "Richiesta",
+  "diag.times": "Volte",
+  "diag.status": "Stato",
+  "diag.counted": "Contata come"
 }
