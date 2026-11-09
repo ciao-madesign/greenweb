@@ -7,6 +7,6 @@
   "scripts": {
     "test": "node --test",
     "package": "bash scripts/package.sh",
-    "lint": "npx --yes web-ext@8 lint --source-dir . --ignore-files 'tests/**' 'docs/**' 'scripts/**' 'dist/**' 'PLAN.md' 'package.json' 'README*.md' 'CITATION.cff'"
+    "lint": "npx --yes web-ext@8 lint --source-dir . --ignore-files 'tests/**' 'docs/**' 'scripts/**' 'dist/**' 'site/**' 'store/**' '.github/**' 'PLAN.md' 'package.json' 'README*.md' 'CITATION.cff'"
   }
 }
