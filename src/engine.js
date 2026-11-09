@@ -28,7 +28,11 @@ export function estimateEntry(entry, category, c, device) {
     let net = 0, dc = 0;
     switch (cat.model) {
       case 'streaming': {
-        const remote = hours * e.streaming_kwh_per_hour.value[k] * 1000;
+        // Riferimento: media realistica con stima per eccesso. Solo i flussi osservati a velocità da 4K
+        // lo alzano; una velocità bassa non lo riduce (i byte sono spesso sottostimati).
+        const rate = hours > 0 ? gb / hours : 0;
+        const factor = rate >= e.streaming_uhd_gb_per_hour.value[k] ? e.streaming_uhd_factor.value[k] : 1;
+        const remote = hours * e.streaming_kwh_per_hour.value[k] * 1000 * factor;
         dc = remote * e.dc_share_of_remote.value[k];
         net = remote - dc;
         break;

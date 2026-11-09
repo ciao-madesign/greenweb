@@ -7,7 +7,7 @@ La ricerca è stata fornita dal proprietario del progetto e **non è stata river
 |---|---|---|
 | Rete + data center | 0,114 kWh/GB, intervallo ×0,5/×2 | Due coefficienti separati: rete 0,059 (0,030–0,100) e data center 0,055 (0,030–0,100), dichiarati come **allocazione**, non come misura (Mytton et al. 2024) |
 | Dispositivo | 20 W unico | **Per tipo**, scelto dall'utente nelle Impostazioni: portatile 12 W (5–25), portatile Apple 7 W (3–15), desktop+monitor 45 W (20–100), tablet 5 W, telefono 2,5 W. Predefinito: portatile. Non si deducono i watt dallo user agent |
-| Streaming | 0,077 kWh/h | Invariato (rete + data center), con la quota di data center (48%) per l'acqua. Gli intervalli per risoluzione non sono usati: includono il dispositivo |
+| Streaming | 0,077 kWh/h | Riferimento **0,10 kWh/h** (media realistica 0,077–0,08 arrotondata per eccesso), ×1,5 se la velocità dei dati indica 4K (oltre 4 GB/h); quota di data center 48% per l'acqua. Gli intervalli per risoluzione della ricerca non sono usati: includono il dispositivo |
 | AI testuale | 0,24 Wh, 10 prompt/h | **0,30 Wh** (0,10–1,00), 30 prompt/h (10–60, ipotesi) |
 | AI immagini | 2,9 Wh (fonte secondaria) | **Non stimata** (come il video): conta solo dispositivo e rete, con asterisco |
 | Acqua | 4 L/kWh sull'energia totale | **Sul sito** (data center, 0,30 L/kWh) + **nella produzione dell'elettricità** (4,52 L/kWh, valore USA usato come sostituto per tutte le regioni). Consumo, mai prelievo |

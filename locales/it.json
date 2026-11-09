@@ -173,5 +173,7 @@
   "options.ai_hint": "Conta quanti messaggi invii a un servizio, per sostituire l'ipotesi con numeri reali. Si conserva solo il numero, mai ciò che scrivi. Spento di default, una scelta per servizio. Gli indirizzi dei servizi cambiano: il conteggio può smettere di funzionare finché l'estensione non viene aggiornata.",
   "options.ai_delete": "Elimina i conteggi AI",
   "options.ai_deleted": "Conteggi AI eliminati.",
-  "col.prompts": "Messaggi AI"
+  "col.prompts": "Messaggi AI",
+  "coef.streaming_uhd_gb_per_hour": "Streaming: soglia di velocità per il 4K",
+  "coef.streaming_uhd_factor": "Streaming: moltiplicatore 4K"
 }

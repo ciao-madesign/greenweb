@@ -173,5 +173,7 @@
   "options.ai_hint": "Counts how many messages you send to a service, to replace the assumed rate with real numbers. Only the number is kept, never what you write. Off by default, one choice per service. Service addresses change, so counting may stop working until the extension is updated.",
   "options.ai_delete": "Delete AI counts",
   "options.ai_deleted": "AI counts deleted.",
-  "col.prompts": "AI messages"
+  "col.prompts": "AI messages",
+  "coef.streaming_uhd_gb_per_hour": "Streaming: 4K data-rate threshold",
+  "coef.streaming_uhd_factor": "Streaming: 4K multiplier"
 }

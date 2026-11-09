@@ -279,7 +279,7 @@
       "unit": "kWh/h",
       "value": {
         "min": 0.04,
-        "mid": 0.077,
+        "mid": 0.1,
         "max": 0.24
       },
       "sources": [
@@ -288,8 +288,8 @@
         "netflix"
       ],
       "reliability": "medium",
-      "status": "to_verify",
-      "method": "Network + data center per hour of streaming, replacing the byte-based calculation (which would overstate streaming: HD is about 3 GB/h). Device energy is counted separately. No universal value by resolution exists; per-resolution ranges in the research mix in the display device and are not used. Possible slight double counting with the device."
+      "status": "assumption",
+      "method": "Network + data center energy per hour of streaming (device energy is counted separately). Realistic average: about 0.077-0.08 kWh/h (IEA 2019 typical hour; research mid value for HD 0.08). The reference is deliberately raised to 0.10 (about +25%) to err on the side of overestimation. It replaces the byte-based calculation, which would overstate streaming (HD is about 3 GB/h). No universal value by resolution exists and the per-resolution ranges in the research include the display device, so they are not used directly."
     },
     "dc_share_of_remote": {
       "unit": "fraction",
@@ -350,6 +350,34 @@
       "reliability": "unavailable",
       "status": "to_verify",
       "method": "No comparable provider-independent measurement of energy per generated second. Remote part not estimated (device and network are counted). Multiplying image energy by frame count would be incorrect."
+    },
+    "streaming_uhd_gb_per_hour": {
+      "unit": "GB/h",
+      "value": {
+        "min": 4,
+        "mid": 4,
+        "max": 4
+      },
+      "sources": [
+        "netflix"
+      ],
+      "reliability": "medium",
+      "status": "assumption",
+      "method": "Observed data rate (bytes transferred / active time) above which streaming is treated as 4K: Netflix reports about 7 GB/h for 4K and 3 GB/h for HD, so 4 GB/h separates them. The rate is only used to raise the estimate: lower rates stay at the realistic-average reference, because bytes are undercounted when servers do not declare a size."
+    },
+    "streaming_uhd_factor": {
+      "unit": "x",
+      "value": {
+        "min": 1.5,
+        "mid": 1.5,
+        "max": 1.5
+      },
+      "sources": [
+        "netflix"
+      ],
+      "reliability": "low",
+      "status": "to_verify",
+      "method": "Multiplier on the streaming reference for 4K-level data rates. Ratio of the research mid values for 4K and HD (0.12 / 0.08)."
     }
   },
   "categories": {

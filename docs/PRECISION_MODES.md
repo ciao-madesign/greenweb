@@ -14,7 +14,7 @@ Obiettivo: stime più precise **solo se l'utente lo sceglie**, senza chiedere pi
 |---|---|---|---|---|---|
 | **0 Base** (oggi) | Stima da dominio, byte dichiarati, tempo | `webRequest` in sola lettura | accesso ai siti + `webRequest` | Basso: solo dominio e conteggi | Sempre |
 | **1 Dati più completi** | Profilo del dispositivo (fatto). Byte inviati e andamento orario della rete elettrica: **non realizzabili ora** | Scelta manuale portatile/desktop/telefono. I browser non espongono la dimensione delle richieste nelle intestazioni: servirebbe leggere il corpo (`requestBody`), che non facciamo. Mancano i dati orari affidabili per le curve | Nessuno nuovo | Molto basso | Fatto per il dispositivo; il resto si riprende se emergono dati o API adatte |
-| **2 Streaming preciso** | Risoluzione reale del video → energia per ora molto più accurata | Script minimo su siti scelti (YouTube, Netflix, Twitch…) che legge solo altezza del video, riproduzione/pausa | Permesso di sito **per sito**, opzionale | Medio-basso: non legge titoli né URL | Sì, opt-in per sito |
+| **2 Streaming preciso** (fatto, senza accesso ai dati) | Streaming più realistico, con stima per eccesso | Nessuno script nelle pagine e nessun permesso: si usano i byte e il tempo già osservati. Riferimento = media realistica arrotondata per eccesso; i flussi osservati a velocità da 4K (oltre 4 GB/h) lo alzano di 1,5 volte; una velocità bassa non lo riduce | Nessuno | Nessun rischio nuovo | Fatto. La lettura della risoluzione reale con uno script per sito resta scartata per privacy |
 | **3 AI per servizio** (fatto per il testo) | Sostituisce l'ipotesi "messaggi all'ora" con conteggi reali dei messaggi inviati | Riconosce l'indirizzo della richiesta (metodo, dominio, percorso) e incrementa un contatore; il corpo non viene mai letto | Già coperto dal livello 0; in modalità Light, per sito | Medio: rivela quanto usi l'AI, in locale | Sì, opt-in per servizio. **Attivo**: ChatGPT, Claude, Gemini, Perplexity, DeepSeek (indirizzi da verificare con traffico reale); immagini e video non contati perché mancano i coefficienti |
 | **4 Carico del dispositivo** | Potenza reale al posto dell'ipotesi 9–50 W | Un campione al minuto del carico CPU | `system.cpu` opzionale (solo Chrome/Edge) | Medio-basso: non identifica contenuti | Facoltativo avanzato |
 
@@ -47,3 +47,10 @@ Ogni livello deve arrivare con: testo di consenso, voce nella Metodologia, test 
 - Il motore usa i conteggi per il tempo coperto e l'ipotesi di messaggi all'ora per il resto; con il tempo quasi tutto coperto e almeno un messaggio visto l'affidabilità sale a "media".
 - "Elimina i conteggi AI" toglie solo questi due numeri.
 - **Limite**: gli indirizzi dei servizi cambiano. Se un adattatore smette di funzionare il conteggio resta a zero: in quel caso il motore **non** si fida della copertura (un falso zero sarebbe peggio) e torna all'ipotesi dei messaggi all'ora. Gli indirizzi vanno comunque verificati con traffico reale prima della pubblicazione e tenuti aggiornati (`data/ai_adapters.json`).
+
+## Livello 2: come funziona oggi (senza accesso ai dati)
+- **Nessun permesso e nessuno script nelle pagine.** Si usano solo i byte e il tempo attivo già raccolti.
+- **Riferimento**: energia di rete + data center per ora di streaming = **0,10 kWh/h**. La media realistica è circa 0,077–0,08 (IEA 2019; valore centrale HD della ricerca): il riferimento è alzato di circa il 25% di proposito, per errare per eccesso. Intervallo 0,04–0,24.
+- **4K**: se i byte per ora attiva superano 4 GB/h (Netflix: HD circa 3 GB/h, 4K circa 7 GB/h) il riferimento sale di 1,5 volte.
+- **Mai al ribasso**: una velocità bassa non riduce la stima, perché i byte sono spesso sottostimati (server che non dichiarano la dimensione).
+- **Limite**: i valori per risoluzione della ricerca includono lo schermo e non sono usati direttamente; la musica (poche centinaia di MB all'ora) è stimata con lo stesso riferimento e quindi sovrastimata.

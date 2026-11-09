@@ -19,10 +19,21 @@ test('dispositivo: 1 ora = potenza del tipo scelto; streaming usa il tempo, non 
   near(estimateEntry({ n: 1, b: 0, ms: 3.6e6 }, 'browsing', c).wh.mid, P);
   near(estimateEntry({ n: 1, b: 0, ms: 3.6e6 }, 'browsing', c, 'desktop').wh.mid, E.device_power_w.types.desktop.mid);
   near(estimateEntry({ n: 1, b: 0, ms: 3.6e6 }, 'browsing', c, 'sconosciuto').wh.mid, P); // ripiego sul predefinito
-  const s = estimateEntry({ n: 1, b: 5e9, ms: 3.6e6 }, 'streaming', c);
+  const s = estimateEntry({ n: 1, b: 2e9, ms: 3.6e6 }, 'streaming', c); // 2 GB/h: sotto la soglia 4K
   near(s.wh.mid, P + E.streaming_kwh_per_hour.value.mid * 1000);
   near(s.dc_wh.mid, E.streaming_kwh_per_hour.value.mid * 1000 * E.dc_share_of_remote.value.mid);
   assert.deepEqual(devicePower(c, 'phone'), E.device_power_w.types.phone);
+});
+
+test('streaming: media realistica per eccesso; solo i flussi da 4K alzano il riferimento', () => {
+  const ref = E.streaming_kwh_per_hour.value.mid * 1000;
+  const at = (gbPerHour, ms = 3.6e6) => estimateEntry({ n: 1, b: gbPerHour * 1e9 * (ms / 3.6e6), ms }, 'streaming', c).wh.mid - P * (ms / 3.6e6);
+  near(at(0), ref);                  // byte non noti: riferimento
+  near(at(0.3), ref);                // flusso basso (o byte sottostimati): non scende sotto il riferimento
+  near(at(3), ref);                  // HD
+  near(at(7), ref * E.streaming_uhd_factor.value.mid); // 4K
+  near(at(7, 1.8e6), (ref / 2) * E.streaming_uhd_factor.value.mid); // mezz'ora a velocità da 4K
+  assert.ok(E.streaming_kwh_per_hour.value.mid > 0.08, 'il riferimento deve stare sopra la media realistica (circa 0,08 kWh/h)');
 });
 
 test('AI testuale: 1 ora = dispositivo + prompt/h x Wh per prompt (tutta energia da data center)', () => {
