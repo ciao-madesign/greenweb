@@ -1,13 +1,13 @@
 // Service worker: raccoglie byte e tempo attivo per dominio. Nessuna rete, nessun contenuto di pagina.
 import { api, action } from './compat.js';
-import { hostFromUrl, dayKey, addSample, mergeStats, pruneOld, contentLength, classify, badgeValue } from './core.js';
+import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue } from './core.js';
 import { estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
 import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
 
 const FLUSH_DELAY_MS = 20000;   // salvataggio aggregato (non a ogni richiesta)
 const MAX_TICK_MS = 120000;     // tetto di tempo attribuibile tra due eventi
-const KEEP_DAYS = 400;
+const KEEP_DAYS = 90;
 
 let pending = {};               // dati non ancora salvati
 let flushTimer = null;
@@ -97,16 +97,38 @@ function flush() {
   const batch = pending;
   pending = {};
   queue = queue.then(async () => {
-    if (Object.keys(batch).length) {
-      const { stats = {}, session = { start: Date.now(), stats: {} } } = await api.storage.local.get(['stats', 'session']);
-      mergeStats(stats, batch);
-      pruneOld(stats, KEEP_DAYS);
-      for (const hosts of Object.values(batch)) for (const [host, e] of Object.entries(hosts)) addSample(session.stats, 'all', host, e);
-      await api.storage.local.set({ stats, session });
+    const days = Object.keys(batch);
+    if (days.length) {
+      // Un record per giorno: ogni salvataggio legge e scrive solo i giorni toccati (di solito uno).
+      const keys = days.map(dayStorageKey);
+      const stored = await api.storage.local.get([...keys, 'session']);
+      const session = stored.session ?? { start: Date.now(), stats: {} };
+      const out = { session };
+      for (const day of days) {
+        const rec = stored[dayStorageKey(day)] ?? {};
+        for (const [host, e] of Object.entries(batch[day])) {
+          addSample({ [day]: rec }, day, host, e);
+          addSample(session.stats, 'all', host, e);
+        }
+        out[dayStorageKey(day)] = rec;
+      }
+      await api.storage.local.set(out);
     }
+    await pruneOldDays();
     await refreshBadge(); // anche senza nuovi dati: cambia il giorno, il badge si riallinea
-  }).catch(() => {});
+  }).catch((e) => console.error('flush', e));
   return queue;
+}
+
+// Elimina i giorni più vecchi di KEEP_DAYS; una volta al giorno per avvio del worker.
+let lastPrune = '';
+async function pruneOldDays() {
+  const today = dayKey();
+  if (lastPrune === today) return;
+  lastPrune = today;
+  const all = await api.storage.local.get(null);
+  const old = expiredDayKeys(Object.keys(all), KEEP_DAYS);
+  if (old.length) await api.storage.local.remove(old);
 }
 
 // --- Indicatore (foglia + badge) ---------------------------------------------
@@ -117,13 +139,14 @@ const iconSet = (lvl) => Object.fromEntries([16, 32, 48, 128].map((n) => [n, `ic
 let strings = null;
 
 async function refreshBadge() {
-  const [{ stats = {}, settings = {} }, catalog, coeffs] = await Promise.all([
-    api.storage.local.get(['stats', 'settings']), loadJson('data/catalog.json'), loadJson('data/coefficients.json'),
+  const todayKey = dayStorageKey(dayKey());
+  const [{ [todayKey]: today, settings = {} }, catalog, coeffs] = await Promise.all([
+    api.storage.local.get([todayKey, 'settings']), loadJson('data/catalog.json'), loadJson('data/coefficients.json'),
   ]);
   const lang = await (strings ??= loadStrings());
   const profile = resolveProfile(coeffs, settings);
   const metric = metricOf(settings);
-  const est = estimateDay(stats[dayKey()], catalog.domains, classify, coeffs);
+  const est = estimateDay(today, catalog.domains, classify, coeffs);
   const value = convert(est.wh, profile, coeffs)[METRICS[metric].key].mid;
   const level = levelOf(value, thresholdsFor(metric, settings, profile, coeffs));
   const shown = makeFormatter(lang, profile.currency)(value, METRICS[metric].unit);
@@ -137,7 +160,8 @@ async function refreshBadge() {
 api.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
   if (changes.settings) { strings = null; refreshBadge().catch(() => {}); }
-  if (changes.stats && changes.stats.newValue === undefined) { pending = {}; refreshBadge().catch(() => {}); }
+  // Chiave 'session' rimossa = l'utente ha cancellato i dati: scarta anche quelli in attesa.
+  if (changes.session && changes.session.newValue === undefined) { pending = {}; refreshBadge().catch(() => {}); }
 });
 
 // --- Avvio ------------------------------------------------------------------

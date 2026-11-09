@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "Digital Footprint Counter"
+type: software
+authors:
+  - family-names: Aldeni
+    given-names: Michele
+version: 0.1.0
+date-released: 2026-11-09
+license: MIT
+repository-code: "https://github.com/ciao-madesign/greenweb"
+abstract: "Open source browser extension that estimates the energy, CO2e, water and cost of web browsing, locally and with documented coefficients."

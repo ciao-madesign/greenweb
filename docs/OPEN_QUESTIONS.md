@@ -8,7 +8,7 @@
 
 ## Valori da verificare sul dato primario (status `to_verify`)
 - Intensità carbonica UE (valore 2020 "Europa") e Giappone (2020): aggiornare con Ember/IEA.
-- Prezzi elettrici Cina (CNY, stima) e Giappone (senza anno) e media mondiale.
+- Prezzi elettrici: Cina (media nazionale 2021, le province fissano le fasce), Giappone (senza anno) e media mondiale. Alternative trovate ma senza anno: UE ~194 e Giappone ~438 gCO₂e/kWh (lowcarbonpower.org).
 - Acqua: fattori diretto/indiretto da fonti secondarie (LBNL 2016); raffinare per paese.
 - Immagini AI: valori Luccioni da fonti secondarie.
 - Streaming (IEA ~0,08 kWh/h): possibile lieve doppio conteggio con il dispositivo.
@@ -20,3 +20,10 @@
 
 ## Traduzioni
 - Cinese e giapponese: revisione da madrelingua.
+
+## Test e distribuzione
+- **Firefox**: `web-ext lint` passa (0 errori; avviso atteso sulla chiave `service_worker`, ignorata da Firefox). Non provato in un Firefox reale: verificare `webRequest`, `idle` e il permesso sui siti all'installazione.
+- Misurare l'impatto su hardware reale e su Firefox (vedi `docs/EXTENSION_IMPACT.md`).
+- Quando le richieste arrivano prima dell'avvio del service worker (es. avvio a freddo del browser) possono non essere contate: effetto minimo, da quantificare.
+- Il tempo accumulato si salva al più ogni minuto: un worker terminato dal browser può perdere gli ultimi secondi.
+- Traduzioni complete di cinese e giapponese, revisione madrelingua.

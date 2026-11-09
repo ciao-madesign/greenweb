@@ -1,1 +1,12 @@
-{ "name": "digital-footprint-counter", "version": "0.1.0", "private": true, "license": "MIT", "type": "module", "scripts": { "test": "node --test" } }
+{
+  "name": "digital-footprint-counter",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "package": "bash scripts/package.sh",
+    "lint": "npx --yes web-ext@8 lint --source-dir . --ignore-files 'tests/**' 'docs/**' 'scripts/**' 'dist/**' 'PLAN.md' 'package.json' 'README*.md' 'CITATION.cff'"
+  }
+}

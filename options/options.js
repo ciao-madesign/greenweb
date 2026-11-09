@@ -58,7 +58,8 @@ async function save() {
 $('lang').addEventListener('change', save);
 $('delete').addEventListener('click', async () => {
   if (!confirm(t('options.delete_confirm'))) return;
-  await api.storage.local.remove(['stats', 'session']);
+  const all = await api.storage.local.get(null);
+  await api.storage.local.remove(Object.keys(all).filter((k) => k.startsWith('day:') || k === 'session'));
   $('status').textContent = t('options.deleted');
 });
 refreshFields();

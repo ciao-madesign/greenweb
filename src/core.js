@@ -38,18 +38,15 @@ export function addSample(stats, day, host, delta) {
   e.ms += delta.ms ?? 0;
 }
 
-export function mergeStats(target, source) {
-  for (const [day, hosts] of Object.entries(source)) {
-    for (const [host, e] of Object.entries(hosts)) addSample(target, day, host, e);
-  }
-}
+/** Chiave di archiviazione del giorno: un record { dominio: { n, b, ms } } per giorno. */
+export const dayStorageKey = (day) => `day:${day}`;
 
-/** Elimina i giorni più vecchi di `keepDays`. */
-export function pruneOld(stats, keepDays, now = new Date()) {
+/** Tra le chiavi di storage, quelle dei giorni più vecchi di `keepDays`. */
+export function expiredDayKeys(keys, keepDays, now = new Date()) {
   const limit = new Date(now);
   limit.setDate(limit.getDate() - keepDays);
-  const min = dayKey(limit);
-  for (const day of Object.keys(stats)) if (day < min) delete stats[day];
+  const min = dayStorageKey(dayKey(limit));
+  return keys.filter((k) => k.startsWith('day:') && k < min);
 }
 
 /** Content-Length dalle intestazioni di risposta; 0 se assente (dato non disponibile). */

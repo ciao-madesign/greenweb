@@ -39,6 +39,9 @@ L'utente sceglie il profilo e, in "Avanzate", può modificare i singoli valori. 
 - Al lancio: italiano e inglese curati. Cinese e giapponese supportati dalla struttura, traduzione da far rivedere a madrelingua. Altre lingue da contributi.
 - Categorie, avvisi e descrizioni dei coefficienti sono chiavi traducibili; le fonti restano in lingua originale.
 
+## Stato
+Fasi 1–5 completate (V0.1.0). Restano da chiudere i punti aperti sotto e la verifica su Firefox reale e hardware reale.
+
 ## Fasi
 ### Fase 1 – Scheletro e monitor
 - Manifest, service worker, layer di compatibilità.

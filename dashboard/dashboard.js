@@ -1,6 +1,6 @@
 import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
-import { classify, lastNDays, aggregateDays } from '../src/core.js';
+import { classify, lastNDays, aggregateDays, dayStorageKey } from '../src/core.js';
 import { makeFormatter, makeUnits } from '../src/format.js';
 import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
 
@@ -8,9 +8,12 @@ const lang = await initI18n();
 translateDom();
 
 const load = (p) => fetch(api.runtime.getURL(p)).then((r) => r.json());
-const [{ stats = {}, settings = {}, session }, catalog, coeffs, eq] = await Promise.all([
-  api.storage.local.get(['stats', 'settings', 'session']), load('data/catalog.json'), load('data/coefficients.json'), load('data/equivalences.json'),
+const days30 = lastNDays(30);
+const [raw, catalog, coeffs, eq] = await Promise.all([
+  api.storage.local.get([...days30.map(dayStorageKey), 'settings', 'session']), load('data/catalog.json'), load('data/coefficients.json'), load('data/equivalences.json'),
 ]);
+const { settings = {}, session } = raw;
+const stats = Object.fromEntries(days30.map((d) => [d, raw[dayStorageKey(d)] ?? {}]));
 const profileId = settings.profile in coeffs.profiles ? settings.profile : DEFAULT_PROFILE;
 const profile = resolveProfile(coeffs, settings);
 const fmt = makeFormatter(lang, profile.currency);

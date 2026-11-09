@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { hostFromUrl, classify, addSample, mergeStats, pruneOld, contentLength, badgeText } from '../src/core.js';
+import { hostFromUrl, classify, addSample, contentLength, badgeText, expiredDayKeys, dayStorageKey } from '../src/core.js';
 
 test('hostFromUrl: solo dominio, solo http(s)', () => {
   assert.equal(hostFromUrl('https://www.example.com/a?b=1#c'), 'example.com');
@@ -15,13 +15,13 @@ test('classify: corrispondenza più specifica, default other', () => {
   assert.equal(classify('sconosciuto.it', d), 'other');
 });
 
-test('addSample / mergeStats / pruneOld', () => {
-  const a = {}; addSample(a, '2026-11-06', 'x.com', { n: 1, b: 10 });
-  const b = {}; addSample(b, '2026-11-06', 'x.com', { ms: 5 }); addSample(b, '2020-01-01', 'old.com', { n: 1 });
-  mergeStats(a, b);
+test('addSample somma i campioni; expiredDayKeys elimina solo i giorni vecchi', () => {
+  const a = {};
+  addSample(a, '2026-11-06', 'x.com', { n: 1, b: 10 });
+  addSample(a, '2026-11-06', 'x.com', { ms: 5 });
   assert.deepEqual(a['2026-11-06']['x.com'], { n: 1, b: 10, ms: 5 });
-  pruneOld(a, 400, new Date('2026-11-06'));
-  assert.equal(a['2020-01-01'], undefined);
+  const keys = ['day:2020-01-01', 'day:2026-11-06', 'settings', 'session'].concat(dayStorageKey('2026-08-01'));
+  assert.deepEqual(expiredDayKeys(keys, 90, new Date('2026-11-06')), ['day:2020-01-01', 'day:2026-08-01']);
 });
 
 test('contentLength e badgeText', () => {

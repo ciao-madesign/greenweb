@@ -67,6 +67,11 @@
       "title": "LBNL, United States Data Center Energy Usage Report (2016): ~1.8 L/kWh on site (secondary source)",
       "url": null,
       "year": 2016
+    },
+    "cn_price": {
+      "title": "Beijing municipal guidance on residential electricity tiers (first tier 0.4883 CNY/kWh, 2023); national average household price 0.542 CNY/kWh from a 2021 Reuters explainer (secondary)",
+      "url": "https://english.beijing.gov.cn/livinginbeijing/housing/202005/t20200513_1895841.html",
+      "year": 2023
     }
   },
   "profiles": {
@@ -92,7 +97,7 @@
         "owid2020",
         "eurostat"
       ],
-      "reference": "CO2: 2020 'Europe' value, to be updated; price: H2 2024"
+      "reference": "CO2: 2020 'Europe' value, to be updated (lowcarbonpower.org lists EU ~194, year not stated); price: H2 2024"
     },
     "us": {
       "label": "USA",
@@ -110,12 +115,13 @@
       "label": "Cina",
       "currency": "CNY",
       "co2_g_per_kwh": 562,
-      "price_per_kwh": 0.55,
+      "price_per_kwh": 0.542,
       "status": "to_verify",
       "sources": [
-        "ember"
+        "ember",
+        "cn_price"
       ],
-      "reference": "CO2: Jan-Oct 2025 average; price: CNY estimate to be verified (NDRC/NEA)"
+      "reference": "CO2: Jan-Oct 2025 average; price: 2021 national household average, to be verified (provinces set their own tiers)"
     },
     "jp": {
       "label": "Giappone",
@@ -127,7 +133,7 @@
         "owid2020",
         "gpp_jp"
       ],
-      "reference": "CO2: 2020 value, to be updated; price: no year stated (METI)"
+      "reference": "CO2: 2020 value, to be updated (lowcarbonpower.org lists ~438, year not stated); price: no year stated (METI)"
     },
     "world": {
       "label": "Media mondiale",
