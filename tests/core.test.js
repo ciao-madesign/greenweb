@@ -88,3 +88,10 @@ test('equivalenze: auto, lampadina, bottiglie, lavatrice', () => {
   assert.ok(Math.abs(r.light_hours_co2 - 106.4 / (0.01 * 331)) < 1e-9);
   for (const it of eq.items) for (const id of it.params) assert.ok(eq.params[id]);
 });
+
+test('manifest: nessuna connessione esterna consentita dalla CSP', () => {
+  const m = JSON.parse(readFileSync(new URL('../manifest.json', import.meta.url)));
+  const csp = m.content_security_policy.extension_pages;
+  assert.match(csp, /connect-src 'self'/);
+  assert.doesNotMatch(csp, /https?:|\*/);
+});

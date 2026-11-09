@@ -7,16 +7,15 @@ export function svg(tag, attrs = {}, ...children) {
   return el;
 }
 
-/** Icone semplici a tratto (48x48). */
+/** Icone semplici a tratto (48x48), costruite con DOM (niente innerHTML). */
 const ICONS = {
-  car: '<path d="M6 30v-7l5-9h22l5 9v7z"/><circle cx="14" cy="32" r="4"/><circle cx="34" cy="32" r="4"/><path d="M11 23h26"/>',
-  bulb: '<path d="M24 6a12 12 0 0 0-6 22v5h12v-5a12 12 0 0 0-6-22z"/><path d="M19 39h10M21 43h6"/>',
-  bottle: '<path d="M20 6h8v6l4 6v24a3 3 0 0 1-3 3H19a3 3 0 0 1-3-3V18l4-6z"/><path d="M16 26h16"/>',
+  car: [['path', { d: 'M6 30v-7l5-9h22l5 9v7z' }], ['circle', { cx: 14, cy: 32, r: 4 }], ['circle', { cx: 34, cy: 32, r: 4 }], ['path', { d: 'M11 23h26' }]],
+  bulb: [['path', { d: 'M24 6a12 12 0 0 0-6 22v5h12v-5a12 12 0 0 0-6-22z' }], ['path', { d: 'M19 39h10M21 43h6' }]],
+  bottle: [['path', { d: 'M20 6h8v6l4 6v24a3 3 0 0 1-3 3H19a3 3 0 0 1-3-3V18l4-6z' }], ['path', { d: 'M16 26h16' }]],
 };
 export function icon(name) {
-  const el = svg('svg', { viewBox: '0 0 48 48', width: 44, height: 44, 'aria-hidden': 'true', fill: 'none', stroke: 'currentColor', 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' });
-  el.innerHTML = ICONS[name]; // contenuto statico, definito qui sopra
-  return el;
+  return svg('svg', { viewBox: '0 0 48 48', width: 44, height: 44, 'aria-hidden': 'true', fill: 'none', stroke: 'currentColor', 'stroke-width': 2.2, 'stroke-linecap': 'round', 'stroke-linejoin': 'round' },
+    ...ICONS[name].map(([tag, attrs]) => svg(tag, attrs)));
 }
 
 /** Semicerchio verde/giallo/rosso con lancetta. `value` e `[lo, hi]` nella stessa unità. */

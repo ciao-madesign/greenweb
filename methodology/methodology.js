@@ -92,6 +92,11 @@ for (const [id, s] of Object.entries(sources)) {
   list.append(li);
 }
 
-// Limiti: attività non misurabili
-const limits = document.getElementById('limits-list');
-for (let i = 1; i <= 6; i++) limits.append(Object.assign(document.createElement('li'), { textContent: t(`m8.item${i}`) }));
+// Un link interno (#src-..., #coef-...) apre la sezione che lo contiene.
+function openTarget() {
+  const target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+  const box = target?.closest('details');
+  if (box) { box.open = true; target.scrollIntoView(); }
+}
+addEventListener('hashchange', openTarget);
+openTarget();

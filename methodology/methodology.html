@@ -9,42 +9,53 @@
 </head>
 <body>
   <main>
-    <header>
-      <h1 data-i18n="nav.methodology"></h1>
+    <header class="top">
+      <div class="brand"><img src="../icons/leaf-green-48.png" alt="" width="26" height="26"><span data-i18n="nav.methodology"></span></div>
       <nav><a href="../dashboard/dashboard.html" data-i18n="nav.dashboard"></a></nav>
     </header>
-    <p data-i18n="m.intro"></p>
 
-    <h2 id="detect" data-i18n="m1.title"></h2><p data-i18n="m1.body"></p>
-    <h2 id="info" data-i18n="m2.title"></h2><p data-i18n="m2.body"></p>
-    <h2 id="classify" data-i18n="m3.title"></h2><p data-i18n="m3.body"></p>
-    <h2 id="estimate" data-i18n="m4.title"></h2>
-    <p data-i18n="m4.body1"></p><p data-i18n="m4.body2"></p><p data-i18n="m4.body3"></p><p data-i18n="m4.body4"></p>
+    <p class="lead" data-i18n="m.lead"></p>
 
-    <h2 id="coefficients" data-i18n="m5.title"></h2><p class="note" data-i18n="m5.hint"></p>
-    <div class="scroll"><table id="coef-table"><thead><tr>
-      <th data-i18n="mt.coef"></th><th data-i18n="mt.value"></th><th data-i18n="col.reliability"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
-    </tr></thead><tbody></tbody></table></div>
+    <section id="estimate" class="flow" aria-label="Calculation">
+      <div class="node"><b data-i18n="flow.time"></b><span data-i18n="flow.time.sub"></span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="node core"><b data-i18n="flow.energy"></b><span data-i18n="flow.energy.sub"></span></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="outs">
+        <div class="node"><b data-i18n="flow.co2"></b><span data-i18n="flow.co2.sub"></span></div>
+        <div class="node"><b data-i18n="flow.water"></b><span data-i18n="flow.water.sub"></span></div>
+        <div class="node"><b data-i18n="flow.cost"></b><span data-i18n="flow.cost.sub"></span></div>
+      </div>
+    </section>
 
-    <h3 id="profiles" data-i18n="mt.profiles"></h3>
-    <div class="scroll"><table id="profile-table"><thead><tr>
-      <th data-i18n="mt.region"></th><th>gCO₂e/kWh</th><th data-i18n="mt.price"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
-    </tr></thead><tbody></tbody></table></div>
+    <section class="trio">
+      <div class="card"><h2 data-i18n="card.see.title"></h2><p data-i18n="card.see.body"></p></div>
+      <div class="card" id="margins"><h2 data-i18n="card.sure.title"></h2><p data-i18n="card.sure.body"></p>
+        <ul class="chips"><li class="rel-medium" data-i18n="reliability.medium" title=""></li><li class="rel-low" data-i18n="reliability.low"></li><li class="rel-unavailable" data-i18n="reliability.unavailable"></li></ul>
+      </div>
+      <div class="card" id="limits"><h2 data-i18n="card.cant.title"></h2>
+        <ul><li data-i18n="cant.1"></li><li data-i18n="cant.2"></li><li data-i18n="cant.3"></li></ul>
+      </div>
+    </section>
 
-    <h3 id="equivalences" data-i18n="mt.equivalences"></h3>
-    <div class="scroll"><table id="eq-table"><thead><tr>
-      <th data-i18n="mt.coef"></th><th data-i18n="mt.value"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
-    </tr></thead><tbody></tbody></table></div>
+    <details id="coefficients"><summary data-i18n="det.coef"></summary>
+      <div class="scroll"><table id="coef-table"><thead><tr>
+        <th data-i18n="mt.coef"></th><th data-i18n="mt.value"></th><th data-i18n="col.reliability"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
+      </tr></thead><tbody></tbody></table></div>
+    </details>
+    <details id="profiles"><summary data-i18n="det.profiles"></summary>
+      <div class="scroll"><table id="profile-table"><thead><tr>
+        <th data-i18n="mt.region"></th><th>gCO₂e/kWh</th><th data-i18n="mt.price"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
+      </tr></thead><tbody></tbody></table></div>
+    </details>
+    <details id="equivalences"><summary data-i18n="det.eq"></summary>
+      <div class="scroll"><table id="eq-table"><thead><tr>
+        <th data-i18n="mt.coef"></th><th data-i18n="mt.value"></th><th data-i18n="mt.status"></th><th data-i18n="mt.method"></th><th data-i18n="mt.sources"></th>
+      </tr></thead><tbody></tbody></table></div>
+    </details>
+    <details id="sources"><summary data-i18n="det.sources"></summary><ol id="source-list"></ol></details>
 
-    <h2 id="sources" data-i18n="m6.title"></h2><ol id="source-list"></ol>
-    <h2 id="margins" data-i18n="m7.title"></h2>
-    <p data-i18n="m7.body"></p>
-    <ul>
-      <li data-i18n="reliability.def.high"></li><li data-i18n="reliability.def.medium"></li>
-      <li data-i18n="reliability.def.low"></li><li data-i18n="reliability.def.unavailable"></li>
-    </ul>
-    <h2 id="limits" data-i18n="m8.title"></h2><ul id="limits-list"></ul>
-    <p class="note" data-i18n="m.license"></p>
+    <p class="muted small foot" data-i18n="m.license"></p>
   </main>
   <script type="module" src="methodology.js"></script>
 </body>

@@ -37,6 +37,8 @@ const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
 
   const shot = async (name, url, opts = {}) => {
     const p = await ctx.newPage();
+    p.on('console', (m) => { if (m.type() === 'error') console.log('CONSOLE', name, m.text()); });
+    p.on('pageerror', (e) => console.log('PAGEERROR', name, e.message));
     await p.emulateMedia({ colorScheme: opts.dark ? 'dark' : 'light' });
     await p.goto(`chrome-extension://${id}/${url}`);
     await wait(700);
@@ -50,7 +52,7 @@ const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
   await shot('dashboard-dark', 'dashboard/dashboard.html', { full: true, dark: true });
   await shot('dashboard-week-water', 'dashboard/dashboard.html', { full: true, prep: async (p) => { await p.click('#period button:nth-child(2)'); await p.click('#metric button:nth-child(2)'); } });
   await shot('methodology', 'methodology/methodology.html', { clip: { x: 0, y: 0, width: 1280, height: 800 } });
-  await shot('methodology-coefficients', 'methodology/methodology.html', { prep: async (p) => { await p.locator('#coefficients').scrollIntoViewIfNeeded(); await p.evaluate(() => document.getElementById('coefficients').scrollIntoView()); } });
+  await shot('methodology-coefficients', 'methodology/methodology.html', { prep: async (p) => { await p.click('#coefficients summary'); await p.evaluate(() => document.getElementById('coefficients').scrollIntoView()); } });
   await shot('settings', 'options/options.html', { full: true });
 
   // Immagini per gli store: 1280x800 esatti (scale css), schermata intera senza scorrimento.

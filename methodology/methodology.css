@@ -1,5 +1,20 @@
-main { max-width: 64rem; }
-td, th { vertical-align: top; font-size: .9rem; }
-td.method { min-inline-size: 16rem; }
-h2, h3 { scroll-margin-block-start: 1rem; }
+main { max-width: 52rem; }
+.lead { font-size: 1.25rem; margin: 0; max-width: 40rem; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem; }
+.node { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: .8rem 1.1rem; display: grid; gap: .1rem; min-width: 9rem; }
+.node b { font-size: 1.05rem; } .node span { color: var(--muted); font-size: .85rem; }
+.node.core { background: var(--accent); border-color: var(--accent); color: #fff; }
+.node.core span { color: #e3f1e4; }
+@media (prefers-color-scheme: dark) { .node.core { color: #0f1712; } .node.core span { color: #1c3a2a; } }
+.arrow { color: var(--muted); font-size: 1.4rem; }
+.outs { display: grid; gap: .5rem; }
+.trio { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: .9rem; }
+.card p, .card ul { margin: 0; color: var(--muted); font-size: .95rem; }
+.card ul { padding-inline-start: 1.1rem; display: grid; gap: .3rem; }
+.card .chips { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .4rem; margin-block-start: .7rem !important; }
+.chips li { border: 1px solid currentColor; border-radius: 999px; padding: .1rem .7rem; font-size: .85rem; font-weight: 600; }
+td, th { vertical-align: top; }
+td.method { min-width: 16rem; }
 tr:target { outline: 2px solid var(--accent); }
+#source-list { margin-block: .8rem 0; padding-inline-start: 1.3rem; display: grid; gap: .4rem; font-size: .9rem; }
+details[open] > summary { margin-block-end: .4rem; }

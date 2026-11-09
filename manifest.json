@@ -49,5 +49,8 @@
   "options_ui": {
     "page": "options/options.html",
     "open_in_tab": true
+  },
+  "content_security_policy": {
+    "extension_pages": "default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'"
   }
 }
