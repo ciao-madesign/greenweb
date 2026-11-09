@@ -1,10 +1,10 @@
 {
   "version": 1,
   "updated": "2026-11-06",
-  "notes": "Provisional values. status: sourced = from the cited source; to_verify = secondary or dated source, to be checked against the primary data; assumption = declared assumption. Ranges min/mid/max are propagated by the engine up to the final result.",
+  "notes": "Values merged from the 2026-11-09 research baseline supplied by the project owner; not independently re-verified. status: sourced = from the cited source; to_verify = secondary, provisional or dated; assumption = declared assumption. Ranges min/mid/max are propagated by the engine up to the final result.",
   "sources": {
     "swd": {
-      "title": "Sustainable Web Design model v4 (0.055 kWh/GB data center, 0.059 kWh/GB network)",
+      "title": "Sustainable Web Design model v4 (0.055 kWh/GB data center, 0.059 kWh/GB network, 0.080 kWh/GB user devices; allocation model)",
       "url": "https://sustainablewebdesign.org/estimating-digital-emissions/",
       "year": 2024
     },
@@ -13,18 +13,13 @@
       "url": "https://arxiv.org/abs/2510.12566",
       "year": 2025
     },
-    "fraunhofer": {
-      "title": "Fraunhofer / Microsoft study on browser power (desktop ~38 W baseline; secondary, dated source)",
-      "url": "https://www.silicon.co.uk/workspace/microsoft-ie-browser-energy-power-saving-118619/amp",
-      "year": 2011
-    },
     "iea_stream": {
       "title": "IEA, The carbon footprint of streaming video: fact-checking the headlines (~0.08 kWh per hour)",
       "url": "https://www.iea.org/commentaries/the-carbon-footprint-of-streaming-video-fact-checking-the-headlines",
       "year": 2020
     },
     "google": {
-      "title": "Google, Measuring the environmental impact of delivering AI at Google Scale (median Gemini text prompt: 0.24 Wh)",
+      "title": "Google, Measuring the environmental impact of delivering AI at Google Scale (median Gemini text prompt: 0.24 Wh, 0.03 gCO2e, 0.26 mL water; comprehensive method)",
       "url": "https://arxiv.org/abs/2508.15734",
       "year": 2025
     },
@@ -34,14 +29,9 @@
       "year": 2023
     },
     "ember": {
-      "title": "Ember, Yearly Electricity Data / Global Electricity Review",
+      "title": "Ember, Yearly Electricity Data (2025 values are a provisional extraction, to be recomputed from the dataset)",
       "url": "https://ember-energy.org/data/yearly-electricity-data/",
       "year": 2025
-    },
-    "ember_it": {
-      "title": "Ember via Statista: carbon intensity of the Italian power sector",
-      "url": "https://statista.com/statistics/1290244/carbon-intensity-power-sector-italy",
-      "year": 2023
     },
     "owid2020": {
       "title": "Our World in Data, electricity carbon intensity by country (2020 table; secondary source)",
@@ -49,43 +39,96 @@
       "year": 2020
     },
     "eurostat": {
-      "title": "Eurostat, household electricity prices (2024)",
-      "url": "https://ec.europa.eu/eurostat/de/web/products-eurostat-news/w/ddn-20250506-2",
+      "title": "Eurostat nrg_pc_204, household electricity prices",
+      "url": "https://ec.europa.eu/eurostat/databrowser/view/nrg_pc_204/default/table?lang=en",
       "year": 2024
     },
     "eia": {
-      "title": "U.S. EIA, average residential price 2024: 16.5 cents/kWh",
-      "url": "https://www.eia.gov/todayinEnergy/detail.php?id=65244",
+      "title": "U.S. EIA, Electric Power Annual: average residential price 2024 16.48 c$/kWh",
+      "url": "https://www.eia.gov/electricity/annual/table.php?t=epa_02_07.html",
       "year": 2024
-    },
-    "gpp_jp": {
-      "title": "GlobalPetrolPrices, Japan residential price (year not stated)",
-      "url": "https://www.globalpetrolprices.com/Japan/electricity_prices/",
-      "year": null
-    },
-    "lbnl": {
-      "title": "LBNL, United States Data Center Energy Usage Report (2016): ~1.8 L/kWh on site (secondary source)",
-      "url": null,
-      "year": 2016
     },
     "cn_price": {
       "title": "Beijing municipal guidance on residential electricity tiers (first tier 0.4883 CNY/kWh, 2023); national average household price 0.542 CNY/kWh from a 2021 Reuters explainer (secondary)",
       "url": "https://english.beijing.gov.cn/livinginbeijing/housing/202005/t20200513_1895841.html",
       "year": 2023
+    },
+    "mytton": {
+      "title": "Mytton, Lundén & Malmodin, Network energy use is not directly proportional to data volume (J. Industrial Ecology)",
+      "url": "https://onlinelibrary.wiley.com/doi/full/10.1111/jiec.13512",
+      "year": 2024
+    },
+    "carbontrust": {
+      "title": "Carbon Trust, Carbon impact of video streaming",
+      "url": "https://www.carbontrust.com/sites/default/files/documents/resource/public/Carbon-impact-of-video-streaming.pdf",
+      "year": 2021
+    },
+    "netflix": {
+      "title": "Netflix, Data usage per hour (SD 1 GB, HD 3 GB, 4K 7 GB maximum)",
+      "url": "https://help.netflix.com/en/node/87",
+      "year": 2025
+    },
+    "energystar": {
+      "title": "ENERGY STAR, Monitors Most Efficient 2024 criteria (measurement method)",
+      "url": "https://www.energystar.gov/sites/default/files/asset/document/Monitors%20ENERGY%20STAR%20Most%20Efficient%202024%20Final%20Criteria.pdf",
+      "year": 2024
+    },
+    "notebookcheck_ipad": {
+      "title": "Notebookcheck, Apple iPad Air 13 (2024) review: measured power 2.2-16.8 W",
+      "url": "https://www.notebookcheck.net/Apple-iPad-Air-13-2024-review-The-most-affordable-13-inch-tablet-from-Apple.853938.0.html",
+      "year": 2024
+    },
+    "epoch": {
+      "title": "Epoch AI, How much energy does ChatGPT use? (GPT-4o about 0.3 Wh per query, modelled)",
+      "url": "https://epoch.ai/gradient-updates/how-much-energy-does-chatgpt-use",
+      "year": 2025
+    },
+    "openai_altman": {
+      "title": "Data Center Dynamics: OpenAI CEO statement of 0.34 Wh per average ChatGPT query (methodology undisclosed)",
+      "url": "https://www.datacenterdynamics.com/en/news/sam-altman-chatgpt-queries-consume-034-watt-hours-of-electricity-and-0000085-gallons-of-water/",
+      "year": 2025
+    },
+    "lbnl2024": {
+      "title": "LBNL, 2024 United States Data Center Energy Usage Report (site WUE about 0.36 L/kWh)",
+      "url": "https://bies.lbl.gov/publications/2024-lbnl-data-center-energy-usage-report",
+      "year": 2024
+    },
+    "lbnl_water": {
+      "title": "LBNL Water Impact Tool: US electricity generation, consumption 4.52 L/kWh, withdrawal 47.45 L/kWh (2023)",
+      "url": "https://waterimpacttool.lbl.gov/",
+      "year": 2023
+    },
+    "msft_wue": {
+      "title": "Microsoft, Data center sustainability metrics (global WUE 0.30 L/kWh FY2024, 0.27 FY2025)",
+      "url": "https://datacenters.microsoft.com/sustainability/efficiency/",
+      "year": 2025
+    },
+    "fepc": {
+      "title": "FEPC (Federation of Electric Power Companies of Japan), average electricity price trends: household FY2024 32.80 JPY/kWh",
+      "url": "https://www.fepc.or.jp/supply/energymix/",
+      "year": 2024
     }
   },
   "profiles": {
     "it": {
       "label": "Italia",
       "currency": "EUR",
-      "co2_g_per_kwh": 331,
-      "price_per_kwh": 0.32,
-      "status": "sourced",
+      "co2_g_per_kwh": 284,
+      "price_per_kwh": 0.311,
+      "status": "to_verify",
       "sources": [
-        "ember_it",
+        "ember",
         "eurostat"
       ],
-      "reference": "CO2: 2023; price: H1 2024 (Eurostat: above 0.32 EUR/kWh)"
+      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary values: 281-288, to reconcile from one dataset release); price: Dec 2024 household about 0.311 EUR/kWh incl. taxes (Eurostat nrg_pc_204, secondary extraction)",
+      "co2_range": {
+        "min": 270,
+        "max": 300
+      },
+      "price_range": {
+        "min": 0.29,
+        "max": 0.34
+      }
     },
     "eu": {
       "label": "Unione Europea",
@@ -102,38 +145,54 @@
     "us": {
       "label": "USA",
       "currency": "USD",
-      "co2_g_per_kwh": 369,
+      "co2_g_per_kwh": 384,
       "price_per_kwh": 0.1648,
-      "status": "sourced",
+      "status": "to_verify",
       "sources": [
         "ember",
         "eia"
       ],
-      "reference": "CO2: 2023; price: 2024"
+      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary: 384); price: EIA 2024 residential average 16.48 c/kWh",
+      "co2_range": {
+        "min": 370,
+        "max": 400
+      }
     },
     "cn": {
       "label": "Cina",
       "currency": "CNY",
-      "co2_g_per_kwh": 562,
+      "co2_g_per_kwh": 528,
       "price_per_kwh": 0.542,
       "status": "to_verify",
       "sources": [
         "ember",
         "cn_price"
       ],
-      "reference": "CO2: Jan-Oct 2025 average; price: 2021 national household average, to be verified (provinces set their own tiers)"
+      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary: 559); price: 2021 national household average, tariffs are tiered and set by province (provincial tables needed)",
+      "co2_range": {
+        "min": 510,
+        "max": 550
+      }
     },
     "jp": {
       "label": "Giappone",
       "currency": "JPY",
-      "co2_g_per_kwh": 426,
-      "price_per_kwh": 35.9,
+      "co2_g_per_kwh": 477,
+      "price_per_kwh": 32.8,
       "status": "to_verify",
       "sources": [
-        "owid2020",
-        "gpp_jp"
+        "ember",
+        "fepc"
       ],
-      "reference": "CO2: 2020 value, to be updated (lowcarbonpower.org lists ~438, year not stated); price: no year stated (METI)"
+      "reference": "CO2: Ember 2025 provisional extraction (2024 secondary: 484); price: FEPC household average FY2024 32.80 JPY/kWh",
+      "co2_range": {
+        "min": 460,
+        "max": 500
+      },
+      "price_range": {
+        "min": 30,
+        "max": 35
+      }
     },
     "world": {
       "label": "Media mondiale",
@@ -150,32 +209,71 @@
   "energy": {
     "device_power_w": {
       "unit": "W",
-      "value": {
-        "min": 9,
-        "mid": 20,
-        "max": 50
+      "default": "laptop",
+      "types": {
+        "laptop": {
+          "min": 5,
+          "mid": 12,
+          "max": 25
+        },
+        "laptop_apple": {
+          "min": 3,
+          "mid": 7,
+          "max": 15
+        },
+        "desktop": {
+          "min": 20,
+          "mid": 45,
+          "max": 100
+        },
+        "tablet": {
+          "min": 2,
+          "mid": 5,
+          "max": 10
+        },
+        "phone": {
+          "min": 1,
+          "mid": 2.5,
+          "max": 5
+        }
       },
       "sources": [
         "kirkeby",
-        "fraunhofer"
+        "notebookcheck_ipad",
+        "energystar"
       ],
       "reliability": "low",
-      "status": "assumption",
-      "method": "Device power while the tab is active. Laptop ~9-13 W; desktop+monitor higher. The central value is an assumption between the two cases; it will become configurable."
+      "status": "to_verify",
+      "method": "Incremental power attributable to active browsing with the screen on, per device type chosen by the user. Provisional engineering ranges, not validated population averages; no reliable data on the share of browsing time by device type. Watts are never inferred from the user agent."
     },
-    "network_dc_kwh_per_gb": {
+    "network_kwh_per_gb": {
       "unit": "kWh/GB",
       "value": {
-        "min": 0.057,
-        "mid": 0.114,
-        "max": 0.228
+        "min": 0.03,
+        "mid": 0.059,
+        "max": 0.1
+      },
+      "sources": [
+        "swd",
+        "mytton"
+      ],
+      "reliability": "medium",
+      "status": "sourced",
+      "method": "SWD v4 network intensity (310 TWh / 5.29 ZB). An allocation estimate, not a physical measurement: network energy is not proportional to data volume (Mytton et al. 2024). Range = sensitivity range for fixed networks; mobile networks not yet separated."
+    },
+    "datacenter_kwh_per_gb": {
+      "unit": "kWh/GB",
+      "value": {
+        "min": 0.03,
+        "mid": 0.055,
+        "max": 0.1
       },
       "sources": [
         "swd"
       ],
       "reliability": "medium",
-      "status": "assumption",
-      "method": "Data center 0.055 + network 0.059 kWh/GB (SWD v4, operational only). The SWD 'device' segment is NOT used: the device is computed from time to avoid double counting. Range = x0.5 / x2 (assumption: the kWh/GB model is debated in the literature)."
+      "status": "sourced",
+      "method": "SWD v4 data-center intensity (290 TWh / 5.29 ZB). The SWD user-device segment (0.080) is NOT used: the device is computed from time to avoid double counting."
     },
     "streaming_kwh_per_hour": {
       "unit": "kWh/h",
@@ -185,63 +283,65 @@
         "max": 0.24
       },
       "sources": [
-        "iea_stream"
+        "iea_stream",
+        "carbontrust",
+        "netflix"
       ],
       "reliability": "medium",
       "status": "to_verify",
-      "method": "Network + data center per hour of streaming; replaces the byte-based calculation (which would overestimate streaming). Max = earlier IEA estimate (0.12-0.24). Possible slight double counting with the device."
+      "method": "Network + data center per hour of streaming, replacing the byte-based calculation (which would overstate streaming: HD is about 3 GB/h). Device energy is counted separately. No universal value by resolution exists; per-resolution ranges in the research mix in the display device and are not used. Possible slight double counting with the device."
+    },
+    "dc_share_of_remote": {
+      "unit": "fraction",
+      "value": {
+        "min": 0.48,
+        "mid": 0.48,
+        "max": 0.48
+      },
+      "sources": [
+        "swd"
+      ],
+      "reliability": "low",
+      "status": "assumption",
+      "method": "Share of 'network + data center' energy attributed to the data center when only a time-based total is available (streaming): 0.055 / (0.055 + 0.059), the SWD v4 ratio. Used only for the data-center water term."
     },
     "ai_text_wh_per_prompt": {
       "unit": "Wh",
       "value": {
         "min": 0.1,
-        "mid": 0.24,
-        "max": 0.7
+        "mid": 0.3,
+        "max": 1.0
       },
       "sources": [
-        "google"
+        "google",
+        "epoch",
+        "openai_altman"
       ],
       "reliability": "low",
-      "status": "assumption",
-      "method": "Gemini median 0.24 Wh (comprehensive method); 0.10 Wh = active chips only. Max = assumption (x3) for heavier models."
+      "status": "sourced",
+      "method": "Generic text prompt: cross-source reference of 0.30 Wh (Gemini median 0.24 Wh, comprehensive method; GPT-4o about 0.3 Wh, modelled by Epoch AI; ChatGPT average 0.34 Wh, methodology undisclosed). Long-context and reasoning requests can be far higher. Provider-specific values for Claude, Mistral and Llama not found."
     },
     "ai_text_prompts_per_hour": {
       "unit": "prompt/h",
       "value": {
-        "min": 3,
-        "mid": 10,
-        "max": 30
+        "min": 10,
+        "mid": 30,
+        "max": 60
       },
       "sources": [],
       "reliability": "low",
       "status": "assumption",
-      "method": "The browser cannot see prompts: a usage rate per hour of active session is assumed. TO BE DEEPENED."
+      "method": "The browser cannot see prompts: a usage rate per hour of active session is assumed (product-design assumption, no industry measurement). TO BE DEEPENED with per-service counting."
     },
-    "ai_image_wh_per_image": {
-      "unit": "Wh",
-      "value": {
-        "min": 1.35,
-        "mid": 2.9,
-        "max": 11.49
-      },
+    "ai_image": {
+      "unit": "-",
+      "value": null,
       "sources": [
         "luccioni"
       ],
-      "reliability": "low",
+      "reliability": "unavailable",
       "status": "to_verify",
-      "method": "From 1.35 (median) to 11.49 kWh per 1000 images; values from secondary sources. Depends on model and image size."
-    },
-    "ai_image_images_per_hour": {
-      "unit": "images/h",
-      "value": {
-        "min": 1,
-        "mid": 5,
-        "max": 20
-      },
-      "sources": [],
-      "reliability": "low",
-      "status": "assumption",
-      "method": "Assumed usage rate per active hour. TO BE DEEPENED."
+      "method": "No defensible energy per generated image: it depends on model, hardware and resolution and providers do not disclose it. Remote part not estimated (device and network are counted). Indicative research range 1.35-11.5 Wh per image (Luccioni et al.) is not used."
     },
     "ai_video": {
       "unit": "-",
@@ -249,22 +349,8 @@
       "sources": [],
       "reliability": "unavailable",
       "status": "to_verify",
-      "method": "No reliable coefficient collected: the remote part is not estimated (only device and network are counted). TO BE DEEPENED."
+      "method": "No comparable provider-independent measurement of energy per generated second. Remote part not estimated (device and network are counted). Multiplying image energy by frame count would be incorrect."
     }
-  },
-  "water_l_per_kwh": {
-    "unit": "L/kWh",
-    "value": {
-      "min": 1.8,
-      "mid": 4.0,
-      "max": 7.6
-    },
-    "sources": [
-      "lbnl"
-    ],
-    "reliability": "low",
-    "status": "to_verify",
-    "method": "Direct water (cooling, ~1.8 L/kWh) and indirect water (power generation, up to ~7.6 L/kWh) from secondary sources. The central value is an assumed midpoint; to be refined per country."
   },
   "categories": {
     "browsing": {
@@ -296,11 +382,12 @@
       "reliability": "low"
     },
     "ai_image": {
-      "model": "ai_image",
-      "reliability": "low"
+      "model": "bytes",
+      "reliability": "low",
+      "incomplete": true
     },
     "ai_video": {
-      "model": "ai_video",
+      "model": "bytes",
       "reliability": "low",
       "incomplete": true
     },
@@ -310,9 +397,41 @@
     }
   },
   "reference_thresholds_wh_per_day": {
-    "low": 150,
-    "high": 400,
+    "low": 100,
+    "high": 300,
     "status": "assumption",
-    "method": "Default traffic-light thresholds (green/yellow/red) expressed as daily energy, converted with the selected profile. Reference: ~8 h of device at 20 W = 160 Wh. These are NOT scientific or regulatory thresholds: users can set their own."
-  }
+    "method": "Default traffic-light thresholds (green/yellow/red) expressed as daily energy, converted with the selected profile. Reference: about 8 h of laptop browsing at 12 W is 96 Wh before network and data-center energy. These are NOT scientific or regulatory thresholds: users can set their own."
+  },
+  "water": {
+    "onsite_l_per_kwh_dc": {
+      "unit": "L/kWh (data-center energy)",
+      "value": {
+        "min": 0.27,
+        "mid": 0.3,
+        "max": 0.48
+      },
+      "sources": [
+        "lbnl2024",
+        "msft_wue"
+      ],
+      "reliability": "medium",
+      "status": "sourced",
+      "method": "Direct cooling water of data centers (WUE): LBNL US estimate 0.36 L/kWh (0.30-0.48), Microsoft fleet 0.30 L/kWh in FY2024 and 0.27 in FY2025. Different facility populations and methods."
+    },
+    "grid_l_per_kwh": {
+      "unit": "L/kWh (electricity consumed)",
+      "value": {
+        "min": 3.0,
+        "mid": 4.52,
+        "max": 6.0
+      },
+      "sources": [
+        "lbnl_water"
+      ],
+      "reliability": "low",
+      "status": "to_verify",
+      "method": "Water consumed (not withdrawn) to generate electricity: US national average 4.52 L/kWh (LBNL, 2023). Country datasets for EU, Italy, China, Japan and world were not found: the US value is used as a proxy everywhere. Applied to all electricity (device, network, data center)."
+    }
+  },
+  "water_formula": "water = data-center energy x on-site WUE + total energy x electricity water intensity (consumption, never withdrawal)"
 }

@@ -29,12 +29,12 @@ const el = (tag, cls, text) => Object.assign(document.createElement(tag), cls ? 
 function analyse(hosts) {
   const rows = Object.entries(hosts).map(([host, e]) => {
     const cat = classify(host, catalog.domains);
-    return { host, cat, e, est: estimateEntry(e, cat, coeffs) };
+    return { host, cat, e, est: estimateEntry(e, cat, coeffs, settings.device) };
   });
   return { rows, total: rows.length ? sumEstimates(rows.map((r) => r.est)) : zeroEstimate() };
 }
 const analysePeriod = (p) => analyse(aggregateDays(stats, lastNDays(PERIOD_DAYS[p])));
-const triOf = (est, m) => convert(est.wh, profile, coeffs)[METRICS[m].key];
+const triOf = (est, m) => convert(est.wh, profile, coeffs, est.dc_wh)[METRICS[m].key];
 const unitOf = (m) => METRICS[m].unit;
 const dailyThresholds = (m) => thresholdsFor(m, settings, profile, coeffs);
 
@@ -62,10 +62,11 @@ function renderHero(a) {
   $('level').className = `level ${level}`;
   $('range').textContent = t('hero.range', { a: fmt(v.min, unitOf(m)), b: fmt(v.max, unitOf(m)) });
   $('confidence').textContent = t('hero.confidence', { level: t(`reliability.${a.total.reliability}`).toLowerCase() }) + (a.total.incomplete ? ' *' : '');
+  $('confidence').title = a.total.incomplete ? t('hero.incomplete') : '';
 }
 
 function renderEquivalences(a) {
-  const c = convert(a.total.wh, profile, coeffs);
+  const c = convert(a.total.wh, profile, coeffs, a.total.dc_wh);
   const totals = { wh: a.total.wh.mid, co2_g: c.co2_g.mid, water_ml: c.water_ml.mid, cost: c.cost.mid };
   const by = Object.fromEntries(equivalences(totals, profile, eq).map((x) => [x.id, x.value]));
   const cards = [['car', units.distanceKm(by.car_km), 'card.car'], ['bulb', units.hours(by.led_hours), 'card.bulb'], ['bottle', units.num(by.bottles), 'card.bottle']];
@@ -143,7 +144,7 @@ function cell(tr, text, title, num = true) {
 }
 const rangeText = (v, unit) => `${fmt(v.min, unit)} – ${fmt(v.max, unit)}`;
 function metricCells(tr, est) {
-  const c = convert(est.wh, profile, coeffs);
+  const c = convert(est.wh, profile, coeffs, est.dc_wh);
   cell(tr, fmt(est.wh.mid, 'Wh'), rangeText(est.wh, 'Wh'));
   cell(tr, fmt(c.co2_g.mid, 'g'), rangeText(c.co2_g, 'g'));
   cell(tr, fmt(c.water_ml.mid, 'mL'), rangeText(c.water_ml, 'mL'));

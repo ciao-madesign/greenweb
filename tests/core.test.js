@@ -55,7 +55,8 @@ test('soglie: derivate dal riferimento, override utente, semaforo', () => {
   const c = JSON.parse(readFileSync(new URL('../data/coefficients.json', import.meta.url)));
   const p = resolveProfile(c, {});
   const [lo, hi] = thresholdsFor('co2e', {}, p, c);
-  assert.ok(Math.abs(lo - 0.15 * 331) < 1e-6 && Math.abs(hi - 0.4 * 331) < 1e-6);
+  const ref = c.reference_thresholds_wh_per_day;
+  assert.ok(Math.abs(lo - (ref.low / 1000) * p.co2_g_per_kwh) < 1e-6 && Math.abs(hi - (ref.high / 1000) * p.co2_g_per_kwh) < 1e-6);
   assert.deepEqual(thresholdsFor('co2e', { thresholds: { co2e: [1, 2] } }, p, c), [1, 2]);
   assert.equal(levelOf(1, [5, 10]), 'green');
   assert.equal(levelOf(5, [5, 10]), 'yellow');
@@ -80,12 +81,13 @@ test('equivalenze: auto, lampadina, bottiglie, lavatrice', () => {
   const c = JSON.parse(readFileSync(new URL('../data/coefficients.json', import.meta.url)));
   const eq = JSON.parse(readFileSync(new URL('../data/equivalences.json', import.meta.url)));
   const p = resolveProfile(c, {});
-  const r = Object.fromEntries(equivalences({ wh: 100, co2_g: 106.4, water_ml: 1000, cost: 0.32 }, p, eq).map((x) => [x.id, x.value]));
+  const q = (id) => eq.params[id].value;
+  const r = Object.fromEntries(equivalences({ wh: 100, co2_g: q('car_g_per_km'), water_ml: q('bottle_ml') * 2, cost: q('washing_kwh') * p.price_per_kwh }, p, eq).map((x) => [x.id, x.value]));
   assert.ok(Math.abs(r.car_km - 1) < 1e-9);
-  assert.ok(Math.abs(r.led_hours - 10) < 1e-9);
+  assert.ok(Math.abs(r.led_hours - 100 / q('led_w')) < 1e-9);
   assert.ok(Math.abs(r.bottles - 2) < 1e-9);
   assert.ok(Math.abs(r.washing_cycles - 1) < 1e-9);
-  assert.ok(Math.abs(r.light_hours_co2 - 106.4 / (0.01 * 331)) < 1e-9);
+  assert.ok(Math.abs(r.light_hours_co2 - q('car_g_per_km') / ((q('led_w') / 1000) * p.co2_g_per_kwh)) < 1e-9);
   for (const it of eq.items) for (const id of it.params) assert.ok(eq.params[id]);
 });
 

@@ -1,10 +1,12 @@
 # Punti aperti
 
+Aggiornato con i risultati della ricerca del 9 novembre 2026: vedi `docs/RESEARCH_RESULTS.md` (cosa è stato adottato, cosa manca, priorità).
+
 ## AI
 - Il browser non vede i prompt: i coefficienti AI usano un ritmo d'uso assunto per ora attiva (prompt/h, immagini/h). Da sostituire con adattatori per servizio dove possibile.
 - Mancano coefficienti per modello e per tipo di operazione.
 - Distinguere "chat aperta" da "generazione effettiva".
-- **AI video**: nessun coefficiente remoto affidabile raccolto; la stima è marcata incompleta.
+- **AI immagini e video**: nessun coefficiente remoto affidabile; la stima conta solo dispositivo e rete ed è marcata incompleta.
 
 ## Valori da verificare sul dato primario (status `to_verify`)
 - Intensità carbonica UE (valore 2020 "Europa") e Giappone (2020): aggiornare con Ember/IEA.

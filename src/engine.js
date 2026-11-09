@@ -7,35 +7,57 @@ const tri = (f) => Object.fromEntries(K.map((k) => [k, f(k)]));
 const ORDER = ['unavailable', 'low', 'medium', 'high'];
 const worst = (a, b) => (ORDER.indexOf(a) <= ORDER.indexOf(b) ? a : b);
 
-/** Energia (Wh) di una voce { n, b, ms } per una categoria. */
-export function estimateEntry(entry, category, c) {
+/** Potenza del dispositivo scelto dall'utente (terna min/mid/max, in W). */
+export function devicePower(c, device) {
+  const p = c.energy.device_power_w;
+  return p.types[device] ?? p.types[p.default];
+}
+
+/**
+ * Energia (Wh) di una voce { n, b, ms } per una categoria. Restituisce anche la quota di data center
+ * (`dc_wh`), che serve al calcolo dell'acqua sul sito. Dispositivo = tempo; rete e data center = byte
+ * (navigazione) oppure tempo (streaming, AI testuale), mai entrambi.
+ */
+export function estimateEntry(entry, category, c, device) {
   const cat = c.categories[category] ?? c.categories.other;
   const hours = entry.ms / 3.6e6;
   const gb = entry.b / 1e9;
   const e = c.energy;
-  const wh = tri((k) => {
-    let w = hours * e.device_power_w.value[k];
+  const P = devicePower(c, device);
+  const parts = tri((k) => {
+    let net = 0, dc = 0;
     switch (cat.model) {
-      case 'streaming': w += hours * e.streaming_kwh_per_hour.value[k] * 1000; break;
-      case 'ai_text':   w += hours * e.ai_text_prompts_per_hour.value[k] * e.ai_text_wh_per_prompt.value[k]; break;
-      case 'ai_image':  w += hours * e.ai_image_images_per_hour.value[k] * e.ai_image_wh_per_image.value[k]; break;
-      default:          w += gb * e.network_dc_kwh_per_gb.value[k] * 1000; // bytes, ai_video (solo rete)
+      case 'streaming': {
+        const remote = hours * e.streaming_kwh_per_hour.value[k] * 1000;
+        dc = remote * e.dc_share_of_remote.value[k];
+        net = remote - dc;
+        break;
+      }
+      case 'ai_text':
+        dc = hours * e.ai_text_prompts_per_hour.value[k] * e.ai_text_wh_per_prompt.value[k];
+        break;
+      default: // 'bytes': navigazione, e AI immagini/video (solo rete: la parte remota non è stimabile)
+        net = gb * e.network_kwh_per_gb.value[k] * 1000;
+        dc = gb * e.datacenter_kwh_per_gb.value[k] * 1000;
     }
-    return w;
+    return { total: hours * P[k] + net + dc, dc };
   });
   let reliability = cat.reliability;
-  const usesBytes = cat.model === 'bytes' || cat.model === 'ai_video';
-  if (usesBytes && entry.b === 0 && entry.n > 0) reliability = worst(reliability, 'low'); // dimensioni non esposte
-  return { wh, reliability, incomplete: !!cat.incomplete };
+  if (cat.model === 'bytes' && entry.b === 0 && entry.n > 0) reliability = worst(reliability, 'low'); // dimensioni non esposte
+  return { wh: tri((k) => parts[k].total), dc_wh: tri((k) => parts[k].dc), reliability, incomplete: !!cat.incomplete };
 }
 
-/** Conversioni dell'energia con il profilo regionale (con eventuali override dell'utente). */
-export function convert(wh, profile, c) {
-  const w = c.water_l_per_kwh.value;
+/**
+ * Conversioni dell'energia con il profilo regionale.
+ * acqua = energia data center x WUE sul sito + energia totale x acqua consumata per produrre l'elettricità.
+ */
+export function convert(wh, profile, c, dcWh) {
+  const dc = dcWh ?? { min: 0, mid: 0, max: 0 };
+  const onsite = c.water.onsite_l_per_kwh_dc.value, grid = c.water.grid_l_per_kwh.value;
   return {
-    co2_g: tri((k) => (wh[k] / 1000) * profile.co2_g_per_kwh),
-    water_ml: tri((k) => wh[k] * w[k]), // Wh x L/kWh = mL
-    cost: tri((k) => (wh[k] / 1000) * profile.price_per_kwh),
+    co2_g: tri((k) => (wh[k] / 1000) * (profile.co2_range?.[k] ?? profile.co2_g_per_kwh)),
+    water_ml: tri((k) => dc[k] * onsite[k] + wh[k] * grid[k]), // Wh x L/kWh = mL
+    cost: tri((k) => (wh[k] / 1000) * (profile.price_range?.[k] ?? profile.price_per_kwh)),
   };
 }
 
@@ -46,6 +68,7 @@ export function sumTri(list) {
 export function sumEstimates(list) {
   return {
     wh: sumTri(list.map((x) => x.wh)),
+    dc_wh: sumTri(list.map((x) => x.dc_wh)),
     reliability: list.reduce((r, x) => worst(r, x.reliability), 'high'),
     incomplete: list.some((x) => x.incomplete),
   };
@@ -55,8 +78,12 @@ export const DEFAULT_PROFILE = 'it';
 
 /** Profilo effettivo: profilo scelto + override numerici dell'utente. */
 export function resolveProfile(c, settings = {}) {
-  const base = c.profiles[settings.profile] ?? c.profiles[DEFAULT_PROFILE];
-  return { ...base, ...(settings.overrides ?? {}) };
+  const base = { ...(c.profiles[settings.profile] ?? c.profiles[DEFAULT_PROFILE]) };
+  const ov = settings.overrides ?? {};
+  // Un valore scelto dall'utente sostituisce anche l'intervallo documentato.
+  if (ov.co2_g_per_kwh !== undefined) delete base.co2_range;
+  if (ov.price_per_kwh !== undefined) delete base.price_range;
+  return { ...base, ...ov };
 }
 
 // --- Metriche, soglie e semaforo ---------------------------------------------
@@ -68,11 +95,11 @@ export const METRICS = {
 export const DEFAULT_METRIC = 'co2e';
 export const metricOf = (settings = {}) => (METRICS[settings.metric] ? settings.metric : DEFAULT_METRIC);
 
-export const zeroEstimate = () => ({ wh: { min: 0, mid: 0, max: 0 }, reliability: 'high', incomplete: false });
+export const zeroEstimate = () => ({ wh: { min: 0, mid: 0, max: 0 }, dc_wh: { min: 0, mid: 0, max: 0 }, reliability: 'high', incomplete: false });
 
 /** Stima del totale di un giorno: stats[giorno] = { dominio: { n, b, ms } }. */
-export function estimateDay(dayStats, domains, classify, c) {
-  const list = Object.entries(dayStats ?? {}).map(([host, e]) => estimateEntry(e, classify(host, domains), c));
+export function estimateDay(dayStats, domains, classify, c, device) {
+  const list = Object.entries(dayStats ?? {}).map(([host, e]) => estimateEntry(e, classify(host, domains), c, device));
   return list.length ? sumEstimates(list) : zeroEstimate();
 }
 
@@ -81,7 +108,8 @@ export function thresholdsFor(metric, settings, profile, c) {
   const custom = settings?.thresholds?.[metric];
   if (Array.isArray(custom) && custom.length === 2 && custom[0] < custom[1]) return custom;
   const ref = c.reference_thresholds_wh_per_day;
-  const at = (wh) => convert({ min: wh, mid: wh, max: wh }, profile, c)[METRICS[metric].key].mid;
+  // Per l'acqua si assume una quota tipica di data center (30%) nell'energia di riferimento.
+  const at = (wh) => convert({ min: wh, mid: wh, max: wh }, profile, c, { min: wh * 0.3, mid: wh * 0.3, max: wh * 0.3 })[METRICS[metric].key].mid;
   return [at(ref.low), at(ref.high)];
 }
 

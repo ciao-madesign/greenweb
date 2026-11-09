@@ -1,19 +1,88 @@
 {
   "version": 1,
   "sources": {
-    "eea_cars": { "title": "EEA, average CO2 emissions of new passenger cars in the EU, 2023 (about 106.4 g/km, WLTP, tailpipe)", "url": "https://www.eea.europa.eu/data-and-maps/indicators/average-co2-emissions-from-motor-vehicles-1/assessment", "year": 2024 }
+    "eea_cars": {
+      "title": "EEA, CO2 performance of new passenger cars in Europe: 106.7 g/km in 2024 (WLTP, tailpipe, newly registered cars)",
+      "url": "https://www.eea.europa.eu/en/analysis/indicators/co2-performance-of-new-passenger",
+      "year": 2024
+    },
+    "doe_led": {
+      "title": "U.S. DOE, Purchasing energy-efficient light bulbs (LED about 800 lm: 5.9-10.5 W)",
+      "url": "https://www.energy.gov/cmei/femp/purchasing-energy-efficient-light-bulbs",
+      "year": 2024
+    }
   },
   "params": {
-    "car_g_per_km":  { "value": 106.4, "unit": "gCO2/km", "sources": ["eea_cars"], "status": "sourced",    "note": "Average of new cars sold in the EU in 2023 (tailpipe, WLTP). The fleet in use emits more." },
-    "led_w":         { "value": 10,    "unit": "W",       "sources": [],          "status": "assumption", "note": "Typical LED bulb." },
-    "bottle_ml":     { "value": 500,   "unit": "mL",      "sources": [],          "status": "definition", "note": "Standard bottle size." },
-    "washing_kwh":   { "value": 1,     "unit": "kWh",     "sources": [],          "status": "assumption", "note": "Electricity of one washing machine cycle (assumption)." }
+    "car_g_per_km": {
+      "value": 106.7,
+      "unit": "gCO2/km",
+      "sources": [
+        "eea_cars"
+      ],
+      "status": "sourced",
+      "note": "New cars registered in the EU in 2024 (tailpipe, WLTP). In-use fleet averages were not found and are higher, so distances are slightly overstated."
+    },
+    "led_w": {
+      "value": 9,
+      "unit": "W",
+      "sources": [
+        "doe_led"
+      ],
+      "status": "sourced",
+      "note": "LED bulb of about 800 lm (range 5.9-10.5 W)."
+    },
+    "bottle_ml": {
+      "value": 500,
+      "unit": "mL",
+      "sources": [],
+      "status": "definition",
+      "note": "Standard bottle size."
+    },
+    "washing_kwh": {
+      "value": 0.55,
+      "unit": "kWh",
+      "sources": [],
+      "status": "to_verify",
+      "note": "One washing-machine cycle, 0.30-0.90 kWh depending on machine and programme."
+    }
   },
   "items": [
-    { "id": "car_km",          "from": "co2_g",    "params": ["car_g_per_km"] },
-    { "id": "light_hours_co2", "from": "co2_g",    "params": ["led_w"], "uses": "co2_g_per_kwh" },
-    { "id": "led_hours",       "from": "wh",       "params": ["led_w"] },
-    { "id": "bottles",         "from": "water_ml", "params": ["bottle_ml"] },
-    { "id": "washing_cycles",  "from": "cost",     "params": ["washing_kwh"], "uses": "price_per_kwh" }
+    {
+      "id": "car_km",
+      "from": "co2_g",
+      "params": [
+        "car_g_per_km"
+      ]
+    },
+    {
+      "id": "light_hours_co2",
+      "from": "co2_g",
+      "params": [
+        "led_w"
+      ],
+      "uses": "co2_g_per_kwh"
+    },
+    {
+      "id": "led_hours",
+      "from": "wh",
+      "params": [
+        "led_w"
+      ]
+    },
+    {
+      "id": "bottles",
+      "from": "water_ml",
+      "params": [
+        "bottle_ml"
+      ]
+    },
+    {
+      "id": "washing_cycles",
+      "from": "cost",
+      "params": [
+        "washing_kwh"
+      ],
+      "uses": "price_per_kwh"
+    }
   ]
 }

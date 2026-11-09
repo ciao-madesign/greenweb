@@ -30,12 +30,18 @@ function sourceLinks(ids) {
 const range = (v, unit) => (v ? `${num.format(v.min)} / ${num.format(v.mid)} / ${num.format(v.max)} ${unit}` : '—');
 const status = (s) => t(`status.${s}`);
 
-// Coefficienti energetici e acqua
+// Coefficienti energetici e acqua (il dispositivo ha una riga per tipo).
 const coefBody = document.querySelector('#coef-table tbody');
-for (const [id, x] of [...Object.entries(c.energy), ['water_l_per_kwh', c.water_l_per_kwh]]) {
+const coefRows = [];
+for (const [id, x] of Object.entries(c.energy)) {
+  if (x.types) for (const [type, v] of Object.entries(x.types)) coefRows.push([`${id}-${type}`, `${t(`coef.${id}`)} · ${t(`device.${type}`)}`, { ...x, value: v }]);
+  else coefRows.push([id, t(`coef.${id}`), x]);
+}
+for (const [id, x] of Object.entries(c.water)) coefRows.push([id, t(`coef.${id}`), x]);
+for (const [id, label, x] of coefRows) {
   const tr = coefBody.insertRow();
   tr.id = `coef-${id}`;
-  td(tr, t(`coef.${id}`));
+  td(tr, label);
   td(tr, range(x.value, x.unit), 'num');
   td(tr, t(`reliability.${x.reliability}`));
   td(tr, status(x.status));

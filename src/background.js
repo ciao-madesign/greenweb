@@ -173,8 +173,8 @@ async function refreshBadge() {
   const settings = cache.settings;
   const profile = resolveProfile(coeffs, settings);
   const metric = metricOf(settings);
-  const est = estimateDay(todayNow(), catalog.domains, classify, coeffs);
-  const value = convert(est.wh, profile, coeffs)[METRICS[metric].key].mid;
+  const est = estimateDay(todayNow(), catalog.domains, classify, coeffs, settings.device);
+  const value = convert(est.wh, profile, coeffs, est.dc_wh)[METRICS[metric].key].mid;
   const level = levelOf(value, thresholdsFor(metric, settings, profile, coeffs));
   const text = badgeValue(metric, value);
   const title = t('tooltip', { metric: t(`metric.${metric}`), value: makeFormatter(lang, profile.currency)(value, METRICS[metric].unit), profile: t(`profile.${settings.profile in coeffs.profiles ? settings.profile : 'it'}`) });

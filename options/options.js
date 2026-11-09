@@ -17,6 +17,7 @@ const fill = (sel, items, current) => {
 };
 fill($('metric'), Object.keys(METRICS).map((m) => [m, t(`metric.${m}`)]), metricOf(settings));
 fill($('profile'), Object.keys(coeffs.profiles).map((p) => [p, t(`profile.${p}`)]), settings.profile in coeffs.profiles ? settings.profile : DEFAULT_PROFILE);
+fill($('device'), Object.keys(coeffs.energy.device_power_w.types).map((d) => [d, t(`device.${d}`)]), settings.device ?? coeffs.energy.device_power_w.default);
 fill($('lang'), [['', t('options.auto')], ...languages.map((l) => [l.code, l.name])], settings.lang ?? '');
 
 function refreshFields() {
@@ -39,7 +40,7 @@ async function save() {
   const co2 = num($('co2').value), price = num($('price').value);
   const lo = num($('low').value), hi = num($('high').value);
   const metric = $('metric').value;
-  const next = { ...settings, metric, profile: $('profile').value };
+  const next = { ...settings, metric, profile: $('profile').value, device: $('device').value };
   next.overrides = { ...(co2 !== undefined && { co2_g_per_kwh: co2 }), ...(price !== undefined && { price_per_kwh: price }) };
   const th = { ...(settings.thresholds ?? {}) };
   if (lo !== undefined && hi !== undefined && lo < hi) th[metric] = [lo, hi]; else delete th[metric];
@@ -56,6 +57,7 @@ async function save() {
 ['co2', 'price', 'low', 'high'].forEach((id) => $(id).addEventListener('change', save));
 ['metric', 'profile'].forEach((id) => $(id).addEventListener('change', async () => { await save(); refreshFields(); }));
 $('lang').addEventListener('change', save);
+$('device').addEventListener('change', save);
 $('delete').addEventListener('click', async () => {
   if (!confirm(t('options.delete_confirm'))) return;
   const all = await api.storage.local.get(null);
