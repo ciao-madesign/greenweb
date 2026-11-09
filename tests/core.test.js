@@ -42,7 +42,12 @@ test('badgeValue per metrica', () => {
   assert.equal(badgeValue('co2e', 1800), '1.8k');
   assert.equal(badgeValue('water', 45), '45m');
   assert.equal(badgeValue('water', 1200), '1.2L');
-  assert.equal(badgeValue('cost', 0.25), '0.25');
+  assert.equal(badgeValue('cost', 0.25), '.25');
+  assert.equal(badgeValue('cost', 0.0634), '.063');
+  assert.equal(badgeValue('co2e', 0.87), '.87g');
+  assert.equal(badgeValue('co2e', 0.004), '<.01g');
+  assert.equal(badgeValue('water', 0.45), '.45m');
+  assert.equal(badgeValue('co2e', 0.999), '1.0g');
   assert.equal(badgeValue('co2e', 0), '0');
 });
 

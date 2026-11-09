@@ -10,6 +10,7 @@ const MAX_TICK_MS = 120000;     // tetto di tempo attribuibile tra due eventi
 const KEEP_DAYS = 90;
 
 let pending = {};               // dati non ancora salvati
+let inflight = {};              // dati in scrittura (contano ancora nel badge finché la scrittura non finisce)
 let flushTimer = null;
 let queue = Promise.resolve();  // serializza le scritture
 const tabHost = new Map();      // tabId -> dominio del sito aperto
@@ -32,6 +33,7 @@ function accrue(now = Date.now()) {
 
 async function refreshActive() {
   accrue();
+  scheduleLive();
   active.host = null;
   if (state.idle === 'active' && state.focused) {
     try {
@@ -47,6 +49,7 @@ function record(host, bytes) {
   if (!host) return;
   addSample(pending, dayKey(), host, { n: 1, b: bytes });
   scheduleFlush();
+  scheduleLive();
 }
 
 const FILTER = { urls: ['http://*/*', 'https://*/*'] };
@@ -96,6 +99,7 @@ function flush() {
   accrue();
   const batch = pending;
   pending = {};
+  inflight = batch;
   queue = queue.then(async () => {
     const days = Object.keys(batch);
     if (days.length) {
@@ -111,12 +115,14 @@ function flush() {
           addSample(session.stats, 'all', host, e);
         }
         out[dayStorageKey(day)] = rec;
+        if (day === cache.day) cache.today = rec;
       }
       await api.storage.local.set(out);
     }
+    inflight = {};
     await pruneOldDays();
     await refreshBadge(); // anche senza nuovi dati: cambia il giorno, il badge si riallinea
-  }).catch((e) => console.error('flush', e));
+  }).catch((e) => { inflight = {}; console.error('flush', e); });
   return queue;
 }
 
@@ -138,30 +144,67 @@ const COLORS = { green: '#2e7d32', yellow: '#f9a825', red: '#c62828' };
 const iconSet = (lvl) => Object.fromEntries([16, 32, 48, 128].map((n) => [n, `icons/leaf-${lvl}-${n}.png`]));
 let strings = null;
 
+// Cache in memoria: il badge "live" non rilegge lo storage a ogni aggiornamento.
+const cache = { day: null, today: {}, settings: null };
+async function ensureCache() {
+  const day = dayKey();
+  if (cache.settings && cache.day === day) return;
+  const key = dayStorageKey(day);
+  const stored = await api.storage.local.get([key, 'settings']);
+  cache.day = day;
+  cache.today = stored[key] ?? {};
+  cache.settings = stored.settings ?? {};
+}
+
+/** Oggi = record salvato + dati in scrittura + dati ancora in attesa. */
+function todayNow() {
+  const m = {};
+  for (const src of [cache.today, inflight[cache.day], pending[cache.day]]) {
+    for (const [host, e] of Object.entries(src ?? {})) addSample(m, 'd', host, e);
+  }
+  return m.d ?? {};
+}
+
+let last = '';
 async function refreshBadge() {
-  const todayKey = dayStorageKey(dayKey());
-  const [{ [todayKey]: today, settings = {} }, catalog, coeffs] = await Promise.all([
-    api.storage.local.get([todayKey, 'settings']), loadJson('data/catalog.json'), loadJson('data/coefficients.json'),
-  ]);
+  const [catalog, coeffs] = await Promise.all([loadJson('data/catalog.json'), loadJson('data/coefficients.json')]);
+  await ensureCache();
   const lang = await (strings ??= loadStrings());
+  const settings = cache.settings;
   const profile = resolveProfile(coeffs, settings);
   const metric = metricOf(settings);
-  const est = estimateDay(today, catalog.domains, classify, coeffs);
+  const est = estimateDay(todayNow(), catalog.domains, classify, coeffs);
   const value = convert(est.wh, profile, coeffs)[METRICS[metric].key].mid;
   const level = levelOf(value, thresholdsFor(metric, settings, profile, coeffs));
-  const shown = makeFormatter(lang, profile.currency)(value, METRICS[metric].unit);
-  action.setBadgeText({ text: badgeValue(metric, value) });
+  const text = badgeValue(metric, value);
+  const title = t('tooltip', { metric: t(`metric.${metric}`), value: makeFormatter(lang, profile.currency)(value, METRICS[metric].unit), profile: t(`profile.${settings.profile in coeffs.profiles ? settings.profile : 'it'}`) });
+  const sig = `${text}|${level}|${title}`;
+  if (sig === last) return; // niente chiamate inutili se nulla è cambiato
+  last = sig;
+  action.setBadgeText({ text });
   action.setBadgeBackgroundColor({ color: COLORS[level] });
   action.setIcon({ path: iconSet(level) });
-  action.setTitle({ title: t('tooltip', { metric: t(`metric.${metric}`), value: shown, profile: t(`profile.${settings.profile in coeffs.profiles ? settings.profile : 'it'}`) }) });
+  action.setTitle({ title });
+}
+
+// Aggiornamento "live": durante la navigazione il badge si ricalcola al più ogni 1,5 s.
+const LIVE_MS = 1500;
+let liveTimer = null;
+function scheduleLive() {
+  if (liveTimer) return;
+  liveTimer = setTimeout(() => {
+    liveTimer = null;
+    accrue();
+    refreshBadge().catch(() => {});
+  }, LIVE_MS);
 }
 
 // Cambi di impostazioni o cancellazione dati: aggiorna subito.
 api.storage.onChanged.addListener((changes, area) => {
   if (area !== 'local') return;
-  if (changes.settings) { strings = null; refreshBadge().catch(() => {}); }
+  if (changes.settings) { strings = null; cache.settings = null; last = ''; refreshBadge().catch(() => {}); }
   // Chiave 'session' rimossa = l'utente ha cancellato i dati: scarta anche quelli in attesa.
-  if (changes.session && changes.session.newValue === undefined) { pending = {}; refreshBadge().catch(() => {}); }
+  if (changes.session && changes.session.newValue === undefined) { pending = {}; inflight = {}; cache.day = null; last = ''; refreshBadge().catch(() => {}); }
 });
 
 // --- Avvio ------------------------------------------------------------------

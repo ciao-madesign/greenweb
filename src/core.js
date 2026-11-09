@@ -77,11 +77,14 @@ export function badgeText(bytes) {
   return gb < 10 ? `${gb.toFixed(1)}G` : `${Math.round(gb)}G`;
 }
 
-function compact(x) {
+// Valore breve per il badge (circa 4 caratteri). Sotto 1 si usano decimali senza zero iniziale
+// (".87") così il numero cambia già nei primi secondi di navigazione.
+function compact(x, decimals = 2) {
   if (x >= 10) return String(Math.round(x));
-  if (x >= 1) return x.toFixed(1);
-  if (x >= 0.1) return x.toFixed(2);
-  return x > 0 ? '<.1' : '0';
+  if (x >= 0.995) return x.toFixed(1);
+  const d = x.toFixed(decimals);
+  if (+d > 0) return d.slice(1).replace(/0+$/, '');
+  return x > 0 ? `<.${'0'.repeat(decimals - 1)}1` : '0';
 }
 
 /** Testo del badge per la metrica scelta (breve, indipendente dalla lingua). g/kg, mL/L, costo senza simbolo. */
@@ -89,7 +92,7 @@ export function badgeValue(metric, v) {
   if (!(v > 0)) return '0';
   if (metric === 'co2e') return v >= 1000 ? `${compact(v / 1000)}k` : `${compact(v)}g`;
   if (metric === 'water') return v >= 1000 ? `${compact(v / 1000)}L` : `${compact(v)}m`;
-  return compact(v);
+  return compact(v, 3);
 }
 
 /** Chiavi dei giorni degli ultimi n giorni (oggi incluso). */
