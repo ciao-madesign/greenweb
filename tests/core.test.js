@@ -126,7 +126,7 @@ test('isExcluded: dominio e sottodomini, non omonimi parziali', () => {
 test('purgeHosts e csvFromDays', () => {
   const rec = { 'banca.it': { n: 1, b: 2, ms: 3000 }, 'app.banca.it': { n: 1, b: 1, ms: 1 }, 'a.com': { n: 4, b: 5, ms: 6000 } };
   assert.deepEqual(Object.keys(purgeHosts(rec, ['banca.it'])), ['a.com']);
-  assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,active_seconds\n2026-11-09,"a.com",4,5,6\n');
+  assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,requests_without_size,active_seconds,model_version,coefficient_version\n2026-11-09,"a.com",4,5,0,6,"",""\n');
 });
 
 import { matchAdapter, stripAiFields, maskPath } from '../src/core.js';
@@ -166,4 +166,12 @@ test('maskPath: nasconde gli identificativi, conserva il percorso', () => {
   assert.equal(maskPath('/v1/threads/1234567/messages'), '/v1/threads/:id/messages');
   assert.equal(maskPath('/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate'), '/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate');
   assert.equal(maskPath('/a/AbCdEfGhIjKlMnOpQrStUvWx'), '/a/:id');
+});
+
+import { mergeMeta, metaStorageKey } from '../src/core.js';
+test('mergeMeta registra le versioni senza duplicati; le chiavi meta scadono con i giorni', () => {
+  const a = mergeMeta(undefined, 2, '1@x');
+  assert.deepEqual(mergeMeta(a, 2, '1@x'), { m: [2], c: ['1@x'] });
+  assert.deepEqual(mergeMeta(a, 3, '1@x'), { m: [2, 3], c: ['1@x'] });
+  assert.deepEqual(expiredDayKeys([metaStorageKey('2020-01-01'), metaStorageKey('2026-11-05')], 90, new Date('2026-11-06')), ['meta:2020-01-01']);
 });

@@ -104,3 +104,11 @@ test('ogni coefficiente: min<=mid<=max e fonti esistenti', () => {
     if (p.price_range) assert.ok(p.price_range.min <= p.price_per_kwh && p.price_per_kwh <= p.price_range.max, k);
   }
 });
+
+test('richieste senza dimensione abbassano l\'affidabilità in proporzione', () => {
+  const r = (nu) => estimateEntry({ n: 10, b: 1e6, nu, ms: 1000 }, 'browsing', c);
+  assert.equal(r(0).reliability, 'medium');
+  assert.equal(r(2).reliability, 'medium');
+  assert.equal(r(6).reliability, 'low');
+  assert.equal(r(3).unsized, 3);
+});
