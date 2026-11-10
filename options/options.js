@@ -157,7 +157,7 @@ $('ai-delete').addEventListener('click', async () => {
 $('delete').addEventListener('click', async () => {
   if (!confirm(t('options.delete_confirm'))) return;
   const all = await api.storage.local.get(null);
-  await api.storage.local.remove([...dayKeys(all), 'session']);
+  await api.storage.local.remove([...dayKeys(all), ...Object.keys(all).filter((k) => k.startsWith('meta:')), 'session']);
   $('status').textContent = t('options.deleted');
   await refreshSummary();
 });
@@ -166,7 +166,8 @@ $('delete').addEventListener('click', async () => {
 $('export').addEventListener('click', async () => {
   const all = await api.storage.local.get(null);
   const days = Object.fromEntries(dayKeys(all).map((k) => [k.slice(4), all[k]]));
-  const url = URL.createObjectURL(new Blob([csvFromDays(days)], { type: 'text/csv' }));
+  const metas = Object.fromEntries(Object.keys(all).filter((k) => k.startsWith('meta:')).map((k) => [k.slice(5), all[k]]));
+  const url = URL.createObjectURL(new Blob([csvFromDays(days, metas)], { type: 'text/csv' }));
   const a = Object.assign(document.createElement('a'), { href: url, download: 'digital-footprint-counter-data.csv' });
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);

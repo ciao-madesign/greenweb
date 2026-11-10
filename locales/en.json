@@ -113,6 +113,7 @@
   "dash.foot": "Estimates, not measurements.",
   "hero.range": "Likely between {a} and {b}",
   "hero.confidence": "Confidence: {level}",
+  "hero.unsized": "{n} of {total} requests without a declared size (bytes unavailable)",
   "card.car": "driving a car",
   "card.bulb": "of an LED bulb",
   "card.bottle": "bottles of 500 mL",

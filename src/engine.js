@@ -2,6 +2,11 @@
 // Ogni valore è una terna { min, mid, max }. Nessun doppio conteggio: il dispositivo dipende dal tempo,
 // rete e data center dai byte (o dal tempo per streaming e AI), mai entrambi per la stessa componente.
 
+/** Versione delle formule del motore: aumenta quando cambia il modo di calcolare (non i soli coefficienti). */
+export const MODEL_VERSION = 2;
+/** Versione dei coefficienti, ricavata dal file dati. */
+export const coefficientVersion = (c) => `${c.version}@${c.updated}`;
+
 const K = ['min', 'mid', 'max'];
 const tri = (f) => Object.fromEntries(K.map((k) => [k, f(k)]));
 const ORDER = ['unavailable', 'low', 'medium', 'high'];
@@ -54,8 +59,14 @@ export function estimateEntry(entry, category, c, device) {
   });
   let reliability = cat.reliability;
   if (cat.model === 'bytes' && entry.b === 0 && entry.n > 0) reliability = worst(reliability, 'low'); // dimensioni non esposte
+  // Richieste senza dimensione dichiarata: tante = byte sottostimati, quindi affidabilità ridotta.
+  if (cat.model === 'bytes' && entry.n > 0 && (entry.nu ?? 0) > 0) {
+    const share = entry.nu / entry.n;
+    if (share >= 0.5) reliability = worst(reliability, 'low');
+    else if (share > 0.1) reliability = worst(reliability, 'medium');
+  }
   if (cat.model === 'ai_text' && entry.ms > 0 && (entry.p ?? 0) > 0 && (entry.msc ?? 0) >= 0.9 * entry.ms) reliability = 'medium'; // messaggi realmente contati
-  return { wh: tri((k) => parts[k].total), dc_wh: tri((k) => parts[k].dc), reliability, incomplete: !!cat.incomplete };
+  return { wh: tri((k) => parts[k].total), dc_wh: tri((k) => parts[k].dc), reliability, incomplete: !!cat.incomplete, requests: entry.n ?? 0, unsized: entry.nu ?? 0 };
 }
 
 /**
@@ -82,6 +93,8 @@ export function sumEstimates(list) {
     dc_wh: sumTri(list.map((x) => x.dc_wh)),
     reliability: list.reduce((r, x) => worst(r, x.reliability), 'high'),
     incomplete: list.some((x) => x.incomplete),
+    requests: list.reduce((s, x) => s + (x.requests ?? 0), 0),
+    unsized: list.reduce((s, x) => s + (x.unsized ?? 0), 0),
   };
 }
 
@@ -106,7 +119,7 @@ export const METRICS = {
 export const DEFAULT_METRIC = 'co2e';
 export const metricOf = (settings = {}) => (METRICS[settings.metric] ? settings.metric : DEFAULT_METRIC);
 
-export const zeroEstimate = () => ({ wh: { min: 0, mid: 0, max: 0 }, dc_wh: { min: 0, mid: 0, max: 0 }, reliability: 'high', incomplete: false });
+export const zeroEstimate = () => ({ wh: { min: 0, mid: 0, max: 0 }, dc_wh: { min: 0, mid: 0, max: 0 }, reliability: 'high', incomplete: false, requests: 0, unsized: 0 });
 
 /** Stima del totale di un giorno: stats[giorno] = { dominio: { n, b, ms } }. */
 export function estimateDay(dayStats, domains, classify, c, device) {
