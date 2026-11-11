@@ -6,6 +6,9 @@ import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
 
 const FLUSH_DELAY_MS = 20000;   // salvataggio aggregato (non a ogni richiesta)
+// Assente = nessun input per 5 minuti (o schermo bloccato). Con soglie brevi la lettura o un video senza audio
+// verrebbero scartati, anche se il dispositivo resta acceso e consuma.
+const IDLE_SECONDS = 300;
 const MAX_TICK_MS = 120000;     // tetto di tempo attribuibile tra due eventi
 
 let pending = {};               // dati non ancora salvati
@@ -16,6 +19,11 @@ const tabHost = new Map();      // tabId -> dominio del sito aperto
 const audible = new Map();      // tabId -> dominio, per le schede che stanno emettendo audio
 const privateTabs = new Set();  // schede in finestre private: mai monitorate
 const active = { host: null, since: 0 };
+// Il service worker viene sospeso dopo ~30 s senza eventi: la scheda attiva e l'ora dell'ultimo conteggio
+// si salvano in storage.session (memoria che sopravvive alla sospensione) per non perdere il tempo trascorso.
+const sessionStore = api.storage.session;
+let restored = false;
+let ready; // promessa di ripristino, assegnata a fine file
 let cfg = privacyOf({});        // pausa, esclusioni, conservazione (da impostazioni)
 let cfgReady = false;
 const early = [];               // richieste arrivate prima del caricamento delle impostazioni
@@ -25,6 +33,7 @@ const state = { idle: 'active', focused: true };
 // Il tempo va alla scheda attiva (finestra a fuoco, utente non inattivo) e alle schede che
 // riproducono audio (musica/video in secondo piano). Le altre schede in background non contano.
 function accrue(now = Date.now()) {
+  if (!restored) return; // finché lo stato salvato non è stato ripristinato
   const dt = Math.min(now - active.since, MAX_TICK_MS);
   if (dt > 0) {
     const hosts = new Set(audible.values());
@@ -38,7 +47,16 @@ function accrue(now = Date.now()) {
   active.since = now;
 }
 
+function persistActive() {
+  try { sessionStore?.set({ activeState: { host: active.host, since: active.since } })?.catch?.(() => {}); } catch { /* storage.session non disponibile */ }
+}
+
 async function refreshActive() {
+  await ready;
+  return refreshActiveNow();
+}
+
+async function refreshActiveNow() {
   accrue();
   scheduleLive();
   active.host = null;
@@ -49,6 +67,7 @@ async function refreshActive() {
     } catch { /* tab non disponibile */ }
   }
   active.since = Date.now();
+  persistActive();
 }
 
 // --- Byte trasferiti --------------------------------------------------------
@@ -163,7 +182,7 @@ api.windows.onFocusChanged.addListener((id) => {
   state.focused = id !== api.windows.WINDOW_ID_NONE;
   refreshActive();
 });
-api.idle.setDetectionInterval(60);
+api.idle.setDetectionInterval(IDLE_SECONDS);
 api.idle.onStateChanged.addListener((s) => { state.idle = s === 'active' ? 'active' : 'idle'; refreshActive(); });
 
 // --- Salvataggio ------------------------------------------------------------
@@ -174,11 +193,13 @@ function scheduleFlush() {
 function flush() {
   clearTimeout(flushTimer);
   flushTimer = null;
-  accrue();
-  const batch = pending;
-  pending = {};
-  inflight = batch;
   queue = queue.then(async () => {
+    await ready;
+    accrue();
+    const batch = pending;
+    pending = {};
+    inflight = batch;
+    persistActive();
     const days = Object.keys(batch);
     if (days.length) {
       // Un record per giorno: ogni salvataggio legge e scrive solo i giorni toccati (di solito uno).
@@ -331,7 +352,23 @@ api.runtime.onInstalled.addListener((d) => {
 
 action.onClicked.addListener(() => api.tabs.create({ url: api.runtime.getURL('dashboard/dashboard.html') }));
 
-api.tabs.query({ audible: true }).then((tabs) => tabs.forEach((t) => !t.incognito && audible.set(t.id, hostFromUrl(t.url)))).catch(() => {});
-api.idle.queryState(60).then((s) => { state.idle = s === 'active' ? 'active' : 'idle'; refreshActive(); });
+const audibleLoaded = api.tabs.query({ audible: true }).then((tabs) => tabs.forEach((t) => !t.incognito && audible.set(t.id, hostFromUrl(t.url)))).catch(() => {});
+
+// Ripristino all'avvio del worker: stato salvato + stato attuale del browser, poi si conta il tempo trascorso
+// durante la sospensione (con il tetto MAX_TICK_MS, l'allarme di un minuto basta a non perderne).
+ready = (async () => {
+  try {
+    const [saved, idle, win] = await Promise.all([
+      sessionStore ? sessionStore.get('activeState') : {}, api.idle.queryState(IDLE_SECONDS), api.windows.getLastFocused().catch(() => null), audibleLoaded,
+    ]);
+    state.idle = idle === 'active' ? 'active' : 'idle';
+    if (win) state.focused = !!win.focused;
+    const st = saved?.activeState;
+    if (st?.host && st.since && state.idle === 'active' && state.focused) { active.host = st.host; active.since = st.since; }
+  } catch { /* si riparte dallo stato attuale */ }
+  restored = true;
+  accrue();
+  await refreshActiveNow();
+})();
 loadCfg().then(() => refreshBadge()).catch(() => {});
 api.tabs.query({}).then((tabs) => tabs.forEach((t) => t.incognito && privateTabs.add(t.id))).catch(() => {});

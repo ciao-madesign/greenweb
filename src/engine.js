@@ -4,7 +4,8 @@
 
 /** Versione delle formule del motore: aumenta quando cambia il modo di calcolare (non i soli coefficienti). */
 // 3: le richieste senza dimensione dichiarata (nu) valgono una dimensione media assunta.
-export const MODEL_VERSION = 3;
+// 4: il tempo attivo non si perde più quando il browser sospende il service worker; assenza dopo 5 minuti.
+export const MODEL_VERSION = 4;
 /** Versione dei coefficienti, ricavata dal file dati. */
 export const coefficientVersion = (c) => `${c.version}@${c.updated}`;
 

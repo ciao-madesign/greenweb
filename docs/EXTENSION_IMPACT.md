@@ -29,3 +29,6 @@ Il dispositivo, nello stesso intervallo di tempo, è stimato a 12 Wh/ora (portat
 - La memoria residente (~105–146 MB) comprende il runtime del browser per l'estensione: non è tutta attribuibile al nostro codice.
 - Firefox non è stato misurato.
 - Il costo per richiesta è dominato dal recapito degli eventi `webRequest` (intestazioni di risposta), non dal nostro calcolo.
+
+## Nota (11 novembre 2026)
+Ogni minuto, al salvataggio, si scrive anche un piccolo stato (dominio della scheda attiva e orario) in `storage.session`, memoria temporanea del browser: serve a non perdere il tempo quando il browser sospende il service worker. Costo trascurabile. Le misure sopra sono precedenti a questa modifica.

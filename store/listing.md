@@ -44,7 +44,7 @@ Estimate and display the environmental footprint of the user's web browsing.
 ## Permission justifications
 - **webRequest + access to http/https sites**: observe (read-only, non-blocking) the number and declared size of requests and which tab they belong to, to estimate data transfer. Nothing is modified, and only the domain is stored.
 - **Optional AI message counting**: if the user enables it for a service, a successful POST request to that service's address increments a counter. The request body is never read and no content is stored.
-- **idle**: stop counting active time when the user is away.
+- **idle**: stop counting active time when the user is away (no input for 5 minutes or screen locked).
 - **storage**: keep statistics and settings locally.
 - **alarms**: one wake-up per minute to save data and refresh the badge.
 - No remote code, no data transmitted, no content scripts.
