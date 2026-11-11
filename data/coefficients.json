@@ -102,6 +102,11 @@
       "title": "FEPC (Federation of Electric Power Companies of Japan), average electricity price trends: household FY2024 32.80 JPY/kWh",
       "url": "https://www.fepc.or.jp/supply/energymix/",
       "year": 2024
+    },
+    "httparchive": {
+      "title": "HTTP Archive Web Almanac 2024, Page Weight (median page 2,652 KB desktop, 2,311 KB mobile)",
+      "url": "https://almanac.httparchive.org/en/2024/page-weight",
+      "year": 2024
     }
   },
   "profiles": {
@@ -393,6 +398,20 @@
       "reliability": "low",
       "status": "to_verify",
       "method": "Multiplier on the streaming reference for 4K-level data rates. Ratio of the research mid values for 4K and HD (0.12 / 0.08)."
+    },
+    "unknown_response_kb": {
+      "unit": "KB",
+      "value": {
+        "min": 10,
+        "mid": 30,
+        "max": 100
+      },
+      "sources": [
+        "httparchive"
+      ],
+      "reliability": "low",
+      "status": "assumption",
+      "method": "Average size assumed for each request whose server does not declare a size (typically compressed or chunked responses), so that sites that do not declare sizes are not counted as nearly free. A moderate value is used: a median page weighs about 2.3-2.7 MB over a few dozen to about a hundred requests, so tens of KB per request. The real mix of responses is unknown. Applies to browsing categories (not to streaming or AI text, whose energy is time-based)."
     }
   },
   "categories": {

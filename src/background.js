@@ -59,7 +59,7 @@ function record(host, bytes, countRequest = true) {
   if (!host) return;
   if (!cfgReady) { if (early.length < 500) early.push([host, bytes, countRequest]); return; }
   if (!allowed(host)) return;
-  addSample(pending, dayKey(), host, { n: countRequest ? 1 : 0, b: bytes });
+  addSample(pending, dayKey(), host, { n: countRequest ? 1 : 0, b: bytes, u: countRequest && bytes === 0 ? 1 : 0 });
   scheduleFlush();
   scheduleLive();
 }

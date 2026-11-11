@@ -190,5 +190,12 @@
   "diag.request": "Request",
   "diag.times": "Times",
   "diag.status": "Status",
-  "diag.counted": "Counted as"
+  "diag.counted": "Counted as",
+  "col.time": "Active time",
+  "col.data": "Data",
+  "brk.device": "Device",
+  "brk.network": "Network",
+  "brk.dc": "Data center",
+  "brk.unsized": "Plus {n} requests without a declared size, estimated with an average size.",
+  "coef.unknown_response_kb": "Average size of unsized responses"
 }

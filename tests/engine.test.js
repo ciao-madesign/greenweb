@@ -15,6 +15,20 @@ test('navigazione: 1 GB senza tempo = (rete + data center) Wh, con quota data ce
   near(r.dc_wh.mid, DC * 1000);
 });
 
+test('richieste senza dimensione dichiarata: dimensione media assunta; ripartizione dispositivo/rete/data center', () => {
+  const kb = E.unknown_response_kb.value.mid;
+  const r = estimateEntry({ n: 10, b: 0, u: 10, ms: 0 }, 'browsing', c);
+  near(r.wh.mid, (10 * kb * 1000 / 1e9) * (NET + DC) * 1000);
+  assert.equal(r.reliability, 'low');          // tutte senza dimensione dichiarata
+  const known = estimateEntry({ n: 10, b: 1e6, u: 1, ms: 3.6e6 }, 'browsing', c);
+  assert.equal(known.reliability, 'medium');   // poche richieste senza dimensione
+  near(known.wh.mid, P + ((1e6 + kb * 1000) / 1e9) * (NET + DC) * 1000);
+  near(known.device_wh.mid, P);
+  assert.ok(known.wh.mid > known.device_wh.mid + known.dc_wh.mid);   // resta la quota di rete
+  // voci vecchie senza il campo u: comportamento precedente (nessuna stima aggiunta)
+  near(estimateEntry({ n: 5, b: 0, ms: 0 }, 'browsing', c).wh.mid, 0);
+});
+
 test('dispositivo: 1 ora = potenza del tipo scelto; streaming usa il tempo, non i byte', () => {
   near(estimateEntry({ n: 1, b: 0, ms: 3.6e6 }, 'browsing', c).wh.mid, P);
   near(estimateEntry({ n: 1, b: 0, ms: 3.6e6 }, 'browsing', c, 'desktop').wh.mid, E.device_power_w.types.desktop.mid);

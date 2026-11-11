@@ -26,6 +26,9 @@ export function estimateEntry(entry, category, c, device) {
   const P = devicePower(c, device);
   const parts = tri((k) => {
     let net = 0, dc = 0;
+    // Le richieste senza dimensione dichiarata (u) valgono una dimensione media assunta: senza questo
+    // i siti che non dichiarano la dimensione (risposte compresse a pezzi) risulterebbero troppo leggeri.
+    const gbk = (entry.b + (entry.u ?? 0) * e.unknown_response_kb.value[k] * 1000) / 1e9;
     switch (cat.model) {
       case 'streaming': {
         // Riferimento: media realistica con stima per eccesso. Solo i flussi osservati a velocità da 4K
@@ -47,15 +50,17 @@ export function estimateEntry(entry, category, c, device) {
         break;
       }
       default: // 'bytes': navigazione, e AI immagini/video (solo rete: la parte remota non è stimabile)
-        net = gb * e.network_kwh_per_gb.value[k] * 1000;
-        dc = gb * e.datacenter_kwh_per_gb.value[k] * 1000;
+        net = gbk * e.network_kwh_per_gb.value[k] * 1000;
+        dc = gbk * e.datacenter_kwh_per_gb.value[k] * 1000;
     }
-    return { total: hours * P[k] + net + dc, dc };
+    return { total: hours * P[k] + net + dc, dc, device: hours * P[k] };
   });
   let reliability = cat.reliability;
-  if (cat.model === 'bytes' && entry.b === 0 && entry.n > 0) reliability = worst(reliability, 'low'); // dimensioni non esposte
+  // Dimensioni non esposte: se più della metà delle richieste non dichiara la dimensione, l'affidabilità scende.
+  const unsized = entry.u ?? (entry.b === 0 ? entry.n : 0);
+  if (cat.model === 'bytes' && entry.n > 0 && unsized / entry.n > 0.5) reliability = worst(reliability, 'low');
   if (cat.model === 'ai_text' && entry.ms > 0 && (entry.p ?? 0) > 0 && (entry.msc ?? 0) >= 0.9 * entry.ms) reliability = 'medium'; // messaggi realmente contati
-  return { wh: tri((k) => parts[k].total), dc_wh: tri((k) => parts[k].dc), reliability, incomplete: !!cat.incomplete };
+  return { wh: tri((k) => parts[k].total), dc_wh: tri((k) => parts[k].dc), device_wh: tri((k) => parts[k].device), reliability, incomplete: !!cat.incomplete };
 }
 
 /**
@@ -80,6 +85,7 @@ export function sumEstimates(list) {
   return {
     wh: sumTri(list.map((x) => x.wh)),
     dc_wh: sumTri(list.map((x) => x.dc_wh)),
+    device_wh: sumTri(list.map((x) => x.device_wh)),
     reliability: list.reduce((r, x) => worst(r, x.reliability), 'high'),
     incomplete: list.some((x) => x.incomplete),
   };
@@ -106,7 +112,7 @@ export const METRICS = {
 export const DEFAULT_METRIC = 'co2e';
 export const metricOf = (settings = {}) => (METRICS[settings.metric] ? settings.metric : DEFAULT_METRIC);
 
-export const zeroEstimate = () => ({ wh: { min: 0, mid: 0, max: 0 }, dc_wh: { min: 0, mid: 0, max: 0 }, reliability: 'high', incomplete: false });
+export const zeroEstimate = () => ({ wh: { min: 0, mid: 0, max: 0 }, dc_wh: { min: 0, mid: 0, max: 0 }, device_wh: { min: 0, mid: 0, max: 0 }, reliability: 'high', incomplete: false });
 
 /** Stima del totale di un giorno: stats[giorno] = { dominio: { n, b, ms } }. */
 export function estimateDay(dayStats, domains, classify, c, device) {

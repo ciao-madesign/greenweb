@@ -190,5 +190,12 @@
   "diag.request": "Richiesta",
   "diag.times": "Volte",
   "diag.status": "Stato",
-  "diag.counted": "Contata come"
+  "diag.counted": "Contata come",
+  "col.time": "Tempo attivo",
+  "col.data": "Dati",
+  "brk.device": "Dispositivo",
+  "brk.network": "Rete",
+  "brk.dc": "Data center",
+  "brk.unsized": "Più {n} richieste senza dimensione dichiarata, stimate con una dimensione media.",
+  "coef.unknown_response_kb": "Dimensione media delle risposte senza dimensione"
 }

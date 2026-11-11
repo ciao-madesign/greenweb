@@ -1,6 +1,6 @@
 import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
-import { classify, lastNDays, aggregateDays, dayStorageKey } from '../src/core.js';
+import { classify, lastNDays, aggregateDays, dayStorageKey, formatBytes } from '../src/core.js';
 import { makeFormatter, makeUnits } from '../src/format.js';
 import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
 import { gauge, donut, bars, icon } from './charts.js';
@@ -145,7 +145,9 @@ function cell(tr, text, title, num = true) {
 const rangeText = (v, unit) => `${fmt(v.min, unit)} – ${fmt(v.max, unit)}`;
 function metricCells(tr, est) {
   const c = convert(est.wh, profile, coeffs, est.dc_wh);
-  cell(tr, fmt(est.wh.mid, 'Wh'), rangeText(est.wh, 'Wh'));
+  // Dettaglio dell'energia: quanto viene dal dispositivo (tempo attivo), dalla rete e dal data center.
+  const net = Math.max(est.wh.mid - est.device_wh.mid - est.dc_wh.mid, 0);
+  cell(tr, fmt(est.wh.mid, 'Wh'), `${rangeText(est.wh, 'Wh')}\n${t('brk.device')}: ${fmt(est.device_wh.mid, 'Wh')} · ${t('brk.network')}: ${fmt(net, 'Wh')} · ${t('brk.dc')}: ${fmt(est.dc_wh.mid, 'Wh')}`);
   cell(tr, fmt(c.co2_g.mid, 'g'), rangeText(c.co2_g, 'g'));
   cell(tr, fmt(c.water_ml.mid, 'mL'), rangeText(c.water_ml, 'mL'));
   cell(tr, fmt(c.cost.mid, 'cur'), rangeText(c.cost, 'cur'));
@@ -168,6 +170,8 @@ function renderDetails() {
     cell(tr, t(`category.${r.cat}`), '', false);
     cell(tr, new Intl.NumberFormat(lang).format(r.e.n));
     cell(tr, r.e.p ? new Intl.NumberFormat(lang).format(r.e.p) : '–');
+    cell(tr, `${new Intl.NumberFormat(lang).format(Math.round(r.e.ms / 60000))} min`);
+    cell(tr, formatBytes(r.e.b), r.e.u ? t('brk.unsized', { n: r.e.u }) : '');
     metricCells(tr, r.est);
   }
 }

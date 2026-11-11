@@ -51,6 +51,7 @@ const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
   await shot('dashboard', 'dashboard/dashboard.html', { full: true });
   await shot('dashboard-dark', 'dashboard/dashboard.html', { full: true, dark: true });
   await shot('dashboard-week-water', 'dashboard/dashboard.html', { full: true, prep: async (p) => { await p.click('#period button:nth-child(2)'); await p.click('#metric button:nth-child(2)'); } });
+  await shot('dashboard-details', 'dashboard/dashboard.html', { full: true, prep: async (p) => { await p.click('#details summary'); await wait(300); } });
   await shot('methodology', 'methodology/methodology.html', { clip: { x: 0, y: 0, width: 1280, height: 800 } });
   await shot('methodology-coefficients', 'methodology/methodology.html', { prep: async (p) => { await p.click('#coefficients summary'); await p.evaluate(() => document.getElementById('coefficients').scrollIntoView()); } });
   await shot('settings', 'options/options.html', { full: true });
