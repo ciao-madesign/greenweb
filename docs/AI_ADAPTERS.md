@@ -2,12 +2,12 @@
 
 Il conteggio dei messaggi (livello 3) riconosce una richiesta `POST` riuscita verso l'indirizzo del servizio. Gli indirizzi sono quelli usati dalle app web e **non sono documentati**: possono cambiare senza preavviso.
 
-## Stato al 10 novembre 2026
-Non è stato possibile provare i servizi veri (servono account e gli indirizzi non sono raggiungibili dall'ambiente di sviluppo). La ricerca nelle fonti pubbliche dà questo quadro; **nessuna voce è ancora `verified`**.
+## Stato all'11 novembre 2026
+I servizi veri non sono raggiungibili dall'ambiente di sviluppo (servono account), quindi la conferma arriva dai rapporti di traffico reale del proprietario del progetto. **ChatGPT è `verified`**; per le altre voci restano le fonti pubbliche.
 
 | Servizio | Regola (`data/ai_adapters.json`) | Stato | Evidenza |
 |---|---|---|---|
-| ChatGPT | `POST chatgpt.com/backend-api/conversation` (anche `/f/conversation`) | `reported` | `/backend-api/conversation` è descritto da documentazione della comunità e da un'analisi del traffico (Keysight, 2023). La variante `/f/conversation` non ha conferme |
+| ChatGPT | `POST chatgpt.com/backend-api/conversation` (anche `/f/conversation`) | **`verified`** (11/11/2026) | Rapporto reale: un messaggio = una sola richiesta `POST /backend-api/f/conversation` (200), riconosciuta dalla regola. Le richieste attorno (`/f/conversation/prepare` ×3, `sentinel/chat-requirements`, `bazaar`, telemetria `ces`, `ab.chatgpt.com`) non vengono contate, come previsto |
 | Perplexity | `POST perplexity.ai/rest/sse/perplexity_ask` | `reported` | Usato da due progetti non ufficiali (risposta a flusso di eventi) |
 | Claude | `POST claude.ai/api/organizations/{id}/chat_conversations/{id}/completion` | `unconfirmed` | Le fonti trovate descrivono solo creazione e lettura delle conversazioni |
 | Gemini | `POST gemini.google.com/.../StreamGenerate` | `unconfirmed` | Nessuna fonte recente |
@@ -27,3 +27,6 @@ La verifica è in memoria e dura un minuto; non si legge alcun contenuto e non s
 - Se un servizio cambia indirizzo il conteggio resta a zero e il motore torna all'ipotesi dei messaggi all'ora (non c'è un falso zero).
 - Prova con un servizio simulato: `node scripts/e2e-ai.cjs <cartella-profilo>`.
 - Verifica periodica consigliata insieme all'aggiornamento trimestrale dei dati.
+
+## Rapporti ricevuti
+**ChatGPT, 11 novembre 2026** (un messaggio inviato): 10 tipi di richiesta `POST`; solo `chatgpt.com/backend-api/f/conversation` (1×, 200) è contata (✓ chatgpt). Il test `matchAdapter: rapporto reale di ChatGPT` in `tests/core.test.js` conserva queste richieste come riferimento.

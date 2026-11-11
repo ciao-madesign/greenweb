@@ -126,7 +126,7 @@ test('isExcluded: dominio e sottodomini, non omonimi parziali', () => {
 test('purgeHosts e csvFromDays', () => {
   const rec = { 'banca.it': { n: 1, b: 2, ms: 3000 }, 'app.banca.it': { n: 1, b: 1, ms: 1 }, 'a.com': { n: 4, b: 5, ms: 6000 } };
   assert.deepEqual(Object.keys(purgeHosts(rec, ['banca.it'])), ['a.com']);
-  assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,unsized_requests,bytes,active_seconds,ai_messages,ai_counted_seconds\n2026-11-09,"a.com",4,0,5,6,0,0\n');
+  assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,requests_without_size,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version\n2026-11-09,"a.com",4,5,0,6,0,0,"",""\n');
 });
 
 import { matchAdapter, stripAiFields, maskPath } from '../src/core.js';
@@ -151,8 +151,8 @@ test('addSample con conteggio AI e stripAiFields', () => {
   addSample(m, 'd', 'chatgpt.com', { p: 2 });
   assert.deepEqual(m.d['chatgpt.com'], { n: 0, b: 0, ms: 60000, p: 2, msc: 60000 });
   const m2 = {};
-  addSample(m2, 'd', 'a.com', { n: 3, u: 2 });
-  assert.equal(m2.d['a.com'].u, 2);
+  addSample(m2, 'd', 'a.com', { n: 3, nu: 2 });
+  assert.equal(m2.d['a.com'].nu, 2);
   assert.deepEqual(stripAiFields(m.d), { 'chatgpt.com': { n: 0, b: 0, ms: 60000 } });
 });
 
@@ -169,4 +169,25 @@ test('maskPath: nasconde gli identificativi, conserva il percorso', () => {
   assert.equal(maskPath('/v1/threads/1234567/messages'), '/v1/threads/:id/messages');
   assert.equal(maskPath('/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate'), '/_/BardChatUi/data/assistant.lamda.BardFrontendService/StreamGenerate');
   assert.equal(maskPath('/a/AbCdEfGhIjKlMnOpQrStUvWx'), '/a/:id');
+});
+
+import { mergeMeta, metaStorageKey } from '../src/core.js';
+test('mergeMeta registra le versioni senza duplicati; le chiavi meta scadono con i giorni', () => {
+  const a = mergeMeta(undefined, 2, '1@x');
+  assert.deepEqual(mergeMeta(a, 2, '1@x'), { m: [2], c: ['1@x'] });
+  assert.deepEqual(mergeMeta(a, 3, '1@x'), { m: [2, 3], c: ['1@x'] });
+  assert.deepEqual(expiredDayKeys([metaStorageKey('2020-01-01'), metaStorageKey('2026-11-05')], 90, new Date('2026-11-06')), ['meta:2020-01-01']);
+});
+
+test('matchAdapter: rapporto reale di ChatGPT (11 novembre 2026), conta solo l\'invio del messaggio', () => {
+  const ad = JSON.parse(readFileSync(new URL('../data/ai_adapters.json', import.meta.url))).adapters;
+  const seen = [
+    'https://chatgpt.com/backend-api/f/conversation/prepare', 'https://chatgpt.com/ces/v1/rgstr',
+    'https://chatgpt.com/backend-api/sentinel/chat-requirements/prepare', 'https://chatgpt.com/backend-api/sentinel/chat-requirements/finalize',
+    'https://ab.chatgpt.com/v1/initialize', 'https://chatgpt.com/backend-api/bazaar/visibility', 'https://chatgpt.com/backend-api/bazaar/event',
+    'https://chatgpt.com/ces/v1/telemetry/intake', 'https://chatgpt.com/ces/statsc/flush',
+  ];
+  for (const u of seen) assert.equal(matchAdapter('POST', u, ad), null, u);
+  assert.equal(matchAdapter('POST', 'https://chatgpt.com/backend-api/f/conversation', ad)?.id, 'chatgpt');
+  assert.equal(ad.find((a) => a.id === 'chatgpt').status, 'verified');
 });

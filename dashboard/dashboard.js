@@ -61,7 +61,8 @@ function renderHero(a) {
   $('level').textContent = t(`hero.level.${level}`);
   $('level').className = `level ${level}`;
   $('range').textContent = t('hero.range', { a: fmt(v.min, unitOf(m)), b: fmt(v.max, unitOf(m)) });
-  $('confidence').textContent = t('hero.confidence', { level: t(`reliability.${a.total.reliability}`).toLowerCase() }) + (a.total.incomplete ? ' *' : '');
+  $('confidence').textContent = t('hero.confidence', { level: t(`reliability.${a.total.reliability}`).toLowerCase() }) + (a.total.incomplete ? ' *' : '')
+    + (a.total.unsized > 0 ? ` · ${t('hero.unsized', { n: a.total.unsized, total: a.total.requests })}` : '');
   $('confidence').title = a.total.incomplete ? t('hero.incomplete') : '';
 }
 

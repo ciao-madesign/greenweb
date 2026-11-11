@@ -37,9 +37,19 @@ export function addSample(stats, day, host, delta) {
   e.b += delta.b ?? 0;
   e.ms += delta.ms ?? 0;
   // Campi facoltativi del conteggio AI (solo numeri): p = messaggi inviati, msc = tempo coperto dal conteggio.
-  if (delta.u) e.u = (e.u ?? 0) + delta.u; // richieste senza dimensione dichiarata
   if (delta.p) e.p = (e.p ?? 0) + delta.p;
   if (delta.msc) e.msc = (e.msc ?? 0) + delta.msc;
+  // nu = richieste completate senza dimensione dichiarata (dato non disponibile, non zero byte).
+  if (delta.nu) e.nu = (e.nu ?? 0) + delta.nu;
+}
+
+/** Versioni del modello usate nella raccolta di un giorno: { m: [modello], c: [coefficienti] }. */
+export const metaStorageKey = (day) => `meta:${day}`;
+
+/** Aggiunge le versioni correnti a quelle già registrate per il giorno (senza duplicati). */
+export function mergeMeta(meta, modelVersion, coeffVersion) {
+  const add = (list, v) => (list ?? []).includes(v) ? list : [...(list ?? []), v];
+  return { m: add(meta?.m, modelVersion), c: add(meta?.c, coeffVersion) };
 }
 
 /** Chiave di archiviazione del giorno: un record { dominio: { n, b, ms } } per giorno. */
@@ -50,7 +60,8 @@ export function expiredDayKeys(keys, keepDays, now = new Date()) {
   const limit = new Date(now);
   limit.setDate(limit.getDate() - keepDays);
   const min = dayStorageKey(dayKey(limit));
-  return keys.filter((k) => k.startsWith('day:') && k < min);
+  const minMeta = metaStorageKey(dayKey(limit));
+  return keys.filter((k) => (k.startsWith('day:') && k < min) || (k.startsWith('meta:') && k < minMeta));
 }
 
 /** Content-Length dalle intestazioni di risposta; 0 se assente (dato non disponibile). */
@@ -159,12 +170,15 @@ export function purgeHosts(record, list) {
   return Object.fromEntries(Object.entries(record ?? {}).filter(([host]) => !isExcluded(host, list)));
 }
 
-/** CSV leggibile di tutto ciò che è memorizzato: ogni campo di ogni dominio e giorno. */
-export function csvFromDays(days) {
+/** CSV leggibile di tutto ciò che è memorizzato: ogni campo di ogni dominio e giorno, con le versioni del modello. */
+export function csvFromDays(days, metas = {}) {
   const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
-  const rows = ['day,domain,requests,unsized_requests,bytes,active_seconds,ai_messages,ai_counted_seconds'];
+  const rows = ['day,domain,requests,bytes,requests_without_size,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version'];
   for (const day of Object.keys(days).sort()) {
-    for (const [host, e] of Object.entries(days[day]).sort()) rows.push([day, q(host), e.n, e.u ?? 0, e.b, Math.round(e.ms / 1000), e.p ?? 0, Math.round((e.msc ?? 0) / 1000)].join(','));
+    const m = metas[day] ?? {};
+    for (const [host, e] of Object.entries(days[day]).sort()) {
+      rows.push([day, q(host), e.n, e.b, e.nu ?? 0, Math.round(e.ms / 1000), e.p ?? 0, Math.round((e.msc ?? 0) / 1000), q((m.m ?? []).join(' ')), q((m.c ?? []).join(' '))].join(','));
+    }
   }
   return `${rows.join('\n')}\n`;
 }

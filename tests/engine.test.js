@@ -17,10 +17,10 @@ test('navigazione: 1 GB senza tempo = (rete + data center) Wh, con quota data ce
 
 test('richieste senza dimensione dichiarata: dimensione media assunta; ripartizione dispositivo/rete/data center', () => {
   const kb = E.unknown_response_kb.value.mid;
-  const r = estimateEntry({ n: 10, b: 0, u: 10, ms: 0 }, 'browsing', c);
+  const r = estimateEntry({ n: 10, b: 0, nu: 10, ms: 0 }, 'browsing', c);
   near(r.wh.mid, (10 * kb * 1000 / 1e9) * (NET + DC) * 1000);
   assert.equal(r.reliability, 'low');          // tutte senza dimensione dichiarata
-  const known = estimateEntry({ n: 10, b: 1e6, u: 1, ms: 3.6e6 }, 'browsing', c);
+  const known = estimateEntry({ n: 10, b: 1e6, nu: 1, ms: 3.6e6 }, 'browsing', c);
   assert.equal(known.reliability, 'medium');   // poche richieste senza dimensione
   near(known.wh.mid, P + ((1e6 + kb * 1000) / 1e9) * (NET + DC) * 1000);
   near(known.device_wh.mid, P);
@@ -117,4 +117,12 @@ test('ogni coefficiente: min<=mid<=max e fonti esistenti', () => {
     if (p.co2_range) assert.ok(p.co2_range.min <= p.co2_g_per_kwh && p.co2_g_per_kwh <= p.co2_range.max, k);
     if (p.price_range) assert.ok(p.price_range.min <= p.price_per_kwh && p.price_per_kwh <= p.price_range.max, k);
   }
+});
+
+test('richieste senza dimensione abbassano l\'affidabilità in proporzione', () => {
+  const r = (nu) => estimateEntry({ n: 10, b: 1e6, nu, ms: 1000 }, 'browsing', c);
+  assert.equal(r(0).reliability, 'medium');
+  assert.equal(r(2).reliability, 'medium');
+  assert.equal(r(6).reliability, 'low');
+  assert.equal(r(3).unsized, 3);
 });

@@ -1,7 +1,7 @@
 // Service worker: raccoglie byte e tempo attivo per dominio. Nessuna rete, nessun contenuto di pagina.
 import { api, action } from './compat.js';
-import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, privacyOf, isExcluded, purgeHosts, matchAdapter, maskPath, normalizeDomain } from './core.js';
-import { estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
+import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, metaStorageKey, mergeMeta, privacyOf, isExcluded, purgeHosts, matchAdapter, maskPath, normalizeDomain } from './core.js';
+import { MODEL_VERSION, coefficientVersion, estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
 import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
 
@@ -55,11 +55,11 @@ async function refreshActive() {
 /** Sito monitorabile: non in pausa e non escluso dall'utente. */
 const allowed = (host) => !cfg.paused && !isExcluded(host, cfg.excluded);
 
-function record(host, bytes, countRequest = true) {
+function record(host, bytes, countRequest = true, unsized = false) {
   if (!host) return;
-  if (!cfgReady) { if (early.length < 500) early.push([host, bytes, countRequest]); return; }
+  if (!cfgReady) { if (early.length < 500) early.push([host, bytes, countRequest, unsized]); return; }
   if (!allowed(host)) return;
-  addSample(pending, dayKey(), host, { n: countRequest ? 1 : 0, b: bytes, u: countRequest && bytes === 0 ? 1 : 0 });
+  addSample(pending, dayKey(), host, { n: countRequest ? 1 : 0, b: bytes, nu: countRequest && unsized ? 1 : 0 });
   scheduleFlush();
   scheduleLive();
 }
@@ -135,13 +135,15 @@ api.webRequest.onCompleted.addListener((d) => {
   diagCapture(d);
   countPrompt(d);
   const bytes = contentLength(d.responseHeaders);
+  // Senza dimensione dichiarata: non è zero byte, è un dato mancante (204/304 e cache non sono lacune).
+  const unsized = bytes === 0 && !d.fromCache && d.statusCode !== 204 && d.statusCode !== 304;
   if (d.type === 'main_frame') tabHost.set(d.tabId, hostFromUrl(d.url)); // dominio finale dopo eventuali redirect
-  if (tabHost.has(d.tabId)) return record(tabHost.get(d.tabId), bytes);
+  if (tabHost.has(d.tabId)) return record(tabHost.get(d.tabId), bytes, true, unsized);
   api.tabs.get(d.tabId).then((t) => {
     if (t.incognito) { privateTabs.add(t.id); tabHost.set(d.tabId, null); return; }
     const h = hostFromUrl(t.url);
     tabHost.set(d.tabId, h);
-    record(h, bytes);
+    record(h, bytes, true, unsized);
   }).catch(() => {});
 }, FILTER, ['responseHeaders']);
 
@@ -181,7 +183,9 @@ function flush() {
     if (days.length) {
       // Un record per giorno: ogni salvataggio legge e scrive solo i giorni toccati (di solito uno).
       const keys = days.map(dayStorageKey);
-      const stored = await api.storage.local.get([...keys, 'session']);
+      const metaKeys = days.map(metaStorageKey);
+      const coeffs = await loadJson('data/coefficients.json');
+      const stored = await api.storage.local.get([...keys, ...metaKeys, 'session']);
       const session = stored.session ?? { start: Date.now(), stats: {} };
       const out = { session };
       for (const day of days) {
@@ -191,6 +195,7 @@ function flush() {
           addSample(session.stats, 'all', host, e);
         }
         out[dayStorageKey(day)] = rec;
+        out[metaStorageKey(day)] = mergeMeta(stored[metaStorageKey(day)], MODEL_VERSION, coefficientVersion(coeffs));
         if (day === cache.day) cache.today = rec;
       }
       await api.storage.local.set(out);
@@ -297,7 +302,7 @@ async function loadCfg() {
   cfg.activeAdapters = [...file.adapters, ...extra].filter((a) => cfg.aiServices[a.id]);
   cfgReady = true;
   for (const day of Object.keys(pending)) pending[day] = purgeHosts(pending[day], cfg.excluded);
-  for (const [host, bytes, count] of early.splice(0)) record(host, bytes, count);
+  for (const [host, bytes, count, unsized] of early.splice(0)) record(host, bytes, count, unsized);
 }
 
 // Cambi di impostazioni o cancellazione dati: aggiorna subito.

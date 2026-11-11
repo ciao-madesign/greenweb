@@ -113,6 +113,7 @@
   "dash.foot": "Stime, non misure.",
   "hero.range": "Probabilmente tra {a} e {b}",
   "hero.confidence": "Affidabilità: {level}",
+  "hero.unsized": "{n} richieste su {total} senza dimensione dichiarata (byte non disponibili)",
   "card.car": "alla guida di un'auto",
   "card.bulb": "di lampadina LED",
   "card.bottle": "bottiglie da 500 mL",
