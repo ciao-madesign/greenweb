@@ -205,5 +205,10 @@
   "status.unfocused": "Finestra del browser non in primo piano",
   "status.counting": "Sto contando il tempo su {host}",
   "status.nosite": "Nessun sito nella scheda attiva",
-  "status.audio": "audio: {hosts}"
+  "status.audio": "audio: {hosts}",
+  "options.diag_title": "Diagnostica",
+  "options.diag_hint": "Come è stato suddiviso il tempo del browser dall'avvio. Utile se il tempo attivo sembra troppo basso. Aggiornata una volta al minuto; resta in memoria temporanea.",
+  "options.diag_states": "In conteggio: {counting} · assente: {away} · finestra non in primo piano: {unfocused} · nessun sito nella scheda attiva: {nosite} · in pausa: {paused}",
+  "options.diag_last": "Ultimo sito contato: {host} alle {time}",
+  "options.diag_none": "Ancora nessun dato. Naviga per un minuto e riapri questa pagina."
 }

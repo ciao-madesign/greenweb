@@ -205,5 +205,10 @@
   "status.unfocused": "Browser window not in focus",
   "status.counting": "Counting time on {host}",
   "status.nosite": "No website in the active tab",
-  "status.audio": "audio: {hosts}"
+  "status.audio": "audio: {hosts}",
+  "options.diag_title": "Diagnostics",
+  "options.diag_hint": "How the browser's time was split since it started. Useful if active time looks too low. Updated once a minute; kept in temporary memory.",
+  "options.diag_states": "Counting: {counting} · away: {away} · window not in focus: {unfocused} · no website in the active tab: {nosite} · paused: {paused}",
+  "options.diag_last": "Last site counted: {host} at {time}",
+  "options.diag_none": "No data yet. Browse for a minute and reopen this page."
 }

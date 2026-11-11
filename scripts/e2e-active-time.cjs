@@ -52,6 +52,11 @@ const KEY = `day:${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}
   assert.ok(e && e.ms >= 105000, `tempo attivo troppo basso: ${e ? Math.round(e.ms / 1000) : 0} s su ${elapsed.toFixed(0)} s`);
   assert.ok(e.ms <= (elapsed + 10) * 1000, 'tempo attivo superiore al tempo trascorso');
   console.log('OK   tempo attivo corretto anche con il service worker in sospensione');
+  const diag = (await sw.evaluate(() => chrome.storage.session.get('diagState'))).diagState;
+  console.log('diagnostica:', JSON.stringify(diag));
+  assert.ok(diag.stateMs.counting >= 100000 && diag.lastCounted.host === 'localhost', 'la diagnostica deve registrare il tempo in conteggio');
+  assert.ok(diag.stateMs.nosite < 30000, `tempo fittizio senza sito: ${diag.stateMs.nosite} ms`);
+  console.log('OK   la diagnostica mostra il tempo in conteggio e l\'ultimo sito');
   await ctx.close();
   srv.close();
 })().catch((e) => { console.error('FALLITO:', e.message); process.exit(1); });

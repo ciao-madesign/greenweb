@@ -176,3 +176,16 @@ $('export').addEventListener('click', async () => {
 refreshFields();
 refreshSummary();
 refreshAiToday();
+
+// Diagnostica del conteggio del tempo: quanto tempo il browser ha passato in ogni stato dall'avvio.
+async function refreshDiag() {
+  const { diagState } = (await api.storage.session?.get('diagState')) ?? {};
+  const m = diagState?.stateMs;
+  const min = (ms) => `${(ms / 60000).toFixed(1)} min`;
+  $('diag-states').textContent = m
+    ? t('options.diag_states', { counting: min(m.counting), away: min(m.away), unfocused: min(m.unfocused), nosite: min(m.nosite), paused: min(m.paused) })
+    : t('options.diag_none');
+  const last = diagState?.lastCounted;
+  $('diag-last').textContent = last ? t('options.diag_last', { host: last.host, time: new Date(last.at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }) }) : '';
+}
+$('diag-card').addEventListener('toggle', () => { if ($('diag-card').open) refreshDiag(); });

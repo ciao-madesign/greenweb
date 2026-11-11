@@ -23,6 +23,9 @@ const active = { host: null, since: 0 };
 // si salvano in storage.session (memoria che sopravvive alla sospensione) per non perdere il tempo trascorso.
 const sessionStore = api.storage.session;
 let restored = false;
+// Diagnostica: quanto tempo il browser ha passato in ogni stato (memoria temporanea, visibile nelle Impostazioni).
+const stateMs = { counting: 0, away: 0, unfocused: 0, nosite: 0, paused: 0 };
+let lastCounted = null;
 let ready; // promessa di ripristino, assegnata a fine file
 let cfg = privacyOf({});        // pausa, esclusioni, conservazione (da impostazioni)
 let cfgReady = false;
@@ -36,6 +39,9 @@ function accrue(now = Date.now()) {
   if (!restored) return; // finché lo stato salvato non è stato ripristinato
   const dt = Math.min(now - active.since, MAX_TICK_MS);
   if (dt > 0) {
+    const bucket = cfg.paused ? 'paused' : state.idle !== 'active' ? 'away' : !state.focused ? 'unfocused' : active.host ? 'counting' : 'nosite';
+    stateMs[bucket] += dt;
+    if (bucket === 'counting') lastCounted = { host: active.host, at: now };
     const hosts = new Set(audible.values());
     if (active.host) hosts.add(active.host);
     for (const h of hosts) {
@@ -48,7 +54,7 @@ function accrue(now = Date.now()) {
 }
 
 function persistActive() {
-  try { sessionStore?.set({ activeState: { host: active.host, since: active.since } })?.catch?.(() => {}); } catch { /* storage.session non disponibile */ }
+  try { sessionStore?.set({ activeState: { host: active.host, since: active.since }, diagState: { stateMs, lastCounted } })?.catch?.(() => {}); } catch { /* storage.session non disponibile */ }
 }
 
 async function refreshActive() {
@@ -191,12 +197,16 @@ api.tabs.onUpdated.addListener((id, change, tab) => {
   }
   if (tab.active && change.url) refreshActive();
 });
-api.windows.onFocusChanged.addListener((id) => {
-  state.focused = id !== api.windows.WINDOW_ID_NONE;
-  refreshActive();
-});
+// Si conta prima il tempo trascorso con lo stato precedente, poi lo stato cambia.
+async function setState(patch) {
+  await ready;
+  accrue();
+  Object.assign(state, patch);
+  return refreshActiveNow();
+}
+api.windows.onFocusChanged.addListener((id) => setState({ focused: id !== api.windows.WINDOW_ID_NONE }));
 api.idle.setDetectionInterval(IDLE_SECONDS);
-api.idle.onStateChanged.addListener((s) => { state.idle = s === 'active' ? 'active' : 'idle'; refreshActive(); });
+api.idle.onStateChanged.addListener((s) => setState({ idle: s === 'active' ? 'active' : 'idle' }));
 
 // --- Salvataggio ------------------------------------------------------------
 function scheduleFlush() {
@@ -375,12 +385,17 @@ const audibleLoaded = api.tabs.query({ audible: true }).then((tabs) => tabs.forE
 ready = (async () => {
   try {
     const [saved, idle, win] = await Promise.all([
-      sessionStore ? sessionStore.get('activeState') : {}, api.idle.queryState(IDLE_SECONDS), api.windows.getLastFocused().catch(() => null), audibleLoaded,
+      sessionStore ? sessionStore.get(['activeState', 'diagState']) : {}, api.idle.queryState(IDLE_SECONDS), api.windows.getLastFocused().catch(() => null), audibleLoaded,
     ]);
     state.idle = idle === 'active' ? 'active' : 'idle';
     if (win) state.focused = !!win.focused;
+    Object.assign(stateMs, saved?.diagState?.stateMs ?? {});
+    lastCounted = saved?.diagState?.lastCounted ?? null;
     const st = saved?.activeState;
-    if (st?.host && st.since && state.idle === 'active' && state.focused) { active.host = st.host; active.since = st.since; }
+    // L'ora dell'ultimo conteggio si ripristina sempre (senza, la prima volta si contavano 120 s fittizi, anche ai
+    // siti con audio); la scheda attiva solo se l'utente non è assente e la finestra è in primo piano.
+    active.since = st?.since ?? Date.now();
+    if (st?.host && state.idle === 'active' && state.focused) active.host = st.host;
   } catch { /* si riparte dallo stato attuale */ }
   restored = true;
   accrue();
