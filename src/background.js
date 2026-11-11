@@ -303,7 +303,11 @@ async function refreshBadge() {
   const value = convert(est.wh, profile, coeffs, est.dc_wh)[METRICS[metric].key].mid;
   const level = levelOf(value, thresholdsFor(metric, settings, profile, coeffs));
   const text = badgeValue(metric, value);
-  const title = t('tooltip', { metric: t(`metric.${metric}`), value: makeFormatter(lang, profile.currency)(value, METRICS[metric].unit), profile: t(`profile.${settings.profile in coeffs.profiles ? settings.profile : 'it'}`) });
+  let title = t('tooltip', { metric: t(`metric.${metric}`), value: makeFormatter(lang, profile.currency)(value, METRICS[metric].unit), profile: t(`profile.${settings.profile in coeffs.profiles ? settings.profile : 'it'}`) });
+  // Stato del conteggio del tempo (utile per capire perché a volte non si registra tempo).
+  const audioHosts = [...new Set(audible.values())].filter(Boolean);
+  const now = state.idle !== 'active' ? t('status.away') : !state.focused ? t('status.unfocused') : active.host ? t('status.counting', { host: active.host }) : t('status.nosite');
+  title = `${title}\n${now}${audioHosts.length ? ` · ${t('status.audio', { hosts: audioHosts.join(', ') })}` : ''}`;
   const sig = `${text}|${level}|${title}`;
   if (sig === last) return; // niente chiamate inutili se nulla è cambiato
   last = sig;

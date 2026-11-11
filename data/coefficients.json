@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated": "2026-11-06",
+  "updated": "2026-11-11",
   "notes": "Values merged from the 2026-11-09 research baseline supplied by the project owner; not independently re-verified. status: sourced = from the cited source; to_verify = secondary, provisional or dated; assumption = declared assumption. Ranges min/mid/max are propagated by the engine up to the final result.",
   "sources": {
     "swd": {
@@ -104,8 +104,13 @@
       "year": 2024
     },
     "httparchive": {
-      "title": "HTTP Archive Web Almanac 2024, Page Weight (median page 2,652 KB desktop, 2,311 KB mobile)",
+      "title": "HTTP Archive Web Almanac 2024, Page Weight (median page 2,652 KB desktop / 2,311 KB mobile; median 71 requests desktop / 66 mobile)",
       "url": "https://almanac.httparchive.org/en/2024/page-weight",
+      "year": 2024
+    },
+    "fame_greenstreaming": {
+      "title": "Fraunhofer FOKUS FAME, Green Streaming white paper (Oct 2024): recommends expressing streaming energy in kWh per hour rather than kWh/GB",
+      "url": "https://www.fokus.fraunhofer.de/content/dam/fokus/dokumente/fame/studien-paper/FAME_Greenstreaming_Whitepaper_2024-10_en.pdf",
       "year": 2024
     }
   },
@@ -305,11 +310,12 @@
       "sources": [
         "iea_stream",
         "carbontrust",
-        "netflix"
+        "netflix",
+        "fame_greenstreaming"
       ],
       "reliability": "medium",
       "status": "assumption",
-      "method": "Network + data center energy per hour of streaming (device energy is counted separately). Realistic average: about 0.077-0.08 kWh/h (IEA 2019 typical hour; research mid value for HD 0.08). The reference is deliberately raised to 0.10 (about +25%) to err on the side of overestimation. It replaces the byte-based calculation, which would overstate streaming (HD is about 3 GB/h). No universal value by resolution exists and the per-resolution ranges in the research include the display device, so they are not used directly."
+      "method": "Network + data center energy per hour of streaming (device energy is counted separately). Realistic average: about 0.077-0.08 kWh/h (IEA 2019 typical hour; research mid value for HD 0.08). The IEA figure is a TOTAL that includes the viewing device; for a phone on Wi-Fi in SD the IEA derives about 0.037 kWh/h, with more than 80% of it in data transmission. The reference used here (0.10 kWh/h for network + data center alone, plus the device) is therefore deliberately well above the realistic total, to err on the side of overestimation. Carbon Trust/DIMPACT (2021) gives about 55 gCO2e per hour for Europe as a total. Fraunhofer FAME (2024) recommends the kWh-per-hour metric. No universal value by resolution exists; per-resolution ranges in the research include the display device and are not used directly."
     },
     "dc_share_of_remote": {
       "unit": "fraction",
@@ -383,7 +389,7 @@
       ],
       "reliability": "medium",
       "status": "assumption",
-      "method": "Observed data rate (bytes transferred / active time) above which streaming is treated as 4K: Netflix reports about 7 GB/h for 4K and 3 GB/h for HD, so 4 GB/h separates them. The rate is only used to raise the estimate: lower rates stay at the realistic-average reference, because bytes are undercounted when servers do not declare a size."
+      "method": "Observed data rate (bytes transferred / active time) above which streaming is treated as 4K: Netflix reports about 7 GB/h for 4K and 3 GB/h for HD, and third-party sources put YouTube 1080p at roughly 1.5-4 GB/h and 4K at roughly 5 GB/h (no official figure found), so 4 GB/h separates them. The rate is only used to raise the estimate: lower rates stay at the reference. In practice the declared bytes of video are heavily undercounted (range requests are aborted and chunked responses declare no size), so this threshold rarely triggers."
     },
     "streaming_uhd_factor": {
       "unit": "x",
@@ -403,7 +409,7 @@
       "unit": "KB",
       "value": {
         "min": 10,
-        "mid": 30,
+        "mid": 37,
         "max": 100
       },
       "sources": [
@@ -411,7 +417,7 @@
       ],
       "reliability": "low",
       "status": "assumption",
-      "method": "Average size assumed for each request whose server does not declare a size (typically compressed or chunked responses), so that sites that do not declare sizes are not counted as nearly free. A moderate value is used: a median page weighs about 2.3-2.7 MB over a few dozen to about a hundred requests, so tens of KB per request. The real mix of responses is unknown. Applies to browsing categories (not to streaming or AI text, whose energy is time-based)."
+      "method": "Average size assumed for each request whose server does not declare a size (typically compressed or chunked responses), so that sites that do not declare sizes are not counted as nearly free. Central value = HTTP Archive 2024 desktop median page weight over its median request count (2,652 KB / 71 requests = about 37 KB; mobile 2,311 / 66 = 35 KB). The real mix of undeclared responses is unknown (they are probably dynamic, compressed resources), hence the wide range. Applies to browsing categories (not to streaming or AI text, whose energy is time-based)."
     }
   },
   "categories": {

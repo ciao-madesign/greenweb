@@ -29,3 +29,8 @@ Aggiornato con i risultati della ricerca del 9 novembre 2026: vedi `docs/RESEARC
 - Quando le richieste arrivano prima dell'avvio del service worker (es. avvio a freddo del browser) possono non essere contate: effetto minimo, da quantificare.
 - Il tempo accumulato si salva al più ogni minuto: un worker terminato dal browser può perdere gli ultimi secondi.
 - Traduzioni complete di cinese e giapponese, revisione madrelingua.
+
+## Dai dati reali (11 novembre 2026)
+- **Tempo attivo a zero** per quasi tutti i siti non audio, nonostante la correzione della sospensione del worker: da indagare con lo stato mostrato nella descrizione della foglia (quale sito si sta contando, assenza, finestra non in primo piano).
+- **Byte dei video sottostimati** (YouTube: 5,6 MB dichiarati in 15 minuti di riproduzione): richieste interrotte (`net::ERR_ABORTED`) e risposte a pezzi. Idea: contare le richieste interrotte come richieste senza dimensione; per lo streaming l'energia è già a tempo.
+- **Dispositivo durante la riproduzione video**: potenza probabilmente maggiore della navigazione (schermo, decodifica), senza misure controllate.

@@ -39,3 +39,11 @@ Rete e data center: 0,059 / 0,055 per compatibilità con SWD v4. AI testuale: 0,
 
 ## Dati d'uso utili per le versioni future
 Peso mediano di una pagina (HTTP Archive 2024): desktop 2.652 KB, mobile 2.311 KB. Video Netflix: SD 1 GB/h, HD 3 GB/h, 4K 7 GB/h. Videochiamata: da 0,27 a 1,7 GB/h per direzione secondo la risoluzione.
+
+## Seconda ricerca (11 novembre 2026), dopo i primi dati reali
+- **Dimensione media di una richiesta** (HTTP Archive 2024): pagina mediana 2.652 KB desktop / 2.311 KB mobile su 71 / 66 richieste, quindi circa 37 / 35 KB a richiesta. Adottato come valore centrale per le richieste senza dimensione dichiarata (prima 30 KB, ipotesi).
+- **Streaming**: l'IEA indica circa 0,08 kWh all'ora come **totale** compreso il dispositivo; per uno smartphone in SD su Wi-Fi circa 0,037 kWh/h, con oltre l'80% nella trasmissione dei dati. Il riferimento adottato (0,10 kWh/h di sola rete e data center, più il dispositivo) resta quindi ben sopra la stima realistica, come richiesto. Carbon Trust/DIMPACT 2021: circa 55 gCO₂e all'ora in Europa. Fraunhofer FAME 2024 raccomanda il kWh all'ora.
+- **Dati di YouTube** (fonti non ufficiali): 1080p circa 1,5–4 GB/h, 4K circa 5 GB/h (alcune fonti molto di più). La soglia di 4 GB/h per il 4K è compatibile, ma i byte dei video osservati sono molto sottostimati: il browser le richieste a intervalli (range) le interrompe e le risposte a pezzi non dichiarano la dimensione.
+- **Dispositivo**: lo studio Kirkeby e Lagermann (2025) conferma 9–13 W per la navigazione su portatile; non esistono misure controllate per la riproduzione video (misure amatoriali da presa: 20–40 W, non confrontabili).
+- **Data center**: l'IEA (Energy and AI, 2025) stima 415 TWh nel 2024 (1,5% dell'elettricità mondiale), contro i 290 TWh del 2022 usati da SWD v4. Senza il traffico del 2024 non si può ricalcolare l'energia per GB: la parte alta dell'intervallo (0,100 kWh/GB) copre il rischio di sottostima.
+- **Non trovato**: dimensione media dei video osservabili, misure di consumo del dispositivo durante la riproduzione, quota di risposte senza `Content-Length`.

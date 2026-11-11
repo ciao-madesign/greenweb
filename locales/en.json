@@ -200,5 +200,10 @@
   "brk.unsized": "Plus {n} requests without a declared size, estimated with an average size.",
   "coef.unknown_response_kb": "Average size of unsized responses",
   "brk.unattr": "Plus {n} requests ({size} declared) from background workers, not attributable to a tab and not counted.",
-  "dash.unattr": "Requests from background workers of open sites, not attributable to a tab and not included in the estimate: {n} ({size} declared)."
+  "dash.unattr": "Requests from background workers of open sites, not attributable to a tab and not included in the estimate: {n} ({size} declared).",
+  "status.away": "Away: no input for 5 minutes or screen locked",
+  "status.unfocused": "Browser window not in focus",
+  "status.counting": "Counting time on {host}",
+  "status.nosite": "No website in the active tab",
+  "status.audio": "audio: {hosts}"
 }
