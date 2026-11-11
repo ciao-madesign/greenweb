@@ -12,7 +12,7 @@ const TODAY = {
   'mail.google.com': [260, 22e6, 25], 'instagram.com': [600, 210e6, 20], 'reddit.com': [420, 95e6, 18],
   'ilpost.it': [380, 60e6, 16], 'midjourney.com': [80, 160e6, 12], 'google.com': [140, 9e6, 14], 'wikipedia.org': [90, 12e6, 9],
 };
-const scaled = (f) => Object.fromEntries(Object.entries(TODAY).map(([h, [n, b, m, p]]) => [h, { n: Math.round(n * f), b: Math.round(b * f), ms: Math.round(m * f * 60000), ...(p ? { p: Math.round(p * f), msc: Math.round(m * f * 60000) } : {}) }]));
+const scaled = (f) => Object.fromEntries(Object.entries(TODAY).map(([h, [n, b, m, p]]) => [h, { n: Math.round(n * f), b: Math.round(b * f), ms: Math.round(m * f * 60000), ...(p ? { p: Math.round(p * f), msc: Math.round(m * f * 60000) } : {}), ...(h === 'youtube.com' ? { nu: Math.round(40 * f), ua: Math.round(30 * f), ub: Math.round(60e6 * f) } : {}) }]));
 const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 (async () => {

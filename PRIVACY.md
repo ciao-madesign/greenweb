@@ -4,6 +4,7 @@ Digital Footprint Counter works entirely on your device.
 
 **What it stores (locally, in the browser's extension storage)**
 - For each day and each website domain: number of requests, bytes transferred (when the server declares them) and active time.
+- For each day and domain, also: the number of requests that could not be attributed to a tab (background workers of a site you have open, such as service workers) and their declared size. Only counters, never what they contain, and only for sites open in a non-private tab.
 - Your settings (region, language, device, metric, thresholds).
 - In the browser's temporary memory (not on disk, cleared when the browser closes): the domain of the active tab and a timestamp, to keep counting active time while the browser puts the extension to sleep.
 - Only if you turn it on for a service (off by default): the number of messages you send to that AI service per day, and the time covered by that counting. Never what you write or what it answers.

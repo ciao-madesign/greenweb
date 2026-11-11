@@ -39,6 +39,9 @@ export function addSample(stats, day, host, delta) {
   // Campi facoltativi del conteggio AI (solo numeri): p = messaggi inviati, msc = tempo coperto dal conteggio.
   if (delta.p) e.p = (e.p ?? 0) + delta.p;
   if (delta.msc) e.msc = (e.msc ?? 0) + delta.msc;
+  // ua/ub = richieste (e byte dichiarati) di lavoratori in background di un sito aperto, non attribuibili a una scheda.
+  if (delta.ua) e.ua = (e.ua ?? 0) + delta.ua;
+  if (delta.ub) e.ub = (e.ub ?? 0) + delta.ub;
   // nu = richieste completate senza dimensione dichiarata (dato non disponibile, non zero byte).
   if (delta.nu) e.nu = (e.nu ?? 0) + delta.nu;
 }
@@ -173,11 +176,11 @@ export function purgeHosts(record, list) {
 /** CSV leggibile di tutto ciò che è memorizzato: ogni campo di ogni dominio e giorno, con le versioni del modello. */
 export function csvFromDays(days, metas = {}) {
   const q = (v) => `"${String(v).replace(/"/g, '""')}"`;
-  const rows = ['day,domain,requests,bytes,requests_without_size,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version'];
+  const rows = ['day,domain,requests,bytes,requests_without_size,unattributed_requests,unattributed_bytes,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version'];
   for (const day of Object.keys(days).sort()) {
     const m = metas[day] ?? {};
     for (const [host, e] of Object.entries(days[day]).sort()) {
-      rows.push([day, q(host), e.n, e.b, e.nu ?? 0, Math.round(e.ms / 1000), e.p ?? 0, Math.round((e.msc ?? 0) / 1000), q((m.m ?? []).join(' ')), q((m.c ?? []).join(' '))].join(','));
+      rows.push([day, q(host), e.n, e.b, e.nu ?? 0, e.ua ?? 0, e.ub ?? 0, Math.round(e.ms / 1000), e.p ?? 0, Math.round((e.msc ?? 0) / 1000), q((m.m ?? []).join(' ')), q((m.c ?? []).join(' '))].join(','));
     }
   }
   return `${rows.join('\n')}\n`;

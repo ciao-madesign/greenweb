@@ -149,8 +149,21 @@ api.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   return false;
 });
 
+/**
+ * Richieste che il browser non attribuisce a una scheda (tabId < 0: lavoratori in background come i service worker).
+ * Non entrano nella stima: si contano solo, per sito, per vedere quanto traffico sfugge. Si considera solo l'origine
+ * (dominio) di un sito aperto in una scheda non privata; il resto (browser, estensioni, siti chiusi) si ignora.
+ */
+function countUnattributed(d) {
+  const host = hostFromUrl(d.initiator ?? d.originUrl ?? d.documentUrl ?? '');
+  if (!cfgReady || !host || !allowed(host) || ![...tabHost.values()].includes(host)) return;
+  addSample(pending, dayKey(), host, { ua: 1, ub: contentLength(d.responseHeaders) });
+  scheduleFlush();
+}
+
 api.webRequest.onCompleted.addListener((d) => {
-  if (d.tabId < 0 || privateTabs.has(d.tabId)) return; // richieste del browser/estensioni e finestre private: ignorate
+  if (d.tabId < 0) return countUnattributed(d);
+  if (privateTabs.has(d.tabId)) return; // finestre private: ignorate
   diagCapture(d);
   countPrompt(d);
   const bytes = contentLength(d.responseHeaders);
@@ -309,7 +322,6 @@ function scheduleLive() {
     liveTimer = null;
     accrue();
     loadCfg().then(() => refreshBadge()).catch(() => {});
-api.tabs.query({}).then((tabs) => tabs.forEach((t) => t.incognito && privateTabs.add(t.id))).catch(() => {});
   }, LIVE_MS);
 }
 
@@ -371,4 +383,7 @@ ready = (async () => {
   await refreshActiveNow();
 })();
 loadCfg().then(() => refreshBadge()).catch(() => {});
-api.tabs.query({}).then((tabs) => tabs.forEach((t) => t.incognito && privateTabs.add(t.id))).catch(() => {});
+api.tabs.query({}).then((tabs) => tabs.forEach((t) => {
+  if (t.incognito) privateTabs.add(t.id);
+  else if (!tabHost.has(t.id)) tabHost.set(t.id, hostFromUrl(t.url)); // siti già aperti: servono ad attribuire i lavoratori in background
+})).catch(() => {});

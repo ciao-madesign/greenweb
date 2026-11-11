@@ -81,8 +81,8 @@ const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); retur
   await wait(600);
   const [download] = await Promise.all([o.waitForEvent('download'), o.click('#export')]);
   const csv = require('fs').readFileSync(await download.path(), 'utf8');
-  assert.ok(csv.startsWith('day,domain,requests,bytes,requests_without_size,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version\n'), csv);
-  assert.ok(csv.includes('"esempio.org",3,4096,0,12,0,0,'), csv);
+  assert.ok(csv.startsWith('day,domain,requests,bytes,requests_without_size,unattributed_requests,unattributed_bytes,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version\n'), csv);
+  assert.ok(csv.includes('"esempio.org",3,4096,0,0,0,12,0,0,'), csv);
   ok('esportazione CSV (esattamente ciò che è memorizzato)');
 
   // 6. Conservazione: 7 giorni

@@ -126,7 +126,7 @@ test('isExcluded: dominio e sottodomini, non omonimi parziali', () => {
 test('purgeHosts e csvFromDays', () => {
   const rec = { 'banca.it': { n: 1, b: 2, ms: 3000 }, 'app.banca.it': { n: 1, b: 1, ms: 1 }, 'a.com': { n: 4, b: 5, ms: 6000 } };
   assert.deepEqual(Object.keys(purgeHosts(rec, ['banca.it'])), ['a.com']);
-  assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,requests_without_size,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version\n2026-11-09,"a.com",4,5,0,6,0,0,"",""\n');
+  assert.equal(csvFromDays({ '2026-11-09': { 'a.com': { n: 4, b: 5, ms: 6000 } } }), 'day,domain,requests,bytes,requests_without_size,unattributed_requests,unattributed_bytes,active_seconds,ai_messages,ai_counted_seconds,model_version,coefficient_version\n2026-11-09,"a.com",4,5,0,0,0,6,0,0,"",""\n');
 });
 
 import { matchAdapter, stripAiFields, maskPath } from '../src/core.js';
@@ -151,7 +151,8 @@ test('addSample con conteggio AI e stripAiFields', () => {
   addSample(m, 'd', 'chatgpt.com', { p: 2 });
   assert.deepEqual(m.d['chatgpt.com'], { n: 0, b: 0, ms: 60000, p: 2, msc: 60000 });
   const m2 = {};
-  addSample(m2, 'd', 'a.com', { n: 3, nu: 2 });
+  addSample(m2, 'd', 'a.com', { n: 3, nu: 2, ua: 4, ub: 100 });
+  assert.deepEqual([m2.d['a.com'].ua, m2.d['a.com'].ub], [4, 100]);
   assert.equal(m2.d['a.com'].nu, 2);
   assert.deepEqual(stripAiFields(m.d), { 'chatgpt.com': { n: 0, b: 0, ms: 60000 } });
 });

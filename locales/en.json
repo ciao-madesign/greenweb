@@ -198,5 +198,7 @@
   "brk.network": "Network",
   "brk.dc": "Data center",
   "brk.unsized": "Plus {n} requests without a declared size, estimated with an average size.",
-  "coef.unknown_response_kb": "Average size of unsized responses"
+  "coef.unknown_response_kb": "Average size of unsized responses",
+  "brk.unattr": "Plus {n} requests ({size} declared) from background workers, not attributable to a tab and not counted.",
+  "dash.unattr": "Requests from background workers of open sites, not attributable to a tab and not included in the estimate: {n} ({size} declared)."
 }

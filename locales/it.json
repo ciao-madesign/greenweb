@@ -198,5 +198,7 @@
   "brk.network": "Rete",
   "brk.dc": "Data center",
   "brk.unsized": "Più {n} richieste senza dimensione dichiarata, stimate con una dimensione media.",
-  "coef.unknown_response_kb": "Dimensione media delle risposte senza dimensione"
+  "coef.unknown_response_kb": "Dimensione media delle risposte senza dimensione",
+  "brk.unattr": "Più {n} richieste ({size} dichiarati) di lavoratori in background, non attribuibili a una scheda e non contate.",
+  "dash.unattr": "Richieste di lavoratori in background di siti aperti, non attribuibili a una scheda e non incluse nella stima: {n} ({size} dichiarati)."
 }

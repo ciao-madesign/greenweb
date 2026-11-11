@@ -165,6 +165,9 @@ function renderDetails() {
   const body = $('sites').tBodies[0];
   body.replaceChildren();
   const a = analysePeriod(state.period);
+  const ua = a.rows.reduce((s, r) => s + (r.e.ua ?? 0), 0), ub = a.rows.reduce((s, r) => s + (r.e.ub ?? 0), 0);
+  $('unattr').hidden = ua === 0;
+  $('unattr').textContent = ua ? t('dash.unattr', { n: new Intl.NumberFormat(lang).format(ua), size: formatBytes(ub) }) : '';
   for (const r of [...a.rows].sort((x, y) => y.est.wh.mid - x.est.wh.mid).slice(0, 20)) {
     const tr = body.insertRow();
     cell(tr, r.host, '', false);
@@ -172,7 +175,7 @@ function renderDetails() {
     cell(tr, new Intl.NumberFormat(lang).format(r.e.n));
     cell(tr, r.e.p ? new Intl.NumberFormat(lang).format(r.e.p) : '–');
     cell(tr, `${new Intl.NumberFormat(lang).format(Math.round(r.e.ms / 60000))} min`);
-    cell(tr, formatBytes(r.e.b), r.e.u ? t('brk.unsized', { n: r.e.u }) : '');
+    cell(tr, formatBytes(r.e.b), [r.e.nu ? t('brk.unsized', { n: r.e.nu }) : '', r.e.ua ? t('brk.unattr', { n: r.e.ua, size: formatBytes(r.e.ub ?? 0) }) : ''].filter(Boolean).join('\n'));
     metricCells(tr, r.est);
   }
 }
