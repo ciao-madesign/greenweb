@@ -3,7 +3,7 @@
 Images: `store/screenshots/` (1280×800) and `store/promo-tile-440x280.png`. Privacy policy: `PRIVACY.md` (publish it at a public URL, e.g. the repository page or the site).
 
 ## Name
-Digital Footprint Counter
+Greenweb
 
 ## Short description (≤132 characters)
 - EN: See the footprint of your browsing: energy, CO₂e and water, estimated privately on your device with documented sources.
@@ -13,7 +13,7 @@ Digital Footprint Counter
 Chrome and Edge: Productivity. Firefox: Other.
 
 ## Long description (EN)
-Digital Footprint Counter adds a small leaf to your toolbar that estimates the energy, CO₂e, water and electricity cost behind your browsing.
+Greenweb adds a small leaf to your toolbar that estimates the energy, CO₂e, water and electricity cost behind your browsing.
 
 • Green, yellow or red leaf with a badge for today's value (CO₂e, water or cost).
 • Dashboard with session, today, 7 and 30 days, breakdown by activity and by site, and everyday equivalences.
@@ -26,7 +26,7 @@ Estimates, not measurements: browsers cannot see server consumption, so every va
 Privacy: no account, no server, no telemetry. Only domain, request count, bytes and active time are kept on your device. Never page content, full addresses, prompts or passwords. Delete everything from Settings at any time.
 
 ## Long description (IT)
-Digital Footprint Counter aggiunge una piccola foglia alla barra degli strumenti che stima energia, CO₂e, acqua e costo elettrico della tua navigazione.
+Greenweb aggiunge una piccola foglia alla barra degli strumenti che stima energia, CO₂e, acqua e costo elettrico della tua navigazione.
 
 • Foglia verde, gialla o rossa con badge del valore di oggi (CO₂e, acqua o costo).
 • Dashboard con sessione, oggi, 7 e 30 giorni, ripartizione per attività e sito, equivalenze quotidiane.

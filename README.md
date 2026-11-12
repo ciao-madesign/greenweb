@@ -1,4 +1,4 @@
-# Digital Footprint Counter
+# Greenweb
 
 Free, open source browser extension that **estimates** the environmental footprint of your browsing: energy, CO₂e, water and an equivalent electricity cost. Everything runs locally: no account, no server, no telemetry.
 
@@ -27,7 +27,7 @@ Free, open source browser extension that **estimates** the environmental footpri
 ```bash
 npm test          # unit tests (Node 20+)
 npm run lint      # web-ext lint (Firefox rules)
-npm run package   # dist/digital-footprint-counter-<version>.zip
+npm run package   # dist/greenweb-<version>.zip
 python3 -I scripts/update-ember.py   # grid carbon intensity from Ember's yearly data (--apply to update)
 ```
 

@@ -1,6 +1,6 @@
 # Privacy policy
 
-Digital Footprint Counter works entirely on your device.
+Greenweb works entirely on your device.
 
 **What it stores (locally, in the browser's extension storage)**
 - For each day and each website domain: number of requests, bytes transferred (when the server declares them) and active time.
