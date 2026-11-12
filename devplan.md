@@ -28,7 +28,8 @@ Specifica completa: identificazione e controllo delle destinazioni (provider, AS
 - [x] Aggiunte Cloudflare, Fastly, Google Cloud (12.694 reti totali). Da rifare ogni trimestre insieme agli altri dati
 - [x] Prove automatiche in Chromium (`scripts/e2e-destinations.cjs`): spento/acceso, nessun URL salvato, esclusioni, dashboard, eliminazione dati; `web-ext lint` Firefox senza errori; impatto +10% CPU entro il rumore
 - [ ] Provare su Firefox reale quanto spesso `details.ip` è disponibile (obiettivo dichiarato della V1.0)
-- [ ] V1.1 Policy Engine (BLOCK/ALLOW/PREFER/REVIEW, simulazione). Richiede `webRequestBlocking`: Firefox MV3 lo supporta, Chrome MV3 no. Da decidere prima di partire
+- [x] V1.1 parte 1: regole BLOCK/ALLOW/PREFER/REVIEW con priorità e simulazione nella dashboard (nessun blocco reale), avvisi su infrastrutture condivise e dati probabili
+- [ ] V1.1 parte 2: blocco reale e modalità Monitor/Selective Control. Richiede `webRequestBlocking`: Firefox MV3 lo supporta, Chrome MV3 no. Da decidere prima di partire
 - [ ] V1.2 Intelligence ambientale (ASN registry, data center, PUE/WUE per sede, Environmental Transparency Score, aggiornamento dataset)
 - [ ] V1.3 Controllo avanzato (policy geografiche, IP condivisi, Strict Control)
 - Nota: i dataset ASN/geolocalizzazione completi pesano decine di MB: valutare un sottoinsieme o un download opzionale prima della V1.2

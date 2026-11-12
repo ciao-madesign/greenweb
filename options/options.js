@@ -3,6 +3,7 @@ import { initI18n, t, translateDom } from '../src/i18n.js';
 import { resolveProfile, metricOf, METRICS, thresholdsFor, DEFAULT_PROFILE } from '../src/engine.js';
 import { csvFromDestinations } from '../modules/destination-control/core/audit.js';
 import { loadClassifier } from '../modules/destination-control/core/loader.js';
+import { parseRules, formatRules, sanitizeRules } from '../modules/destination-control/core/policy.js';
 import { privacyOf, parseDomainList, purgeHosts, csvFromDays, stripAiFields, RETENTION_OPTIONS } from '../src/core.js';
 
 await initI18n();
@@ -26,6 +27,8 @@ fill($('lang'), [['', t('options.auto')], ...languages.map((l) => [l.code, l.nam
 fill($('retention'), RETENTION_OPTIONS.map((d) => [d, t(`retention.${d}`)]), priv.retentionDays);
 $('paused').checked = priv.paused;
 $('destinations').checked = priv.destinations;
+$('dest-rules').value = formatRules(sanitizeRules(settings.destinationRules));
+fill($('dest-unknown'), ['allow', 'review', 'block'].map((v) => [v, t(`options.dest_unknown.${v}`)]), ['review', 'block'].includes(settings.destinationUnknown) ? settings.destinationUnknown : 'allow');
 $('excluded').value = priv.excluded.join('\n');
 // Conteggio dei messaggi AI: un'opzione per servizio, tutte spente di default.
 $('ai-list').replaceChildren(...aiFile.adapters.map((a) => {
@@ -124,8 +127,11 @@ async function save() {
   const lo = num($('low').value), hi = num($('high').value);
   const metric = $('metric').value;
   const excluded = parseDomainList($('excluded').value);
+  const parsed = parseRules($('dest-rules').value);
+  const reasons = parsed.errors.map((e) => `${e.line}: ${t(`options.dest_rules_err.${e.reason}`)}`);
+  $('dest-rules-status').textContent = reasons.length ? t('options.dest_rules_invalid', { list: reasons.join('; ') }) : '';
   const next = {
-    ...settings, metric, profile: $('profile').value, device: $('device').value,
+    ...settings, destinationRules: parsed.rules, destinationUnknown: $('dest-unknown').value, metric, profile: $('profile').value, device: $('device').value,
     paused: $('paused').checked, destinations: $('destinations').checked, retentionDays: Number($('retention').value), excluded,
     aiServices: Object.fromEntries([...document.querySelectorAll('#ai-list input')].filter((b) => b.checked).map((b) => [b.dataset.service, true])),
   };
@@ -146,7 +152,7 @@ async function save() {
   if (langChanged) location.reload();
 }
 
-['co2', 'price', 'low', 'high', 'lang', 'device', 'paused', 'destinations', 'retention', 'excluded'].forEach((id) => $(id).addEventListener('change', save));
+['co2', 'price', 'low', 'high', 'lang', 'device', 'paused', 'destinations', 'dest-rules', 'dest-unknown', 'retention', 'excluded'].forEach((id) => $(id).addEventListener('change', save));
 ['metric', 'profile'].forEach((id) => $(id).addEventListener('change', async () => { await save(); refreshFields(); }));
 
 $('ai-delete').addEventListener('click', async () => {

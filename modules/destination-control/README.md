@@ -11,6 +11,14 @@ Nessun blocco nella V1.0 (Policy Engine: V1.1).
 - `core/audit.js`: registro locale `dest:<giorno>` (dominio, IP, contatori). Mai URL, parametri, cookie o contenuti. Segue la conservazione scelta, l'esclusione dei siti e "Elimina tutti i dati".
 - `ui/dashboard.js`: pannello nella dashboard.
 
+## Regole e simulazione (V1.1, parte non bloccante)
+`core/policy.js` valuta le regole dell'utente sulle destinazioni già registrate e `ui/simulation.js` mostra l'esito nella dashboard: **nessuna richiesta viene bloccata**.
+- Regole (Impostazioni, una per riga): `AZIONE tipo valore`, ad esempio `BLOCK provider Cloudflare` o `ALLOW domain example.com`. Azioni: BLOCK, PREFER, ALLOW, REVIEW. Tipi: domain, ip, cidr, asn, provider, country, region.
+- Priorità: dominio, poi IP/intervallo, poi ASN/provider, poi paese/regione, poi il comportamento predefinito. Vince la più specifica; a parità, prefisso o dominio più lungo, poi la regola scritta per prima.
+- PREFER non autorizza e non blocca. Le destinazioni non identificate seguono la scelta dell'utente (consenti per default: fail-open).
+- La simulazione avvisa quando una regola su provider o paese colpisce un'infrastruttura condivisa (CDN, cloud) e quando decide su dati solo probabili o senza informazioni.
+- Il dataset attuale non contiene ASN né paese: le regole `asn`, `country` e `region` non corrispondono a nulla finché non arrivano quei dati (V1.2).
+
 ## Dataset
 `database/ranges.json` contiene le reti di Amazon Web Services (11.495), Google Cloud (1.153), Fastly (24) e Cloudflare (22), dagli elenchi ufficiali del 12 novembre 2026 (~2,3 MB). Google Cloud indica i soli intervalli dei clienti cloud, non tutta la rete di Google. Ciò che non è nel dataset risulta "sconosciuto": è il risultato corretto, non un errore.
 Per generarlo da elenchi pubblici ufficiali già scaricati (nessuna rete nello script):

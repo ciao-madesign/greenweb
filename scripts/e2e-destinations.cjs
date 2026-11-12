@@ -72,6 +72,18 @@ const KEY = `dest:${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())
   ok('dashboard: pannello visibile, nessun errore');
   console.log(text.split('\n').slice(0, 14).join(' | '));
 
+  // 4b. Simulazione delle regole: mostra l'ipotesi e non blocca nulla
+  await setSettings({ destinations: true, destinationRules: [{ action: 'BLOCK', type: 'domain', value: 'localhost' }] });
+  await dash.reload();
+  await wait(1500);
+  const sim = await dash.locator('#dest-sim').innerText();
+  assert.ok(/would be blocked/.test(sim) && /localhost/.test(sim), `simulazione assente: ${sim}`);
+  const after = await ctx.newPage();
+  const res = await after.goto('http://localhost:8781/still-works');
+  assert.strictEqual(res.status(), 200, 'la simulazione ha bloccato una richiesta');
+  assert.deepStrictEqual(errors, [], `errori in dashboard: ${errors}`);
+  ok('simulazione: ipotesi mostrata, nessuna richiesta bloccata');
+
   // 5. Eliminazione dei dati: il registro sparisce
   const opt = await ctx.newPage();
   opt.on('dialog', (dl) => dl.accept());

@@ -3,6 +3,8 @@ import { initI18n, t, translateDom } from '../src/i18n.js';
 import { classify, lastNDays, aggregateDays, dayStorageKey, formatBytes } from '../src/core.js';
 import { makeFormatter, makeUnits } from '../src/format.js';
 import { renderDestinations } from '../modules/destination-control/ui/dashboard.js';
+import { renderSimulation } from '../modules/destination-control/ui/simulation.js';
+import { sanitizeRules } from '../modules/destination-control/core/policy.js';
 import { loadClassifier } from '../modules/destination-control/core/loader.js';
 import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
 import { gauge, donut, bars, icon } from './charts.js';
@@ -191,6 +193,7 @@ async function renderDest() {
   destClassifier ??= await loadClassifier(api);
   const days = lastNDays(PERIOD_DAYS[state.period]).map((d) => raw[`dest:${d}`] ?? {});
   renderDestinations(host, { days, classify: destClassifier.classify, index: destClassifier.index, t, lang });
+  renderSimulation($('dest-sim'), { days, rules: sanitizeRules(settings.destinationRules), unknown: settings.destinationUnknown, classify: destClassifier.classify, t, lang });
 }
 
 function render() {
