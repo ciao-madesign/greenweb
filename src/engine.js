@@ -106,6 +106,27 @@ export function sumEstimates(list) {
 
 export const DEFAULT_PROFILE = 'it';
 
+/**
+ * Classifica dei siti per valore della metrica scelta.
+ * mode 'total': valore complessivo e quota sul totale. mode 'hour': valore per ora di utilizzo, solo per i siti
+ * con almeno `minMs` di tempo attivo (sotto, il rapporto non è significativo): `hidden` conta quelli esclusi.
+ * rows: [{ host, e: { ms }, ... }]; valueOf(row) = valore centrale complessivo.
+ */
+export function rankSites(rows, valueOf, mode, { minMs = 5 * 60000, limit = 10 } = {}) {
+  const all = rows.map((r) => ({ ...r, total: valueOf(r) }));
+  const sum = all.reduce((s, r) => s + r.total, 0);
+  let list = all, hidden = 0;
+  if (mode === 'hour') {
+    list = all.filter((r) => (r.e.ms ?? 0) >= minMs);
+    hidden = all.length - list.length;
+  }
+  const ranked = list.map((r) => {
+    const hours = (r.e.ms ?? 0) / 3.6e6;
+    return { ...r, hours, v: mode === 'hour' ? r.total / hours : r.total, share: sum > 0 ? r.total / sum : 0 };
+  }).sort((a, b) => b.v - a.v);
+  return { rows: ranked.slice(0, limit), hidden, count: list.length };
+}
+
 /** Profilo effettivo: profilo scelto + override numerici dell'utente. */
 export function resolveProfile(c, settings = {}) {
   const base = { ...(c.profiles[settings.profile] ?? c.profiles[DEFAULT_PROFILE]) };

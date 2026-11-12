@@ -272,5 +272,12 @@
   "sim.verdict.default": "no rule",
   "sim.warn.shared": "shared infrastructure",
   "sim.warn.probable_data": "probable data",
-  "sim.warn.no_info": "no information"
+  "sim.warn.no_info": "no information",
+  "rank.total": "Total",
+  "rank.hour": "Per hour of use",
+  "rank.per_hour": "{v} / h",
+  "rank.none": "No site with enough usage time in this period.",
+  "rank.note_total": "Overall impact of the period and share of the total.",
+  "rank.note_hour": "Impact per hour of use, only for sites used at least {min} minutes: below that the ratio is not meaningful.",
+  "rank.hidden": "Sites left out for having less time: {n}."
 }

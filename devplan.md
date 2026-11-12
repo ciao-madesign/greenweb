@@ -35,7 +35,7 @@ Specifica completa: identificazione e controllo delle destinazioni (provider, AS
 - Nota: i dataset ASN/geolocalizzazione completi pesano decine di MB: valutare un sottoinsieme o un download opzionale prima della V1.2
 
 ## Fase 2 – Utilità quotidiana (dopo la prima release pubblica)
-- [ ] 6. Ranking dei siti (totale e per ora d'uso)
+- [x] 6. Ranking dei siti (totale con quota, e per ora d'uso solo per siti con almeno 5 minuti): nel riquadro "Siti principali" della dashboard
 - [ ] 7. Profilo dispositivo configurabile (tipo e potenza media in W; niente user agent)
 - [ ] 8. Baseline personale (media ultimi 30 giorni) e obiettivi opzionali
 - [ ] 9. Pagina Privacy audit (permessi, dati salvati, dove, cosa non viene letto)

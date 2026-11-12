@@ -272,5 +272,12 @@
   "sim.verdict.default": "nessuna regola",
   "sim.warn.shared": "infrastruttura condivisa",
   "sim.warn.probable_data": "dato probabile",
-  "sim.warn.no_info": "senza informazioni"
+  "sim.warn.no_info": "senza informazioni",
+  "rank.total": "Totale",
+  "rank.hour": "Per ora d'uso",
+  "rank.per_hour": "{v} / h",
+  "rank.none": "Nessun sito con abbastanza tempo di utilizzo in questo periodo.",
+  "rank.note_total": "Impatto complessivo del periodo e quota sul totale.",
+  "rank.note_hour": "Impatto per ora di utilizzo, solo per i siti usati almeno {min} minuti: sotto, il rapporto non è significativo.",
+  "rank.hidden": "Siti esclusi perché con meno tempo: {n}."
 }

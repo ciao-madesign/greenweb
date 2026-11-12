@@ -126,3 +126,23 @@ test('richieste senza dimensione abbassano l\'affidabilità in proporzione', () 
   assert.equal(r(6).reliability, 'low');
   assert.equal(r(3).unsized, 3);
 });
+
+import { rankSites } from '../src/engine.js';
+test('rankSites: totale con quote, per ora solo oltre il tempo minimo', () => {
+  const rows = [
+    { host: 'a.com', e: { ms: 60 * 60000 }, v: 10 },   // 1 h, 10 -> 10/h
+    { host: 'b.com', e: { ms: 6 * 60000 }, v: 6 },     // 0,1 h, 6 -> 60/h
+    { host: 'c.com', e: { ms: 60000 }, v: 30 },        // 1 min: troppo poco per l'ora
+    { host: 'd.com', e: {}, v: 4 },                    // nessun tempo
+  ];
+  const val = (r) => r.v;
+  const tot = rankSites(rows, val, 'total');
+  assert.deepEqual(tot.rows.map((r) => r.host), ['c.com', 'a.com', 'b.com', 'd.com']);
+  assert.ok(Math.abs(tot.rows[0].share - 0.6) < 1e-9);
+  const hr = rankSites(rows, val, 'hour');
+  assert.deepEqual(hr.rows.map((r) => r.host), ['b.com', 'a.com']);
+  assert.ok(Math.abs(hr.rows[0].v - 60) < 1e-9);
+  assert.equal(hr.hidden, 2);
+  assert.equal(rankSites(rows, val, 'total', { limit: 2 }).rows.length, 2);
+  assert.deepEqual(rankSites([], val, 'hour'), { rows: [], hidden: 0, count: 0 });
+});
