@@ -353,5 +353,9 @@
   "p.exp.3": "Nothing is sent automatically: you save the file.",
   "p.foot": "Public code (MIT): you can check every point.",
   "p.source": "Source code",
-  "options.privacy_audit": "Open the Privacy audit: what is stored and which permissions it uses"
+  "options.privacy_audit": "Open the Privacy audit: what is stored and which permissions it uses",
+  "options.device_power": "Average power of your device in use (W, optional)",
+  "options.device_power_hint": "If you know it (e.g. from a power meter, without an external monitor) it replaces the device type assumption, range included. Empty = the type's assumption.",
+  "options.monitor_power": "External monitor (W, optional)",
+  "options.monitor_power_hint": "Power of the connected monitor, added while you use the computer. Empty = no external monitor."
 }

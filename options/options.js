@@ -1,6 +1,6 @@
 import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
-import { resolveProfile, metricOf, METRICS, thresholdsFor, DEFAULT_PROFILE } from '../src/engine.js';
+import { devicePower, resolveProfile, metricOf, METRICS, thresholdsFor, DEFAULT_PROFILE } from '../src/engine.js';
 import { csvFromDestinations } from '../modules/destination-control/core/audit.js';
 import { loadClassifier } from '../modules/destination-control/core/loader.js';
 import { parseRules, formatRules, sanitizeRules } from '../modules/destination-control/core/policy.js';
@@ -87,6 +87,9 @@ $('ai-diag-copy').addEventListener('click', async () => {
 function refreshFields() {
   const base = coeffs.profiles[$('profile').value];
   const ov = settings.overrides ?? {};
+  $('device-power').placeholder = devicePower(coeffs, $('device').value).mid;
+  $('device-power').value = settings.devicePowerW ?? '';
+  $('monitor-power').value = settings.monitorW ?? '';
   $('co2').placeholder = base.co2_g_per_kwh;
   $('co2').value = ov.co2_g_per_kwh ?? '';
   $('price-label').textContent = t('options.price', { currency: base.currency });
@@ -130,11 +133,14 @@ async function save() {
   const parsed = parseRules($('dest-rules').value);
   const reasons = parsed.errors.map((e) => `${e.line}: ${t(`options.dest_rules_err.${e.reason}`)}`);
   $('dest-rules-status').textContent = reasons.length ? t('options.dest_rules_invalid', { list: reasons.join('; ') }) : '';
+  const dp = num($('device-power').value), mp = num($('monitor-power').value);
   const next = {
     ...settings, destinationRules: parsed.rules, destinationUnknown: $('dest-unknown').value, metric, profile: $('profile').value, device: $('device').value,
     paused: $('paused').checked, destinations: $('destinations').checked, retentionDays: Number($('retention').value), excluded,
     aiServices: Object.fromEntries([...document.querySelectorAll('#ai-list input')].filter((b) => b.checked).map((b) => [b.dataset.service, true])),
   };
+  if (dp >= 1 && dp <= 1000) next.devicePowerW = dp; else delete next.devicePowerW;
+  if (mp > 0 && mp <= 500) next.monitorW = mp; else delete next.monitorW;
   next.overrides = { ...(co2 !== undefined && { co2_g_per_kwh: co2 }), ...(price !== undefined && { price_per_kwh: price }) };
   const th = { ...(settings.thresholds ?? {}) };
   if (lo !== undefined && hi !== undefined && lo < hi) th[metric] = [lo, hi]; else delete th[metric];
@@ -152,8 +158,8 @@ async function save() {
   if (langChanged) location.reload();
 }
 
-['co2', 'price', 'low', 'high', 'lang', 'device', 'paused', 'destinations', 'dest-rules', 'dest-unknown', 'retention', 'excluded'].forEach((id) => $(id).addEventListener('change', save));
-['metric', 'profile'].forEach((id) => $(id).addEventListener('change', async () => { await save(); refreshFields(); }));
+['co2', 'price', 'low', 'high', 'lang', 'device-power', 'monitor-power', 'paused', 'destinations', 'dest-rules', 'dest-unknown', 'retention', 'excluded'].forEach((id) => $(id).addEventListener('change', save));
+['device', 'metric', 'profile'].forEach((id) => $(id).addEventListener('change', async () => { await save(); refreshFields(); }));
 
 $('ai-delete').addEventListener('click', async () => {
   const all = await api.storage.local.get(null);

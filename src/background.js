@@ -1,7 +1,7 @@
 // Service worker: raccoglie byte e tempo attivo per dominio. Nessuna rete, nessun contenuto di pagina.
 import { api, action } from './compat.js';
 import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentLength, classify, badgeValue, metaStorageKey, mergeMeta, privacyOf, isExcluded, purgeHosts, matchAdapter, maskPath, normalizeDomain } from './core.js';
-import { MODEL_VERSION, coefficientVersion, estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
+import { deviceOf, MODEL_VERSION, coefficientVersion, estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
 import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
 import { createMonitor } from '../modules/destination-control/core/monitor.js';
@@ -318,7 +318,7 @@ async function refreshBadge() {
   }
   const profile = resolveProfile(coeffs, settings);
   const metric = metricOf(settings);
-  const est = estimateDay(todayNow(), catalog.domains, classify, coeffs, settings.device);
+  const est = estimateDay(todayNow(), catalog.domains, classify, coeffs, deviceOf(settings));
   const value = convert(est.wh, profile, coeffs, est.dc_wh)[METRICS[metric].key].mid;
   const level = levelOf(value, thresholdsFor(metric, settings, profile, coeffs));
   const text = badgeValue(metric, value);

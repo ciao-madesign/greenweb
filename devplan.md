@@ -36,7 +36,7 @@ Specifica completa: identificazione e controllo delle destinazioni (provider, AS
 
 ## Fase 2 – Utilità quotidiana (dopo la prima release pubblica)
 - [x] 6. Ranking dei siti (totale con quota, e per ora d'uso solo per siti con almeno 5 minuti): nel riquadro "Siti principali" della dashboard
-- [ ] 7. Profilo dispositivo configurabile (tipo e potenza media in W; niente user agent)
+- [x] 7. Profilo dispositivo configurabile: tipo, potenza media propria (W) e monitor esterno (W) nelle Impostazioni; niente user agent. Batteria/rete elettrica non inclusa: non cambia il modello in modo difendibile
 - [ ] 8. Baseline personale (media ultimi 30 giorni) e obiettivi opzionali
 - [x] 9. Pagina Privacy audit (`privacy/`): permessi e fatti del manifest letti dal vivo, contenuto dello storage, funzioni facoltative attive, cosa non si legge, cancellazione, esportazione. I test falliscono se compare un permesso non spiegato o uno script di contenuto
 - [ ] 10. Report CSV con intervalli di stima e fonti (PDF via stampa del browser)

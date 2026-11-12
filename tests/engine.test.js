@@ -146,3 +146,24 @@ test('rankSites: totale con quote, per ora solo oltre il tempo minimo', () => {
   assert.equal(rankSites(rows, val, 'total', { limit: 2 }).rows.length, 2);
   assert.deepEqual(rankSites([], val, 'hour'), { rows: [], hidden: 0, count: 0 });
 });
+
+import { deviceOf } from '../src/engine.js';
+test('profilo dispositivo: potenza propria sostituisce il tipo, il monitor si somma', () => {
+  const laptop = c.energy.device_power_w.types.laptop;
+  assert.deepEqual(devicePower(c, { type: 'laptop' }), laptop); // senza personalizzazioni: invariato
+  assert.deepEqual(devicePower(c, { type: 'laptop', power_w: 30 }), { min: 30, mid: 30, max: 30 });
+  const m = devicePower(c, { type: 'laptop', monitor_w: 20 });
+  assert.deepEqual(m, { min: laptop.min + 20, mid: laptop.mid + 20, max: laptop.max + 20 });
+  assert.deepEqual(devicePower(c, { type: 'desktop', power_w: 50, monitor_w: 25 }), { min: 75, mid: 75, max: 75 });
+  // l'energia del dispositivo cresce di conseguenza
+  const base = estimateEntry({ n: 0, b: 0, ms: 3.6e6 }, 'browsing', c, { type: 'laptop' }).device_wh.mid;
+  const withMon = estimateEntry({ n: 0, b: 0, ms: 3.6e6 }, 'browsing', c, { type: 'laptop', monitor_w: 20 }).device_wh.mid;
+  near(withMon - base, 20);
+});
+test('deviceOf: scarta valori non validi', () => {
+  assert.deepEqual(deviceOf({ device: 'desktop', devicePowerW: 55, monitorW: 22 }), { type: 'desktop', power_w: 55, monitor_w: 22 });
+  assert.deepEqual(deviceOf({ devicePowerW: 0, monitorW: -3 }), { type: undefined, power_w: undefined, monitor_w: undefined });
+  assert.deepEqual(deviceOf({ devicePowerW: 'abc', monitorW: 5000 }), { type: undefined, power_w: undefined, monitor_w: undefined });
+  assert.deepEqual(deviceOf({ devicePowerW: '', monitorW: null }), { type: undefined, power_w: undefined, monitor_w: undefined });
+  assert.deepEqual(deviceOf(), { type: undefined, power_w: undefined, monitor_w: undefined });
+});

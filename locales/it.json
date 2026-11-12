@@ -353,5 +353,9 @@
   "p.exp.3": "Nessun invio automatico: il file lo salvi tu.",
   "p.foot": "Codice pubblico (MIT): puoi verificare ogni punto.",
   "p.source": "Codice sorgente",
-  "options.privacy_audit": "Apri il Privacy audit: che cosa è memorizzato e quali permessi usa"
+  "options.privacy_audit": "Apri il Privacy audit: che cosa è memorizzato e quali permessi usa",
+  "options.device_power": "Potenza media del tuo dispositivo in uso (W, facoltativo)",
+  "options.device_power_hint": "Se la conosci (es. da un wattmetro, senza monitor esterno) sostituisce l'ipotesi del tipo di dispositivo, anche come intervallo. Vuoto = ipotesi del tipo.",
+  "options.monitor_power": "Monitor esterno (W, facoltativo)",
+  "options.monitor_power_hint": "Potenza del monitor collegato, sommata mentre usi il computer. Vuoto = nessun monitor esterno."
 }

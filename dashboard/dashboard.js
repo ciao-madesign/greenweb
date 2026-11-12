@@ -6,7 +6,7 @@ import { renderDestinations } from '../modules/destination-control/ui/dashboard.
 import { renderSimulation } from '../modules/destination-control/ui/simulation.js';
 import { sanitizeRules } from '../modules/destination-control/core/policy.js';
 import { loadClassifier } from '../modules/destination-control/core/loader.js';
-import { rankSites, estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
+import { deviceOf, rankSites, estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
 import { gauge, donut, bars, icon } from './charts.js';
 
 const lang = await initI18n();
@@ -33,7 +33,7 @@ const el = (tag, cls, text) => Object.assign(document.createElement(tag), cls ? 
 function analyse(hosts) {
   const rows = Object.entries(hosts).map(([host, e]) => {
     const cat = classify(host, catalog.domains);
-    return { host, cat, e, est: estimateEntry(e, cat, coeffs, settings.device) };
+    return { host, cat, e, est: estimateEntry(e, cat, coeffs, deviceOf(settings)) };
   });
   return { rows, total: rows.length ? sumEstimates(rows.map((r) => r.est)) : zeroEstimate() };
 }

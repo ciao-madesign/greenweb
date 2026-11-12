@@ -14,10 +14,24 @@ const tri = (f) => Object.fromEntries(K.map((k) => [k, f(k)]));
 const ORDER = ['unavailable', 'low', 'medium', 'high'];
 const worst = (a, b) => (ORDER.indexOf(a) <= ORDER.indexOf(b) ? a : b);
 
-/** Potenza del dispositivo scelto dall'utente (terna min/mid/max, in W). */
+const inRange = (v, lo, hi) => (Number.isFinite(+v) && v !== '' && v !== null && +v >= lo && +v <= hi ? +v : undefined);
+
+/** Profilo del dispositivo dalle impostazioni: tipo, potenza media propria (W) e monitor esterno (W), se validi. */
+export function deviceOf(settings = {}) {
+  return { type: settings.device, power_w: inRange(settings.devicePowerW, 1, 1000), monitor_w: inRange(settings.monitorW, 0, 500) };
+}
+
+/**
+ * Potenza durante l'uso (terna min/mid/max, in W). `device` è il tipo (testo) oppure un profilo
+ * { type, power_w, monitor_w }. Una potenza indicata dall'utente sostituisce l'intervallo del tipo
+ * (la conosce meglio: es. da un wattmetro, senza monitor esterno); il monitor esterno si somma.
+ */
 export function devicePower(c, device) {
   const p = c.energy.device_power_w;
-  return p.types[device] ?? p.types[p.default];
+  const o = device && typeof device === 'object' ? device : { type: device };
+  const base = o.power_w > 0 ? { min: o.power_w, mid: o.power_w, max: o.power_w } : (p.types[o.type] ?? p.types[p.default]);
+  const extra = o.monitor_w > 0 ? o.monitor_w : 0;
+  return extra ? tri((k) => base[k] + extra) : base;
 }
 
 /**
