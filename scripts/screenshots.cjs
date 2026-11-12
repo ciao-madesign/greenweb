@@ -55,6 +55,7 @@ const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
   await shot('methodology', 'methodology/methodology.html', { clip: { x: 0, y: 0, width: 1280, height: 800 } });
   await shot('methodology-coefficients', 'methodology/methodology.html', { prep: async (p) => { await p.click('#coefficients summary'); await p.evaluate(() => document.getElementById('coefficients').scrollIntoView()); } });
   await shot('settings', 'options/options.html', { full: true });
+  await shot('privacy-audit', 'privacy/privacy.html', { full: true });
 
   // Immagini per gli store: 1280x800 esatti (scale css), schermata intera senza scorrimento.
   const STORE = path.join(EXT, 'store', 'screenshots');
