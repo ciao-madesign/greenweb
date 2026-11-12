@@ -4,6 +4,7 @@ import { hostFromUrl, dayKey, dayStorageKey, addSample, expiredDayKeys, contentL
 import { MODEL_VERSION, coefficientVersion, estimateDay, convert, resolveProfile, metricOf, METRICS, thresholdsFor, levelOf } from './engine.js';
 import { loadStrings, t } from './i18n.js';
 import { makeFormatter } from './format.js';
+import { createMonitor } from '../modules/destination-control/core/monitor.js';
 
 const FLUSH_DELAY_MS = 20000;   // salvataggio aggregato (non a ogni richiesta)
 // Assente = nessun input per 5 minuti (o schermo bloccato). Con soglie brevi la lettura o un video senza audio
@@ -89,6 +90,13 @@ function record(host, bytes, countRequest = true, unsized = false) {
   scheduleLive();
 }
 
+// Destination Control (modulo facoltativo): registra dominio e IP di destinazione, solo se l'utente lo attiva.
+const destinations = createMonitor({
+  api, today: () => dayKey(),
+  isMonitored: (d) => cfgReady && cfg.destinations && !cfg.paused
+    && !isExcluded(hostFromUrl(d.url) ?? '', cfg.excluded) && !isExcluded(tabHost.get(d.tabId) ?? '', cfg.excluded),
+});
+
 const FILTER = { urls: ['http://*/*', 'https://*/*'] };
 
 // La navigazione principale fissa il dominio della scheda prima dei sotto-caricamenti.
@@ -171,6 +179,7 @@ api.webRequest.onCompleted.addListener((d) => {
   if (d.tabId < 0) return countUnattributed(d);
   if (privateTabs.has(d.tabId)) return; // finestre private: ignorate
   diagCapture(d);
+  destinations.observe(d);
   countPrompt(d);
   const bytes = contentLength(d.responseHeaders);
   // Senza dimensione dichiarata: non è zero byte, è un dato mancante (204/304 e cache non sono lacune).
@@ -349,6 +358,7 @@ async function loadCfg() {
   cfg.activeAdapters = [...file.adapters, ...extra].filter((a) => cfg.aiServices[a.id]);
   cfgReady = true;
   for (const day of Object.keys(pending)) pending[day] = purgeHosts(pending[day], cfg.excluded);
+  if (!cfg.destinations) destinations.reset(); else destinations.purge((h) => isExcluded(h, cfg.excluded));
   for (const [host, bytes, count, unsized] of early.splice(0)) record(host, bytes, count, unsized);
 }
 
@@ -360,7 +370,7 @@ api.storage.onChanged.addListener((changes, area) => {
     loadCfg().then(() => { pruneOldDays(true).catch(() => {}); return refreshBadge(); }).catch(() => {});
   }
   // Chiave 'session' rimossa = l'utente ha cancellato i dati: scarta anche quelli in attesa.
-  if (changes.session && changes.session.newValue === undefined) { pending = {}; inflight = {}; cache.day = null; last = ''; refreshBadge().catch(() => {}); }
+  if (changes.session && changes.session.newValue === undefined) { pending = {}; inflight = {}; destinations.reset(); cache.day = null; last = ''; refreshBadge().catch(() => {}); }
 });
 
 // --- Avvio ------------------------------------------------------------------

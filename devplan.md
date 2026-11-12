@@ -21,6 +21,16 @@ Principi: nessun server, nessuna telemetria, nessun content script; meglio un in
 - [ ] 4. Test su Firefox reale (`webRequest`, `idle`, permessi all'installazione)
 - [ ] 5. Documenti minimi: `ARCHITECTURE.md`, `CHANGELOG.md`, `CONTRIBUTING.md`
 
+## Modulo Destination Control (specifica V1.0 ricevuta il 12 nov 2026)
+Specifica completa: identificazione e controllo delle destinazioni (provider, ASN, paese, policy BLOCK/PREFER/ALLOW/REVIEW). Codice in `modules/destination-control/`.
+- [x] V1.0 Monitoraggio e identificazione: registro locale (dominio + IP, opt-in, spento di default), ricerca IP in dataset locale, attendibilità per campo, pannello in dashboard, export CSV, nessun blocco
+- [ ] Generare e verificare il dataset reale (`scripts/build-destinations.mjs` con gli elenchi ufficiali AWS, Cloudflare, Fastly, Google): oggi `ranges.json` è vuoto, quindi tutto risulta "sconosciuto". Lo script non è stato provato su file reali
+- [ ] Provare su Firefox reale quanto spesso `details.ip` è disponibile (obiettivo dichiarato della V1.0)
+- [ ] V1.1 Policy Engine (BLOCK/ALLOW/PREFER/REVIEW, simulazione). Richiede `webRequestBlocking`: Firefox MV3 lo supporta, Chrome MV3 no. Da decidere prima di partire
+- [ ] V1.2 Intelligence ambientale (ASN registry, data center, PUE/WUE per sede, Environmental Transparency Score, aggiornamento dataset)
+- [ ] V1.3 Controllo avanzato (policy geografiche, IP condivisi, Strict Control)
+- Nota: i dataset ASN/geolocalizzazione completi pesano decine di MB: valutare un sottoinsieme o un download opzionale prima della V1.2
+
 ## Fase 2 – Utilità quotidiana (dopo la prima release pubblica)
 - [ ] 6. Ranking dei siti (totale e per ora d'uso)
 - [ ] 7. Profilo dispositivo configurabile (tipo e potenza media in W; niente user agent)

@@ -8,6 +8,7 @@ Digital Footprint Counter works entirely on your device.
 - Your settings (region, language, device, metric, thresholds).
 - In the browser's temporary memory (not on disk, cleared when the browser closes): the domain of the active tab and a timestamp, to keep counting active time while the browser puts the extension to sleep.
 - Only if you turn it on for a service (off by default): the number of messages you send to that AI service per day, and the time covered by that counting. Never what you write or what it answers.
+- Only if you turn on *Destination Control* (off by default): for each day, the domains your browser sends requests to and the IP addresses they answered from, with request counts. Never full web addresses, parameters, cookies or content. Identification (provider, network, country) uses a dataset bundled with the extension, on your device: no lookup service is contacted.
 - Data older than your retention setting (7, 30 or 90 days; 90 by default) is deleted automatically.
 
 **What it never collects**

@@ -2,6 +2,8 @@ import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
 import { classify, lastNDays, aggregateDays, dayStorageKey, formatBytes } from '../src/core.js';
 import { makeFormatter, makeUnits } from '../src/format.js';
+import { renderDestinations } from '../modules/destination-control/ui/dashboard.js';
+import { loadClassifier } from '../modules/destination-control/core/loader.js';
 import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
 import { gauge, donut, bars, icon } from './charts.js';
 
@@ -11,7 +13,7 @@ translateDom();
 const load = (p) => fetch(api.runtime.getURL(p)).then((r) => r.json());
 const days30 = lastNDays(30);
 const [raw, catalog, coeffs, eq] = await Promise.all([
-  api.storage.local.get([...days30.map(dayStorageKey), 'settings']), load('data/catalog.json'), load('data/coefficients.json'), load('data/equivalences.json'),
+  api.storage.local.get([...days30.map(dayStorageKey), ...days30.map((d) => `dest:${d}`), 'settings']), load('data/catalog.json'), load('data/coefficients.json'), load('data/equivalences.json'),
 ]);
 const settings = raw.settings ?? {};
 const stats = Object.fromEntries(days30.map((d) => [d, raw[dayStorageKey(d)] ?? {}]));
@@ -180,6 +182,17 @@ function renderDetails() {
   }
 }
 
+// Destination Control: solo se l'utente lo ha attivato. Periodo e dati seguono la stessa scelta del resto della dashboard.
+let destClassifier = null;
+async function renderDest() {
+  const host = $('dest');
+  host.hidden = settings.destinations !== true;
+  if (host.hidden) return;
+  destClassifier ??= await loadClassifier(api);
+  const days = lastNDays(PERIOD_DAYS[state.period]).map((d) => raw[`dest:${d}`] ?? {});
+  renderDestinations(host, { days, classify: destClassifier.classify, index: destClassifier.index, t, lang });
+}
+
 function render() {
   const a = analysePeriod(state.period);
   const empty = a.rows.length === 0 && !days30.some((d) => Object.keys(stats[d]).length);
@@ -191,6 +204,7 @@ function render() {
   renderWhere(a);
   renderTop(a);
   renderTrend();
+  renderDest();
   if ($('details').open) renderDetails();
 }
 

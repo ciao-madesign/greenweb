@@ -1,6 +1,8 @@
 import { api } from '../src/compat.js';
 import { initI18n, t, translateDom } from '../src/i18n.js';
 import { resolveProfile, metricOf, METRICS, thresholdsFor, DEFAULT_PROFILE } from '../src/engine.js';
+import { csvFromDestinations } from '../modules/destination-control/core/audit.js';
+import { loadClassifier } from '../modules/destination-control/core/loader.js';
 import { privacyOf, parseDomainList, purgeHosts, csvFromDays, stripAiFields, RETENTION_OPTIONS } from '../src/core.js';
 
 await initI18n();
@@ -23,6 +25,7 @@ fill($('device'), Object.keys(coeffs.energy.device_power_w.types).map((d) => [d,
 fill($('lang'), [['', t('options.auto')], ...languages.map((l) => [l.code, l.name])], settings.lang ?? '');
 fill($('retention'), RETENTION_OPTIONS.map((d) => [d, t(`retention.${d}`)]), priv.retentionDays);
 $('paused').checked = priv.paused;
+$('destinations').checked = priv.destinations;
 $('excluded').value = priv.excluded.join('\n');
 // Conteggio dei messaggi AI: un'opzione per servizio, tutte spente di default.
 $('ai-list').replaceChildren(...aiFile.adapters.map((a) => {
@@ -94,6 +97,7 @@ function refreshFields() {
   $('low').value = custom?.[0] ?? ''; $('high').value = custom?.[1] ?? '';
 }
 
+const destKeys = (all) => Object.keys(all).filter((k) => k.startsWith('dest:'));
 const dayKeys = (all) => Object.keys(all).filter((k) => k.startsWith('day:'));
 
 /** Riepilogo di ciò che è memorizzato: trasparenza sui dati. */
@@ -110,7 +114,7 @@ async function purgeExcluded(list) {
   if (!list.length) return;
   const all = await api.storage.local.get(null);
   const out = {};
-  for (const k of dayKeys(all)) out[k] = purgeHosts(all[k], list);
+  for (const k of [...dayKeys(all), ...destKeys(all)]) out[k] = purgeHosts(all[k], list);
   if (all.session) out.session = { ...all.session, stats: { all: purgeHosts(all.session.stats?.all, list) } };
   await api.storage.local.set(out);
 }
@@ -122,7 +126,7 @@ async function save() {
   const excluded = parseDomainList($('excluded').value);
   const next = {
     ...settings, metric, profile: $('profile').value, device: $('device').value,
-    paused: $('paused').checked, retentionDays: Number($('retention').value), excluded,
+    paused: $('paused').checked, destinations: $('destinations').checked, retentionDays: Number($('retention').value), excluded,
     aiServices: Object.fromEntries([...document.querySelectorAll('#ai-list input')].filter((b) => b.checked).map((b) => [b.dataset.service, true])),
   };
   next.overrides = { ...(co2 !== undefined && { co2_g_per_kwh: co2 }), ...(price !== undefined && { price_per_kwh: price }) };
@@ -142,7 +146,7 @@ async function save() {
   if (langChanged) location.reload();
 }
 
-['co2', 'price', 'low', 'high', 'lang', 'device', 'paused', 'retention', 'excluded'].forEach((id) => $(id).addEventListener('change', save));
+['co2', 'price', 'low', 'high', 'lang', 'device', 'paused', 'destinations', 'retention', 'excluded'].forEach((id) => $(id).addEventListener('change', save));
 ['metric', 'profile'].forEach((id) => $(id).addEventListener('change', async () => { await save(); refreshFields(); }));
 
 $('ai-delete').addEventListener('click', async () => {
@@ -157,7 +161,7 @@ $('ai-delete').addEventListener('click', async () => {
 $('delete').addEventListener('click', async () => {
   if (!confirm(t('options.delete_confirm'))) return;
   const all = await api.storage.local.get(null);
-  await api.storage.local.remove([...dayKeys(all), ...Object.keys(all).filter((k) => k.startsWith('meta:')), 'session']);
+  await api.storage.local.remove([...dayKeys(all), ...destKeys(all), ...Object.keys(all).filter((k) => k.startsWith('meta:')), 'session']);
   $('status').textContent = t('options.deleted');
   await refreshSummary();
 });
@@ -169,6 +173,16 @@ $('export').addEventListener('click', async () => {
   const metas = Object.fromEntries(Object.keys(all).filter((k) => k.startsWith('meta:')).map((k) => [k.slice(5), all[k]]));
   const url = URL.createObjectURL(new Blob([csvFromDays(days, metas)], { type: 'text/csv' }));
   const a = Object.assign(document.createElement('a'), { href: url, download: 'digital-footprint-counter-data.csv' });
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+});
+
+$('export-dest').addEventListener('click', async () => {
+  const all = await api.storage.local.get(null);
+  const days = Object.fromEntries(destKeys(all).map((k) => [k.slice(5), all[k]]));
+  const { classify } = await loadClassifier(api);
+  const url = URL.createObjectURL(new Blob([csvFromDestinations(days, classify)], { type: 'text/csv' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: 'digital-footprint-counter-destinations.csv' });
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 });
