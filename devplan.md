@@ -25,7 +25,7 @@ Principi: nessun server, nessuna telemetria, nessun content script; meglio un in
 Specifica completa: identificazione e controllo delle destinazioni (provider, ASN, paese, policy BLOCK/PREFER/ALLOW/REVIEW). Codice in `modules/destination-control/`.
 - [x] V1.0 Monitoraggio e identificazione: registro locale (dominio + IP, opt-in, spento di default), ricerca IP in dataset locale, attendibilità per campo, pannello in dashboard, export CSV, nessun blocco
 - [x] Dataset con le reti AWS (elenco ufficiale, 11.495 intervalli)
-- [ ] Aggiungere Cloudflare, Fastly, Google Cloud: servono gli host `www.cloudflare.com`, `api.fastly.com`, `www.gstatic.com` raggiungibili, poi rieseguire `scripts/build-destinations.mjs` con tutti i file. Parti Cloudflare/Fastly/Google dello script non provate su file reali
+- [x] Aggiunte Cloudflare, Fastly, Google Cloud (12.694 reti totali). Da rifare ogni trimestre insieme agli altri dati
 - [ ] Provare su Firefox reale quanto spesso `details.ip` è disponibile (obiettivo dichiarato della V1.0)
 - [ ] V1.1 Policy Engine (BLOCK/ALLOW/PREFER/REVIEW, simulazione). Richiede `webRequestBlocking`: Firefox MV3 lo supporta, Chrome MV3 no. Da decidere prima di partire
 - [ ] V1.2 Intelligence ambientale (ASN registry, data center, PUE/WUE per sede, Environmental Transparency Score, aggiornamento dataset)
