@@ -172,7 +172,7 @@ $('export').addEventListener('click', async () => {
   const days = Object.fromEntries(dayKeys(all).map((k) => [k.slice(4), all[k]]));
   const metas = Object.fromEntries(Object.keys(all).filter((k) => k.startsWith('meta:')).map((k) => [k.slice(5), all[k]]));
   const url = URL.createObjectURL(new Blob([csvFromDays(days, metas)], { type: 'text/csv' }));
-  const a = Object.assign(document.createElement('a'), { href: url, download: 'digital-footprint-counter-data.csv' });
+  const a = Object.assign(document.createElement('a'), { href: url, download: 'greenweb-data.csv' });
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 });
@@ -182,7 +182,7 @@ $('export-dest').addEventListener('click', async () => {
   const days = Object.fromEntries(destKeys(all).map((k) => [k.slice(5), all[k]]));
   const { classify } = await loadClassifier(api);
   const url = URL.createObjectURL(new Blob([csvFromDestinations(days, classify)], { type: 'text/csv' }));
-  const a = Object.assign(document.createElement('a'), { href: url, download: 'digital-footprint-counter-destinations.csv' });
+  const a = Object.assign(document.createElement('a'), { href: url, download: 'greenweb-destinations.csv' });
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 });
