@@ -28,16 +28,17 @@ Specifica completa: identificazione e controllo delle destinazioni (provider, AS
 - [x] Aggiunte Cloudflare, Fastly, Google Cloud (12.694 reti totali). Da rifare ogni trimestre insieme agli altri dati
 - [x] Prove automatiche in Chromium (`scripts/e2e-destinations.cjs`): spento/acceso, nessun URL salvato, esclusioni, dashboard, eliminazione dati; `web-ext lint` Firefox senza errori; impatto +10% CPU entro il rumore
 - [ ] Provare su Firefox reale quanto spesso `details.ip` è disponibile (obiettivo dichiarato della V1.0)
-- [ ] V1.1 Policy Engine (BLOCK/ALLOW/PREFER/REVIEW, simulazione). Richiede `webRequestBlocking`: Firefox MV3 lo supporta, Chrome MV3 no. Da decidere prima di partire
+- [x] V1.1 parte 1: regole BLOCK/ALLOW/PREFER/REVIEW con priorità e simulazione nella dashboard (nessun blocco reale), avvisi su infrastrutture condivise e dati probabili
+- [ ] V1.1 parte 2: blocco reale e modalità Monitor/Selective Control. Richiede `webRequestBlocking`: Firefox MV3 lo supporta, Chrome MV3 no. Da decidere prima di partire
 - [ ] V1.2 Intelligence ambientale (ASN registry, data center, PUE/WUE per sede, Environmental Transparency Score, aggiornamento dataset)
 - [ ] V1.3 Controllo avanzato (policy geografiche, IP condivisi, Strict Control)
 - Nota: i dataset ASN/geolocalizzazione completi pesano decine di MB: valutare un sottoinsieme o un download opzionale prima della V1.2
 
 ## Fase 2 – Utilità quotidiana (dopo la prima release pubblica)
-- [ ] 6. Ranking dei siti (totale e per ora d'uso)
+- [x] 6. Ranking dei siti (totale con quota, e per ora d'uso solo per siti con almeno 5 minuti): nel riquadro "Siti principali" della dashboard
 - [ ] 7. Profilo dispositivo configurabile (tipo e potenza media in W; niente user agent)
 - [ ] 8. Baseline personale (media ultimi 30 giorni) e obiettivi opzionali
-- [ ] 9. Pagina Privacy audit (permessi, dati salvati, dove, cosa non viene letto)
+- [x] 9. Pagina Privacy audit (`privacy/`): permessi e fatti del manifest letti dal vivo, contenuto dello storage, funzioni facoltative attive, cosa non si legge, cancellazione, esportazione. I test falliscono se compare un permesso non spiegato o uno script di contenuto
 - [ ] 10. Report CSV con intervalli di stima e fonti (PDF via stampa del browser)
 
 ## Fase 3 – Solo se serve

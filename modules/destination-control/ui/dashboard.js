@@ -44,4 +44,7 @@ export function renderDestinations(host, { days, classify, index, t, lang }) {
   const wrap = el('div', '', 'scroll');
   wrap.append(table);
   host.append(wrap, el('p', t('dest.limits'), 'muted small'));
+  const sim = el('div');
+  sim.id = 'dest-sim';
+  host.append(sim);
 }

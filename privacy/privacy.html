@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Digital Footprint Counter</title>
+  <link rel="stylesheet" href="../dashboard/dashboard.css">
+  <link rel="stylesheet" href="../methodology/methodology.css">
+  <link rel="stylesheet" href="privacy.css">
+</head>
+<body>
+  <main>
+    <header class="top">
+      <div class="brand"><img src="../icons/leaf-green-48.png" alt="" width="26" height="26"><span data-i18n="nav.privacy"></span></div>
+      <nav><a href="../dashboard/dashboard.html" data-i18n="nav.dashboard"></a><a href="#" id="settings-link" data-i18n="options.title"></a></nav>
+    </header>
+
+    <p class="lead" data-i18n="p.lead"></p>
+
+    <section class="card">
+      <h2 data-i18n="p.checks"></h2>
+      <p class="muted small" data-i18n="p.checks_hint"></p>
+      <ul class="checks" id="checks"></ul>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="p.perms"></h2>
+      <div class="scroll"><table id="perms"><thead><tr><th data-i18n="p.perm"></th><th data-i18n="p.why"></th></tr></thead><tbody></tbody></table></div>
+      <p class="note small" id="perm-note"></p>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="p.stored"></h2>
+      <p class="muted small" data-i18n="p.stored_hint"></p>
+      <div class="scroll"><table id="stored"><thead><tr><th data-i18n="p.what"></th><th data-i18n="p.contains"></th><th data-i18n="p.entries"></th><th data-i18n="p.size"></th></tr></thead><tbody></tbody></table></div>
+      <p class="muted small" id="stored-total"></p>
+    </section>
+
+    <section class="card">
+      <h2 data-i18n="p.optional"></h2>
+      <ul class="checks" id="optional"></ul>
+    </section>
+
+    <section class="trio">
+      <div class="card"><h2 data-i18n="p.never"></h2><ul id="never"></ul></div>
+      <div class="card"><h2 data-i18n="p.delete"></h2><ul id="delete"></ul></div>
+      <div class="card"><h2 data-i18n="p.export"></h2><ul id="export"></ul></div>
+    </section>
+
+    <p class="muted small foot"><span data-i18n="p.foot"></span> <a href="https://github.com/ciao-madesign/greenweb" data-i18n="p.source"></a></p>
+  </main>
+  <script type="module" src="privacy.js"></script>
+</body>
+</html>

@@ -25,10 +25,14 @@
     <section class="card" id="privacy">
       <h2 data-i18n="options.privacy"></h2>
       <p class="note" data-i18n="options.private_note"></p>
+      <p class="note"><a href="../privacy/privacy.html" data-i18n="options.privacy_audit"></a></p>
       <label class="check"><input type="checkbox" id="paused"><span><b data-i18n="options.pause"></b><small data-i18n="options.pause_hint"></small></span></label>
       <label><span data-i18n="options.retention"></span><select id="retention"></select></label>
       <label><span data-i18n="options.excluded"></span><textarea id="excluded" rows="4" spellcheck="false" placeholder="mybank.com"></textarea><small data-i18n="options.excluded_hint"></small></label>
       <label class="check"><input type="checkbox" id="destinations"><span><b data-i18n="options.dest"></b><small data-i18n="options.dest_hint"></small></span></label>
+      <label><span data-i18n="options.dest_rules"></span><textarea id="dest-rules" rows="5" spellcheck="false" placeholder="BLOCK provider Example Cloud&#10;ALLOW domain example.com"></textarea><small data-i18n="options.dest_rules_hint"></small></label>
+      <p class="note" id="dest-rules-status" role="status"></p>
+      <label><span data-i18n="options.dest_unknown"></span><select id="dest-unknown"></select></label>
       <fieldset class="ai">
         <legend data-i18n="options.ai"></legend>
         <p class="note" data-i18n="options.ai_hint"></p>

@@ -3,8 +3,10 @@ import { initI18n, t, translateDom } from '../src/i18n.js';
 import { classify, lastNDays, aggregateDays, dayStorageKey, formatBytes } from '../src/core.js';
 import { makeFormatter, makeUnits } from '../src/format.js';
 import { renderDestinations } from '../modules/destination-control/ui/dashboard.js';
+import { renderSimulation } from '../modules/destination-control/ui/simulation.js';
+import { sanitizeRules } from '../modules/destination-control/core/policy.js';
 import { loadClassifier } from '../modules/destination-control/core/loader.js';
-import { estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
+import { rankSites, estimateEntry, convert, sumEstimates, zeroEstimate, resolveProfile, equivalences, metricOf, thresholdsFor, levelOf, METRICS, DEFAULT_PROFILE } from '../src/engine.js';
 import { gauge, donut, bars, icon } from './charts.js';
 
 const lang = await initI18n();
@@ -23,7 +25,7 @@ const fmt = makeFormatter(lang, profile.currency);
 const units = makeUnits(lang);
 const pct = new Intl.NumberFormat(lang, { style: 'percent', maximumFractionDigits: 0 });
 const PERIOD_DAYS = { day: 1, week: 7, month: 30 };
-const state = { period: 'day', metric: metricOf(settings) };
+const state = { rank: 'total', period: 'day', metric: metricOf(settings) };
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, text) => Object.assign(document.createElement(tag), cls ? { className: cls } : {}, text !== undefined ? { textContent: text } : {});
 
@@ -104,21 +106,27 @@ function renderWhere(a) {
 }
 
 function renderTop(a) {
-  const m = state.metric;
-  const rows = a.rows.map((r) => ({ ...r, v: triOf(r.est, m).mid })).sort((x, y) => y.v - x.v).slice(0, 5);
-  const max = rows[0]?.v || 1;
-  $('top').replaceChildren(...rows.map((r) => {
+  const m = state.metric, unit = unitOf(m);
+  const r = rankSites(a.rows, (x) => triOf(x.est, m).mid, state.rank);
+  const max = r.rows[0]?.v || 1;
+  $('top').replaceChildren(...r.rows.map((x) => {
     const row = el('div', 'top-row');
-    const name = el('span', 'name', r.host);
-    name.title = `${r.host} · ${fmt(r.v, unitOf(m))}`;
+    const name = el('span', 'name', x.host);
+    const perHour = state.rank === 'hour';
+    name.title = `${x.host} · ${fmt(x.total, unit)} · ${new Intl.NumberFormat(lang).format(Math.round(x.hours * 60))} min`;
     const track = el('div', 'track');
     const fill = el('div', 'fill');
-    fill.style.inlineSize = `${Math.max(3, (r.v / max) * 100)}%`;
-    fill.style.background = `var(--cat-${r.cat})`;
+    fill.style.inlineSize = `${Math.max(3, (x.v / max) * 100)}%`;
+    fill.style.background = `var(--cat-${x.cat})`;
     track.append(fill);
-    row.append(name, track);
+    const value = el('span', 'val', perHour ? t('rank.per_hour', { v: fmt(x.v, unit) }) : `${fmt(x.v, unit)} · ${pct.format(x.share)}`);
+    row.append(name, track, value);
     return row;
   }));
+  if (!r.rows.length) $('top').replaceChildren(el('p', t('rank.none'), 'muted small'));
+  $('rank-note').textContent = state.rank === 'hour'
+    ? t('rank.note_hour', { min: 5 }) + (r.hidden ? ` ${t('rank.hidden', { n: r.hidden })}` : '')
+    : t('rank.note_total');
 }
 
 function renderTrend() {
@@ -191,6 +199,7 @@ async function renderDest() {
   destClassifier ??= await loadClassifier(api);
   const days = lastNDays(PERIOD_DAYS[state.period]).map((d) => raw[`dest:${d}`] ?? {});
   renderDestinations(host, { days, classify: destClassifier.classify, index: destClassifier.index, t, lang });
+  renderSimulation($('dest-sim'), { days, rules: sanitizeRules(settings.destinationRules), unknown: settings.destinationUnknown, classify: destClassifier.classify, t, lang });
 }
 
 function render() {
@@ -211,6 +220,7 @@ function render() {
 // --- Avvio ------------------------------------------------------------------------
 segmented($('period'), ['day', 'week', 'month'].map((p) => [p, t(`period.${p}`)]), state.period, (p) => { state.period = p; render(); });
 segmented($('metric'), Object.keys(METRICS).map((m) => [m, t(`metric.${m}`)]), state.metric, (m) => { state.metric = m; render(); });
+segmented($('rank-mode'), ['total', 'hour'].map((k) => [k, t(`rank.${k}`)]), state.rank, (k) => { state.rank = k; renderTop(analysePeriod(state.period)); });
 $('details').addEventListener('toggle', () => { if ($('details').open) renderDetails(); });
 function showPause() {
   $('pause').textContent = t(settings.paused ? 'pause.off' : 'pause.on');
