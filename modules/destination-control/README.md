@@ -12,7 +12,7 @@ Nessun blocco nella V1.0 (Policy Engine: V1.1).
 - `ui/dashboard.js`: pannello nella dashboard.
 
 ## Dataset
-`database/ranges.json` è **vuoto** finché non viene generato: senza dataset tutto risulta "sconosciuto" (è il risultato corretto, non un errore).
+`database/ranges.json` contiene oggi **solo le reti di Amazon Web Services** (11.495 intervalli, elenco ufficiale del 12 novembre 2026, ~2 MB). Cloudflare, Fastly e Google Cloud mancano (host non raggiungibili dall'ambiente di sviluppo). Ciò che non è nel dataset risulta "sconosciuto": è il risultato corretto, non un errore.
 Per generarlo da elenchi pubblici ufficiali già scaricati (nessuna rete nello script):
 
 ```bash

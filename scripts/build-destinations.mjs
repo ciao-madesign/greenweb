@@ -22,8 +22,18 @@ if (args.aws) {
   const j = json(args.aws);
   const rows = [...(j.prefixes ?? []).map((p) => ({ cidr: p.ip_prefix, region: p.region, service: p.service })),
     ...(j.ipv6_prefixes ?? []).map((p) => ({ cidr: p.ipv6_prefix, region: p.region, service: p.service }))];
+  // Lo stesso intervallo compare una volta per servizio: si unisce. CDN se è anche CloudFront; la regione
+  // si indica solo se è una sola (altrimenti resta vuota, non si sceglie a caso).
+  const byCidr = new Map();
+  for (const r of rows) {
+    const e = byCidr.get(r.cidr) ?? { services: new Set(), regions: new Set() };
+    e.services.add(r.service);
+    if (r.region && r.region !== 'GLOBAL') e.regions.add(r.region);
+    byCidr.set(r.cidr, e);
+  }
   add('aws', 'AWS IP address ranges', 'https://ip-ranges.amazonaws.com/ip-ranges.json', 'AWS Customer Agreement / public file',
-    rows.map((r) => ({ cidr: r.cidr, owner: 'Amazon Web Services', provider: 'Amazon Web Services', type: r.service === 'CLOUDFRONT' ? 'cdn' : 'cloud', region: r.region === 'GLOBAL' ? null : r.region, region_declared_by_operator: true })));
+    [...byCidr].map(([cidr, e]) => ({ cidr, owner: 'Amazon Web Services', provider: 'Amazon Web Services', type: [...e.services].some((x) => x.startsWith('CLOUDFRONT')) ? 'cdn' : 'cloud',
+      region: e.regions.size === 1 ? [...e.regions][0] : null, region_declared_by_operator: e.regions.size === 1 })));
 }
 if (args['cloudflare-v4'] || args['cloudflare-v6']) {
   const rows = [...(args['cloudflare-v4'] ? lines(args['cloudflare-v4']) : []), ...(args['cloudflare-v6'] ? lines(args['cloudflare-v6']) : [])];
