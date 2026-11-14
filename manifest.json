@@ -37,7 +37,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "digital-footprint-counter@greenweb.local",
+      "id": "greenweb@ciao-madesign",
       "strict_min_version": "121.0",
       "data_collection_permissions": {
         "required": [

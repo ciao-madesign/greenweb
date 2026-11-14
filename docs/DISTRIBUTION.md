@@ -51,3 +51,6 @@ Statistiche degli store (installazioni, attivi), stelle e download su GitHub, se
 - **Revisione degli store**: giustificare bene `webRequest` e l'accesso ai siti; non usare affermazioni ambientali non verificabili nella descrizione (usiamo "stima").
 - **Fiducia**: valori `to_verify` e `assumption` restano visibili; chi li corregge va ringraziato pubblicamente.
 - **Aggiornamento dei coefficienti**: pianificare una revisione annuale dei dati (intensità carbonica, prezzi).
+
+## 8. Nota su Firefox (AMO): ID e canale
+Il canale (elencato o non elencato) si sceglie alla prima versione di un ID e non si cambia: un ID nato come "non elencato" non può avere una scheda pubblica. La versione 0.1.0 è stata caricata così con l'ID `digital-footprint-counter@greenweb.local`; per la scheda pubblica l'ID è stato cambiato in `greenweb@ciao-madesign` (versione 0.1.1, canale "Su questo sito"). Non cambiare più l'ID: è permanente, anche se l'estensione viene eliminata.
