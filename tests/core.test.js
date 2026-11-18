@@ -101,7 +101,9 @@ test('manifest: nessuna connessione esterna consentita dalla CSP', () => {
 import { privacyOf, normalizeDomain, parseDomainList, isExcluded, purgeHosts, csvFromDays } from '../src/core.js';
 
 test('privacyOf: valori predefiniti prudenti e validazione', () => {
-  assert.deepEqual(privacyOf({}), { paused: false, retentionDays: 90, excluded: [], aiServices: {} });
+  assert.deepEqual(privacyOf({}), { paused: false, retentionDays: 90, excluded: [], destinations: false, aiServices: {} });
+  assert.equal(privacyOf({ destinations: true }).destinations, true);
+  assert.equal(privacyOf({ destinations: 'yes' }).destinations, false);
   assert.equal(privacyOf({ retentionDays: 5 }).retentionDays, 90);
   assert.equal(privacyOf({ retentionDays: 30, paused: true }).paused, true);
 });

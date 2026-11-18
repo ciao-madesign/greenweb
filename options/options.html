@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Digital Footprint Counter</title>
+  <title>Greenweb</title>
   <link rel="stylesheet" href="../dashboard/dashboard.css">
   <link rel="stylesheet" href="options.css">
 </head>
@@ -19,15 +19,22 @@
       <label><span data-i18n="options.metric"></span><select id="metric"></select></label>
       <label><span data-i18n="options.profile"></span><select id="profile"></select></label>
       <label><span data-i18n="options.device"></span><select id="device"></select></label>
+      <label><span data-i18n="options.device_power"></span><input type="number" id="device-power" min="1" max="1000" step="1" inputmode="decimal"><small data-i18n="options.device_power_hint"></small></label>
+      <label><span data-i18n="options.monitor_power"></span><input type="number" id="monitor-power" min="0" max="500" step="1" inputmode="decimal"><small data-i18n="options.monitor_power_hint"></small></label>
       <label><span data-i18n="options.language"></span><select id="lang"></select></label>
     </section>
 
     <section class="card" id="privacy">
       <h2 data-i18n="options.privacy"></h2>
       <p class="note" data-i18n="options.private_note"></p>
+      <p class="note"><a href="../privacy/privacy.html" data-i18n="options.privacy_audit"></a></p>
       <label class="check"><input type="checkbox" id="paused"><span><b data-i18n="options.pause"></b><small data-i18n="options.pause_hint"></small></span></label>
       <label><span data-i18n="options.retention"></span><select id="retention"></select></label>
       <label><span data-i18n="options.excluded"></span><textarea id="excluded" rows="4" spellcheck="false" placeholder="mybank.com"></textarea><small data-i18n="options.excluded_hint"></small></label>
+      <label class="check"><input type="checkbox" id="destinations"><span><b data-i18n="options.dest"></b><small data-i18n="options.dest_hint"></small></span></label>
+      <label><span data-i18n="options.dest_rules"></span><textarea id="dest-rules" rows="5" spellcheck="false" placeholder="BLOCK provider Example Cloud&#10;ALLOW domain example.com"></textarea><small data-i18n="options.dest_rules_hint"></small></label>
+      <p class="note" id="dest-rules-status" role="status"></p>
+      <label><span data-i18n="options.dest_unknown"></span><select id="dest-unknown"></select></label>
       <fieldset class="ai">
         <legend data-i18n="options.ai"></legend>
         <p class="note" data-i18n="options.ai_hint"></p>
@@ -45,6 +52,7 @@
       <p class="note" id="summary"></p>
       <div class="row">
         <button id="export" class="plain" data-i18n="options.export"></button>
+        <button id="export-dest" class="plain" data-i18n="options.export_dest"></button>
         <button id="delete" data-i18n="options.delete"></button>
       </div>
     </section>

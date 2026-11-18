@@ -32,3 +32,14 @@ Il dispositivo, nello stesso intervallo di tempo, è stimato a 12 Wh/ora (portat
 
 ## Nota (11 novembre 2026)
 Ogni minuto, al salvataggio, si scrive anche un piccolo stato (dominio della scheda attiva e orario) in `storage.session`, memoria temporanea del browser: serve a non perdere il tempo quando il browser sospende il service worker. Costo trascurabile. Le misure sopra sono precedenti a questa modifica.
+
+## Destination Control (12 novembre 2026, Chromium headless, preliminare)
+Stessa prova di carico (1.200 richieste in 60 s), modulo spento e acceso. Il modulo registra solo dominio e IP in memoria; il dataset delle reti non viene caricato dal service worker (solo da dashboard e impostazioni).
+
+| | Modulo spento | Modulo acceso |
+|---|---|---|
+| CPU a riposo (30 s) | 0,010 s | 0,030 s |
+| CPU sotto carico (60 s) | 0,87 s | 0,96 s |
+| Memoria | 147 MB | 149 MB |
+
+Differenza sotto carico: circa +0,09 s ogni 1.200 richieste (+10%, entro il rumore della misura). Non verificato su hardware reale né su Firefox.

@@ -55,6 +55,7 @@ const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
   await shot('methodology', 'methodology/methodology.html', { clip: { x: 0, y: 0, width: 1280, height: 800 } });
   await shot('methodology-coefficients', 'methodology/methodology.html', { prep: async (p) => { await p.click('#coefficients summary'); await p.evaluate(() => document.getElementById('coefficients').scrollIntoView()); } });
   await shot('settings', 'options/options.html', { full: true });
+  await shot('privacy-audit', 'privacy/privacy.html', { full: true });
 
   // Immagini per gli store: 1280x800 esatti (scale css), schermata intera senza scorrimento.
   const STORE = path.join(EXT, 'store', 'screenshots');
@@ -96,7 +97,7 @@ const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2,
   const leaf = 'data:image/png;base64,' + fs.readFileSync(path.join(EXT, 'icons/leaf-green-128.png')).toString('base64');
   await tile.setContent(`<style>body{margin:0;width:440px;height:280px;background:#f3f6f2;font-family:system-ui,sans-serif;color:#14211a;display:grid;place-content:center;gap:14px;text-align:center}
     img{margin:0 auto}h1{margin:0;font-size:30px;line-height:1.1}p{margin:0;font-size:15px;color:#55645b}</style>
-    <img src="${leaf}" width="84" height="84"><h1>Digital Footprint Counter</h1><p>The footprint of your browsing, estimated on your device</p>`);
+    <img src="${leaf}" width="84" height="84"><h1>Greenweb</h1><p>The footprint of your browsing, estimated on your device</p>`);
   await tile.screenshot({ path: path.join(EXT, 'store', 'promo-tile-440x280.png') });
   await b.close();
   console.log('ok', fs.readdirSync(OUT));

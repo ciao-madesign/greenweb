@@ -14,10 +14,24 @@ const tri = (f) => Object.fromEntries(K.map((k) => [k, f(k)]));
 const ORDER = ['unavailable', 'low', 'medium', 'high'];
 const worst = (a, b) => (ORDER.indexOf(a) <= ORDER.indexOf(b) ? a : b);
 
-/** Potenza del dispositivo scelto dall'utente (terna min/mid/max, in W). */
+const inRange = (v, lo, hi) => (Number.isFinite(+v) && v !== '' && v !== null && +v >= lo && +v <= hi ? +v : undefined);
+
+/** Profilo del dispositivo dalle impostazioni: tipo, potenza media propria (W) e monitor esterno (W), se validi. */
+export function deviceOf(settings = {}) {
+  return { type: settings.device, power_w: inRange(settings.devicePowerW, 1, 1000), monitor_w: inRange(settings.monitorW, 0, 500) };
+}
+
+/**
+ * Potenza durante l'uso (terna min/mid/max, in W). `device` è il tipo (testo) oppure un profilo
+ * { type, power_w, monitor_w }. Una potenza indicata dall'utente sostituisce l'intervallo del tipo
+ * (la conosce meglio: es. da un wattmetro, senza monitor esterno); il monitor esterno si somma.
+ */
 export function devicePower(c, device) {
   const p = c.energy.device_power_w;
-  return p.types[device] ?? p.types[p.default];
+  const o = device && typeof device === 'object' ? device : { type: device };
+  const base = o.power_w > 0 ? { min: o.power_w, mid: o.power_w, max: o.power_w } : (p.types[o.type] ?? p.types[p.default]);
+  const extra = o.monitor_w > 0 ? o.monitor_w : 0;
+  return extra ? tri((k) => base[k] + extra) : base;
 }
 
 /**
@@ -105,6 +119,27 @@ export function sumEstimates(list) {
 }
 
 export const DEFAULT_PROFILE = 'it';
+
+/**
+ * Classifica dei siti per valore della metrica scelta.
+ * mode 'total': valore complessivo e quota sul totale. mode 'hour': valore per ora di utilizzo, solo per i siti
+ * con almeno `minMs` di tempo attivo (sotto, il rapporto non è significativo): `hidden` conta quelli esclusi.
+ * rows: [{ host, e: { ms }, ... }]; valueOf(row) = valore centrale complessivo.
+ */
+export function rankSites(rows, valueOf, mode, { minMs = 5 * 60000, limit = 10 } = {}) {
+  const all = rows.map((r) => ({ ...r, total: valueOf(r) }));
+  const sum = all.reduce((s, r) => s + r.total, 0);
+  let list = all, hidden = 0;
+  if (mode === 'hour') {
+    list = all.filter((r) => (r.e.ms ?? 0) >= minMs);
+    hidden = all.length - list.length;
+  }
+  const ranked = list.map((r) => {
+    const hours = (r.e.ms ?? 0) / 3.6e6;
+    return { ...r, hours, v: mode === 'hour' ? r.total / hours : r.total, share: sum > 0 ? r.total / sum : 0 };
+  }).sort((a, b) => b.v - a.v);
+  return { rows: ranked.slice(0, limit), hidden, count: list.length };
+}
 
 /** Profilo effettivo: profilo scelto + override numerici dell'utente. */
 export function resolveProfile(c, settings = {}) {

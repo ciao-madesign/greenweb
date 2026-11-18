@@ -1,0 +1,12 @@
+main { max-width: 52rem; }
+.checks { list-style: none; padding: 0; margin: .6rem 0 0; display: grid; gap: .45rem; }
+.checks li { display: flex; gap: .6rem; align-items: baseline; }
+.checks .mark { font-weight: 700; flex: none; inline-size: 1.2rem; }
+.checks .ok .mark { color: var(--green); }
+.checks .warn .mark { color: var(--red); }
+.checks .on .mark { color: var(--accent); }
+.checks .off .mark { color: var(--muted); }
+.checks small { display: block; color: var(--muted); }
+td, th { vertical-align: top; }
+td.num { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+code { font-size: .88em; }

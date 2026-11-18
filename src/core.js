@@ -64,7 +64,7 @@ export function expiredDayKeys(keys, keepDays, now = new Date()) {
   limit.setDate(limit.getDate() - keepDays);
   const min = dayStorageKey(dayKey(limit));
   const minMeta = metaStorageKey(dayKey(limit));
-  return keys.filter((k) => (k.startsWith('day:') && k < min) || (k.startsWith('meta:') && k < minMeta));
+  return keys.filter((k) => (k.startsWith('day:') && k < min) || (k.startsWith('meta:') && k < minMeta) || (k.startsWith('dest:') && k < `dest:${dayKey(limit)}`));
 }
 
 /** Content-Length dalle intestazioni di risposta; 0 se assente (dato non disponibile). */
@@ -140,6 +140,7 @@ export function privacyOf(settings = {}) {
     paused: !!settings.paused,
     retentionDays: RETENTION_OPTIONS.includes(settings.retentionDays) ? settings.retentionDays : 90,
     excluded: Array.isArray(settings.excluded) ? settings.excluded : [],
+    destinations: settings.destinations === true, // Destination Control: spento senza una scelta esplicita
     aiServices: settings.aiServices && typeof settings.aiServices === 'object' ? settings.aiServices : {},
   };
 }

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Digital Footprint Counter",
-  "version": "0.1.0",
+  "name": "Greenweb",
+  "version": "0.1.1",
   "description": "Estimates the environmental footprint of your browsing. Local only, no account, no telemetry.",
   "permissions": [
     "webRequest",
@@ -21,7 +21,7 @@
     "type": "module"
   },
   "action": {
-    "default_title": "Digital Footprint Counter",
+    "default_title": "Greenweb",
     "default_icon": {
       "16": "icons/leaf-green-16.png",
       "32": "icons/leaf-green-32.png",
@@ -37,7 +37,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "digital-footprint-counter@greenweb.local",
+      "id": "greenweb@ciao-madesign",
       "strict_min_version": "121.0",
       "data_collection_permissions": {
         "required": [

@@ -1,4 +1,4 @@
-# Digital Footprint Counter – Piano di sviluppo V1
+# Greenweb – Piano di sviluppo V1
 
 Estensione browser open source (WebExtensions, Manifest V3) che stima l'impatto ambientale della navigazione. Locale, senza backend, senza account, senza telemetria.
 

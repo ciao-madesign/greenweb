@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 version=$(node -p "require('./manifest.json').version")
 mkdir -p dist
-out="dist/digital-footprint-counter-${version}.zip"
+out="dist/greenweb-${version}.zip"
 rm -f "$out"
-zip -qr "$out" manifest.json src data locales dashboard methodology options icons LICENSE README.md -x '*.DS_Store'
+zip -qr "$out" manifest.json src modules data locales dashboard methodology privacy options welcome icons LICENSE README.md -x '*.DS_Store' 'modules/*/tests/*'
 echo "$out ($(du -h "$out" | cut -f1))"

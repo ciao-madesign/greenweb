@@ -1,4 +1,4 @@
-# Digital Footprint Counter
+# Greenweb
 
 Estensione browser gratuita e open source che **stima** l'impatto ambientale della navigazione: energia, CO₂e, acqua e costo elettrico equivalente. Tutto in locale: nessun account, nessun server, nessuna telemetria.
 

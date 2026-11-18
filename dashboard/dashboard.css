@@ -60,7 +60,10 @@ section { min-width: 0; }
 .legend li { display: flex; align-items: center; gap: .5rem; }
 .legend i { width: .8rem; height: .8rem; border-radius: 3px; display: block; flex: none; }
 .legend .pct { margin-inline-start: auto; color: var(--muted); font-variant-numeric: tabular-nums; }
-.top-row { display: grid; grid-template-columns: minmax(6rem, 9rem) 1fr; gap: .7rem; align-items: center; margin-block: .55rem; font-size: .92rem; }
+.top-row { display: grid; grid-template-columns: minmax(6rem, 9rem) 1fr auto; gap: .7rem; align-items: center; margin-block: .55rem; font-size: .92rem; }
+.top-row .val { color: var(--muted); font-variant-numeric: tabular-nums; font-size: .85rem; white-space: nowrap; }
+.seg-ctl.small { margin-block-end: .5rem; }
+.seg-ctl.small button { font-size: .82rem; padding: .25rem .7rem; }
 .top-row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .track { background: var(--line); border-radius: 6px; height: .8rem; }
 .fill { height: 100%; border-radius: 6px; background: var(--cat-other); }
