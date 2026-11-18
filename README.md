@@ -20,7 +20,11 @@ Free, open source browser extension that **estimates** the environmental footpri
 - Controls in Settings: pause, sites to never track, retention (7/30/90 days), CSV export of everything stored, delete all. Private windows are never tracked.
 - Permissions: `webRequest` (observe requests, read-only), `idle` (stop counting when you are away), `storage`, `alarms` (one tick per minute) and access to http/https sites (needed by `webRequest`).
 
-## Install (development)
+## Install
+- **Firefox**: [Add to Firefox on addons.mozilla.org](https://addons.mozilla.org/firefox/addon/greenweb-footprint/) (one click, automatic updates).
+- **Chrome / Edge / Brave**: not on the Chrome Web Store yet; download the zip from the [latest release](https://github.com/ciao-madesign/greenweb/releases/latest) and load it as below.
+
+### From source (development)
 - **Chrome / Edge / Brave**: `chrome://extensions` → Developer mode → *Load unpacked* → select this folder.
 - **Firefox (121+)**: `about:debugging` → This Firefox → *Load Temporary Add-on* → select `manifest.json`.
 

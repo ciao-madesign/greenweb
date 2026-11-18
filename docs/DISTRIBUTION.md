@@ -11,6 +11,8 @@ Obiettivo: chi sente parlare del progetto deve poterlo avere in **un clic**, nel
 
 Già pronti: pagina di benvenuto, sito con rilevamento del browser (`site/`), pacchetto (`npm run package`), testi e immagini per gli store (`store/`), privacy policy (`PRIVACY.md`), workflow di rilascio e di pubblicazione del sito (`.github/workflows/`).
 
+> **Stato (18 nov 2026):** Firefox è pubblicato su AMO ("Greenweb-footprint", 0.1.1, https://addons.mozilla.org/firefox/addon/greenweb-footprint/). Chrome Web Store, Edge e Opera non ancora. Release GitHub `v0.1.1`: da creare dall'interfaccia di GitHub.
+
 ## 2. Canali di installazione
 | Canale | Copre | Costo | Note |
 |---|---|---|---|

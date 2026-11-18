@@ -88,7 +88,7 @@ footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var
     <div class="cta">
       <a class="btn primary" id="install" href="#try">Try it now</a>
       <a class="btn ghost" href="#how">See how it works</a>
-      <span class="status" id="install-status">Early version for testers · Chrome, Edge, Brave and Firefox.</span>
+      <span class="status" id="install-status">Early version · Firefox add-on live · Chrome, Edge and Brave by hand.</span>
     </div>
     <img class="toolbar-shot" src="img/toolbar.png" alt="Three toolbar states of the extension: a green leaf with 20 g, a yellow leaf with 56 g and a red leaf with 172 g, each with its tooltip.">
   </section>
@@ -96,11 +96,11 @@ footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var
   <section id="try">
     <p class="eyebrow">Try it</p>
     <h2>Early version: help me test it</h2>
-    <p>Greenweb is a young project (version 0.1.1). It is free and works fully on your device, but it is not on the browser stores yet, so you install it by hand. It takes about a minute.</p>
+    <p>Greenweb is a young project (version 0.1.1). It is free and works fully on your device. On Firefox it is one click from the Mozilla add-ons site; on Chrome, Edge and Brave it is not on the store yet, so you install it by hand in about a minute.</p>
     <div class="cta"><a class="btn primary" href="https://github.com/ciao-madesign/greenweb/releases/latest">Download the latest version</a><a class="btn ghost" href="https://github.com/ciao-madesign/greenweb/issues">Tell me what you find</a></div>
     <div class="cols2">
       <div>
-        <h3>Chrome, Edge, Brave</h3>
+        <h3>Chrome, Edge, Brave <small>(Chrome Web Store: coming)</small></h3>
         <ul class="plain">
           <li><b>1.</b> Download the <code>greenweb-0.1.1.zip</code> file from the link above and unzip it into a folder.</li>
           <li><b>2.</b> Open <code>chrome://extensions</code> (Edge: <code>edge://extensions</code>) and turn on <em>Developer mode</em>.</li>
@@ -109,10 +109,8 @@ footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var
       </div>
       <div>
         <h3>Firefox</h3>
-        <ul class="plain">
-          <li>The Mozilla add-ons listing is waiting for review. When it is live, this page will link to it and installation will be one click.</li>
-          <li>Until then, for a quick look: open <code>about:debugging</code>, choose <em>This Firefox</em> → <em>Load Temporary Add-on</em> and select <code>manifest.json</code> inside the unzipped folder. Firefox removes it when you close the browser.</li>
-        </ul>
+        <p>Available on the official Mozilla add-ons site: one click, automatic updates.</p>
+        <div class="cta"><a class="btn primary" href="https://addons.mozilla.org/firefox/addon/greenweb-footprint/">Add to Firefox</a></div>
       </div>
     </div>
     <p class="note">Nothing is sent anywhere: no account, no server, no telemetry. Values are estimates with a stated range, and some data are still being verified. Feedback on the numbers is the most useful thing you can send.</p>
@@ -232,7 +230,7 @@ footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var
 <script>
 /* One button for every browser: it points to the right store once the listing exists. */
 (function () {
-  var STORES = { chrome: null, edge: null, firefox: null }; // fill with the store URLs when listings go live
+  var STORES = { chrome: null, edge: null, firefox: 'https://addons.mozilla.org/firefox/addon/greenweb-footprint/' }; // fill with the store URLs when listings go live
   var ua = navigator.userAgent, key = /Firefox\//.test(ua) ? 'firefox' : /Edg\//.test(ua) ? 'edge' : /Chrome\//.test(ua) ? 'chrome' : null;
   var names = { firefox: 'Firefox', edge: 'Edge', chrome: 'Chrome or Brave' };
   var btn = document.getElementById('install'), note = document.getElementById('install-status');
