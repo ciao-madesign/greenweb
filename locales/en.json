@@ -357,5 +357,10 @@
   "options.device_power": "Average power of your device in use (W, optional)",
   "options.device_power_hint": "If you know it (e.g. from a power meter, without an external monitor) it replaces the device type assumption, range included. Empty = the type's assumption.",
   "options.monitor_power": "External monitor (W, optional)",
-  "options.monitor_power_hint": "Power of the connected monitor, added while you use the computer. Empty = no external monitor."
+  "options.monitor_power_hint": "Power of the connected monitor, added while you use the computer. Empty = no external monitor.",
+  "options.export_report_csv": "Export estimates report (CSV)",
+  "options.export_report_json": "Export estimates report (JSON)",
+  "card.unit.title": "Unit of measure",
+  "card.unit.body": "Each figure is for a period of browsing on this device (today, 7 or 30 days) or for one website on one day. It is not a score per page or per visit.",
+  "m.related": "Related work: CO2.js and the Sustainable Web Design model (Green Web Foundation), Software Carbon Intensity for the Web (in consultation), and Firefox Profiler power profiling."
 }

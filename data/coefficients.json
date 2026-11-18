@@ -112,6 +112,21 @@
       "title": "Fraunhofer FOKUS FAME, Green Streaming white paper (Oct 2024): recommends expressing streaming energy in kWh per hour rather than kWh/GB",
       "url": "https://www.fokus.fraunhofer.de/content/dam/fokus/dokumente/fame/studien-paper/FAME_Greenstreaming_Whitepaper_2024-10_en.pdf",
       "year": 2024
+    },
+    "co2js": {
+      "title": "Green Web Foundation, CO2.js (open source library: Sustainable Web Design model and Ember grid-intensity data)",
+      "url": "https://www.thegreenwebfoundation.org/co2-js/",
+      "year": 2025
+    },
+    "gwf_profiler": {
+      "title": "Green Web Foundation, Carbon Emissions in Browser DevTools: Firefox Profiler and CO2.js (power measured by the browser; global-average grid intensity to avoid storing location)",
+      "url": "https://www.thegreenwebfoundation.org/news/carbon-emissions-in-browser-devtools-firefox-profiler-and-co2-js/",
+      "year": 2023
+    },
+    "sci_web": {
+      "title": "Green Web Foundation, How much energy does it really cost to visit a website? Part 1 (client-side energy approaches; Software Carbon Intensity for the Web, in public consultation)",
+      "url": "https://www.thegreenwebfoundation.org/news/how-much-energy-does-it-really-cost-to-visit-a-website-part-1-the-browser/",
+      "year": 2026
     }
   },
   "profiles": {
@@ -265,7 +280,8 @@
       "sources": [
         "kirkeby",
         "notebookcheck_ipad",
-        "energystar"
+        "energystar",
+        "sci_web"
       ],
       "reliability": "low",
       "status": "to_verify",
@@ -280,7 +296,8 @@
       },
       "sources": [
         "swd",
-        "mytton"
+        "mytton",
+        "co2js"
       ],
       "reliability": "medium",
       "status": "sourced",
@@ -294,7 +311,8 @@
         "max": 0.1
       },
       "sources": [
-        "swd"
+        "swd",
+        "co2js"
       ],
       "reliability": "medium",
       "status": "sourced",

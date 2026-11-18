@@ -34,6 +34,9 @@ python3 -I scripts/update-ember.py   # grid carbon intensity from Ember's yearly
 ## How it works (short)
 `energy = active hours × device power + (GB × kWh/GB | hours × kWh/h | hours × usage × energy per operation)`, then `CO₂e = energy × grid intensity`, `water = energy × L/kWh`, `cost = energy × price`. Energy is stored; the three metrics are computed on display. Details and limits: `methodology/` and [`docs/OPEN_QUESTIONS.md`](docs/OPEN_QUESTIONS.md). Extension's own footprint: [`docs/EXTENSION_IMPACT.md`](docs/EXTENSION_IMPACT.md).
 
+## Related work
+Green Web Foundation: [CO2.js](https://www.thegreenwebfoundation.org/co2-js/) and the Sustainable Web Design model (same network and data-center factors, same Ember grid data), Firefox Profiler power profiling, and Software Carbon Intensity for the Web (in consultation). Comparison: [`docs/CONFRONTO_GREEN_WEB_FOUNDATION.md`](docs/CONFRONTO_GREEN_WEB_FOUNDATION.md); alignment: [`docs/SCI_FOR_WEB.md`](docs/SCI_FOR_WEB.md); how to calibrate device power: [`docs/CALIBRAZIONE.md`](docs/CALIBRAZIONE.md).
+
 ## Contributing
 - **Language**: copy `locales/en.json` to `locales/<code>.json`, translate, add it to `data/languages.json`.
 - **Domains**: add `"domain": "category"` to `data/catalog.json` (most specific match wins).

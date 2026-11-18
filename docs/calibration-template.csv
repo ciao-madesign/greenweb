@@ -1,0 +1,2 @@
+run_id,device_type,os,browser,adblock,journey,duration_s,energy_j,idle_w,bytes,requests,notes
+1,laptop,Windows 11,Chrome 150,no,reading,240,0,0,0,0,

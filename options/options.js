@@ -4,6 +4,7 @@ import { devicePower, resolveProfile, metricOf, METRICS, thresholdsFor, DEFAULT_
 import { csvFromDestinations } from '../modules/destination-control/core/audit.js';
 import { loadClassifier } from '../modules/destination-control/core/loader.js';
 import { parseRules, formatRules, sanitizeRules } from '../modules/destination-control/core/policy.js';
+import { buildReport, reportCsv } from '../src/report.js';
 import { privacyOf, parseDomainList, purgeHosts, csvFromDays, stripAiFields, RETENTION_OPTIONS } from '../src/core.js';
 
 await initI18n();
@@ -198,6 +199,22 @@ $('export-dest').addEventListener('click', async () => {
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 10000);
 });
+
+// Rapporto delle stime con componenti, intervalli, fonti e versioni (CSV piatto oppure JSON con la provenienza).
+async function exportReport(kind) {
+  const all = await api.storage.local.get(null);
+  const days = Object.fromEntries(dayKeys(all).map((k) => [k.slice(4), all[k]]));
+  const metas = Object.fromEntries(Object.keys(all).filter((k) => k.startsWith('meta:')).map((k) => [k.slice(5), all[k]]));
+  const catalog = await load('data/catalog.json');
+  const report = buildReport({ days, metas, catalog, coeffs, settings: all.settings ?? {} });
+  const json = kind === 'json';
+  const url = URL.createObjectURL(new Blob([json ? JSON.stringify(report, null, 2) : reportCsv(report)], { type: json ? 'application/json' : 'text/csv' }));
+  const a = Object.assign(document.createElement('a'), { href: url, download: `greenweb-report.${json ? 'json' : 'csv'}` });
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+$('export-report-csv').addEventListener('click', () => exportReport('csv'));
+$('export-report-json').addEventListener('click', () => exportReport('json'));
 
 refreshFields();
 refreshSummary();

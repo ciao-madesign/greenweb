@@ -357,5 +357,10 @@
   "options.device_power": "Potenza media del tuo dispositivo in uso (W, facoltativo)",
   "options.device_power_hint": "Se la conosci (es. da un wattmetro, senza monitor esterno) sostituisce l'ipotesi del tipo di dispositivo, anche come intervallo. Vuoto = ipotesi del tipo.",
   "options.monitor_power": "Monitor esterno (W, facoltativo)",
-  "options.monitor_power_hint": "Potenza del monitor collegato, sommata mentre usi il computer. Vuoto = nessun monitor esterno."
+  "options.monitor_power_hint": "Potenza del monitor collegato, sommata mentre usi il computer. Vuoto = nessun monitor esterno.",
+  "options.export_report_csv": "Esporta il rapporto delle stime (CSV)",
+  "options.export_report_json": "Esporta il rapporto delle stime (JSON)",
+  "card.unit.title": "Unità di misura",
+  "card.unit.body": "Ogni cifra riguarda un periodo di navigazione su questo dispositivo (oggi, 7 o 30 giorni) oppure un sito in un giorno. Non è un punteggio per pagina o per visita.",
+  "m.related": "Lavori collegati: CO2.js e il modello Sustainable Web Design (Green Web Foundation), Software Carbon Intensity for the Web (in consultazione) e la misura della potenza del Firefox Profiler."
 }
