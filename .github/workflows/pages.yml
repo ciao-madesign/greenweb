@@ -2,7 +2,7 @@ name: Site
 on:
   push:
     branches: [main]
-    paths: ['site/**', 'docs/screenshots/**', 'scripts/build-site.sh']
+    paths: ['site/**', 'docs/screenshots/**', 'scripts/build-site.sh', 'scripts/package.sh', 'manifest.json', 'src/**', 'modules/**', 'data/**', 'locales/**', 'dashboard/**', 'options/**', 'privacy/**', 'welcome/**', 'methodology/**', 'icons/**']
   workflow_dispatch:
 permissions:
   contents: read
@@ -16,6 +16,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
       - run: bash scripts/build-site.sh
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3

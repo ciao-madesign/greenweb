@@ -22,7 +22,7 @@ Free, open source browser extension that **estimates** the environmental footpri
 
 ## Install
 - **Firefox**: [Add to Firefox on addons.mozilla.org](https://addons.mozilla.org/firefox/addon/greenweb-footprint/) (one click, automatic updates).
-- **Chrome / Edge / Brave**: not on the Chrome Web Store yet; download the zip from the [latest release](https://github.com/ciao-madesign/greenweb/releases/latest) and load it as below.
+- **Chrome / Edge / Brave**: not on the Chrome Web Store yet; download the zip from [the project page](https://ciao-madesign.github.io/greenweb/#try) and load it as below.
 
 ### From source (development)
 - **Chrome / Edge / Brave**: `chrome://extensions` → Developer mode → *Load unpacked* → select this folder.
