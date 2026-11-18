@@ -87,11 +87,36 @@ footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var
     <h1>See what your browsing costs the planet.</h1>
     <p class="lead">A small leaf in your toolbar estimates the energy, CO₂e and water behind what you do online. Everything is calculated on your device, and every number shows its range, its sources and its assumptions.</p>
     <div class="cta">
-      <a class="btn primary" id="install" href="https://github.com/ciao-madesign/greenweb#install-development">Install now</a>
+      <a class="btn primary" id="install" href="#try">Try it now</a>
       <a class="btn ghost" href="#how">See how it works</a>
-      <span class="status" id="install-status">Chrome · Edge · Brave · Firefox. Store listings are in preparation.</span>
+      <span class="status" id="install-status">Early version for testers · Chrome, Edge, Brave and Firefox.</span>
     </div>
     <img class="toolbar-shot" src="img/toolbar.png" alt="Three toolbar states of the extension: a green leaf with 20 g, a yellow leaf with 56 g and a red leaf with 172 g, each with its tooltip.">
+  </section>
+
+  <section id="try">
+    <p class="eyebrow">Try it</p>
+    <h2>Early version: help me test it</h2>
+    <p>Greenweb is a young project (version 0.1.1). It is free and works fully on your device, but it is not on the browser stores yet, so you install it by hand. It takes about a minute.</p>
+    <div class="cta"><a class="btn primary" href="https://github.com/ciao-madesign/greenweb/releases/latest">Download the latest version</a><a class="btn ghost" href="https://github.com/ciao-madesign/greenweb/issues">Tell me what you find</a></div>
+    <div class="cols2">
+      <div>
+        <h3>Chrome, Edge, Brave</h3>
+        <ul class="plain">
+          <li><b>1.</b> Download the <code>greenweb-0.1.1.zip</code> file from the link above and unzip it into a folder.</li>
+          <li><b>2.</b> Open <code>chrome://extensions</code> (Edge: <code>edge://extensions</code>) and turn on <em>Developer mode</em>.</li>
+          <li><b>3.</b> Press <em>Load unpacked</em> and choose the unzipped folder. Pin the leaf to the toolbar.</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Firefox</h3>
+        <ul class="plain">
+          <li>The Mozilla add-ons listing is waiting for review. When it is live, this page will link to it and installation will be one click.</li>
+          <li>Until then, for a quick look: open <code>about:debugging</code>, choose <em>This Firefox</em> → <em>Load Temporary Add-on</em> and select <code>manifest.json</code> inside the unzipped folder. Firefox removes it when you close the browser.</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">Nothing is sent anywhere: no account, no server, no telemetry. Values are estimates with a stated range, and some data are still being verified. Feedback on the numbers is the most useful thing you can send.</p>
   </section>
 
   <section id="promises">
@@ -200,7 +225,7 @@ footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var
   </section>
 
   <footer>
-    <div>Greenweb v0.1.0 · MIT © Michele Aldeni</div>
+    <div>Greenweb v0.1.1 · MIT © Michele Aldeni</div>
     <div>Screens in this page are real captures of the extension running with demo data.</div>
   </footer>
 </div>
@@ -214,7 +239,7 @@ footer { border-top: 1px solid var(--line); padding-block: 2rem 3rem; color: var
   var btn = document.getElementById('install'), note = document.getElementById('install-status');
   if (!btn || !key) return;
   if (STORES[key]) { btn.href = STORES[key]; btn.textContent = 'Add to ' + names[key]; if (note) note.textContent = 'Free · one click · updates automatically'; }
-  else if (note) note.textContent = 'Detected ' + names[key] + '. Store listing in preparation: install from source for now.';
+  else if (note) note.textContent = 'Detected ' + names[key] + '. Early version: see how to try it below.';
 })();
 </script>
 </body></html>
